@@ -141,14 +141,14 @@
 
     // קונפיגורציה (אותה בדיוק כמו ב-index.html)
     const firebaseConfig = {
-      apiKey: "YOUR_API_KEY_HERE",
-      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-      projectId: "YOUR_PROJECT_ID",
-      storageBucket: "YOUR_PROJECT_ID.appspot.com",
-      messagingSenderId: "YOUR_SENDER_ID",
-      appId: "YOUR_APP_ID",
-      measurementId: "YOUR_MEASUREMENT_ID",
-      databaseURL: "YOUR_DB_URL"
+      apiKey: "AIzaSyCeYVNOdp8N9BJdsO9eLeATX1_PX5LRG_A",
+      authDomain: "sidoravoda111.firebaseapp.com",
+      projectId: "sidoravoda111",
+      storageBucket: "sidoravoda111.firebasestorage.app",
+      messagingSenderId: "862141234850",
+      appId: "1:862141234850:web:12a616ff91e9a61002a1fb",
+      measurementId: "G-SFFCVQGW37",
+      databaseURL: "https://sidoravoda111-default-rtdb.europe-west1.firebasedatabase.app/"
     };
 
     // אתחול Firebase
@@ -165,7 +165,6 @@
         { name: "לילה", className: "schedule-laila" }
       ];
 
-      // טבלת 4 עמודות: יום, בוקר, ערב, לילה
       const table = document.createElement("table");
       table.className = "schedule-table";
 
@@ -195,7 +194,6 @@
           const cell = document.createElement("td");
           cell.className = timeObj.className;
           const pattern = `${day}-${timeObj.name}`; 
-          // אם scheduleString כולל day-time, נסמן "✓"
           if (scheduleString.includes(pattern)) {
             cell.innerHTML = `<span class="checkmark">✓</span>`;
           } else {
@@ -211,20 +209,16 @@
       return table;
     }
 
-    // מאזינים לכל שינוי בנתיב "schedules"
     onValue(ref(db, "schedules"), (snapshot) => {
       const container = document.getElementById("schedulesContainer");
-      container.innerHTML = ""; // נקה לפני שמציגים מחדש
+      container.innerHTML = "";
       
-      // המרת הסנאפשוט למערך
       const submissions = [];
       snapshot.forEach((childSnapshot) => {
         submissions.push(childSnapshot.val());
       });
       
-      // מיון לפי groupOrder: אחמ״ש (1), סטודנטים (2), קב״ט (3)
       const groupOrder = { "אחמ״ש": 1, "סטודנטים": 2, "קב״ט": 3 };
-
       submissions.sort((a, b) => {
         const aGroup = groupOrder[a.role] || 99;
         const bGroup = groupOrder[b.role] || 99;
@@ -234,7 +228,6 @@
         return aGroup - bGroup;
       });
       
-      // קיבוץ לפי role
       const grouped = {};
       submissions.forEach(entry => {
         if (!grouped[entry.role]) {
@@ -243,26 +236,21 @@
         grouped[entry.role].push(entry);
       });
       
-      // מעבר על הקבוצות לפי הסדר (אחמ״ש, סטודנטים, קב״ט)
       ["אחמ״ש", "סטודנטים", "קב״ט"].forEach(role => {
         if (grouped[role]) {
-          // כותרת קבוצה
           const groupHeader = document.createElement("div");
           groupHeader.className = "group-header";
           groupHeader.textContent = role;
           container.appendChild(groupHeader);
           
-          // הצגת כל הרשומות בקבוצה
           grouped[role].forEach(entry => {
             const entryDiv = document.createElement("div");
             entryDiv.className = "schedule-entry";
             
-            // כותרת: שם העובד
             const nameEl = document.createElement("h3");
             nameEl.textContent = entry.name + ":";
             entryDiv.appendChild(nameEl);
 
-            // טבלת משמרות
             const scheduleTitle = document.createElement("div");
             scheduleTitle.className = "schedule-title";
             scheduleTitle.textContent = "סידור משמרות:";
@@ -271,7 +259,6 @@
             const table = createScheduleTable(entry.schedule || "");
             entryDiv.appendChild(table);
             
-            // העדפות (אם קיימות)
             if (entry.preferences && entry.preferences.trim() !== "") {
               const prefEl = document.createElement("div");
               prefEl.className = "preferences";
