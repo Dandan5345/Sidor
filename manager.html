@@ -18,33 +18,401 @@
       color: #00796b;
       margin-bottom: 30px;
     }
-    .buttons-container {
-      margin: 0 auto;
-      max-width: 400px;
+    .menu {
       display: flex;
-      flex-direction: column;
+      justify-content: center;
       gap: 15px;
+      margin-bottom: 20px;
     }
-    button {
+    .menu button {
       background-color: #00796b;
       color: #fff;
       border: none;
-      padding: 15px;
+      padding: 10px 15px;
       font-size: 16px;
       border-radius: 4px;
       cursor: pointer;
     }
-    button:hover {
+    .menu button:hover {
+      background-color: #005b4f;
+    }
+    .content {
+      max-width: 900px;
+      margin: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    table, th, td {
+      border: 1px solid #ddd;
+    }
+    th, td {
+      padding: 10px;
+      text-align: center;
+    }
+    th {
+      background-color: #00796b;
+      color: #fff;
+    }
+    button.action-btn {
+      padding: 5px 10px;
+      font-size: 14px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button.edit-btn {
+      background-color: #4CAF50;
+      color: #fff;
+    }
+    button.delete-btn {
+      background-color: #f44336;
+      color: #fff;
+    }
+    button.add-btn {
+      background-color: #00796b;
+      color: #fff;
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    button.add-btn:hover {
+      background-color: #005b4f;
+    }
+    /* מודלים */
+    .modal {
+      display: none; 
+      position: fixed; 
+      z-index: 999; 
+      left: 0;
+      top: 0;
+      width: 100%; 
+      height: 100%; 
+      overflow: auto;
+      background-color: rgba(0,0,0,0.4);
+    }
+    .modal-content {
+      background-color: #fff;
+      margin: 10% auto; 
+      padding: 20px;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      position: relative;
+    }
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+      position: absolute;
+      top: 10px;
+      right: 15px;
+    }
+    .close:hover {
+      color: #000;
+    }
+    .modal-content input, .modal-content select {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .modal-content label {
+      font-weight: bold;
+      margin-bottom: 5px;
+      display: block;
+    }
+    .modal-content .radio-group {
+      margin-bottom: 10px;
+      text-align: left;
+    }
+    .modal-content .radio-group label {
+      display: inline-block;
+      margin-right: 15px;
+      font-weight: normal;
+    }
+    .modal-content button {
+      background-color: #00796b;
+      color: #fff;
+      border: none;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      width: 100%;
+    }
+    .modal-content button:hover {
       background-color: #005b4f;
     }
   </style>
 </head>
 <body>
   <h1>ניהול טופס</h1>
-  <div class="buttons-container">
+  <div class="menu">
     <button onclick="window.location.href='index.html'">חזרה לטופס הראשי</button>
     <button onclick="window.location.href='סידורים.html'">מעבר לסידורים</button>
-    <button onclick="alert('כאן יבוצע עריכת עובדים בעתיד...')">ערוך עובדים</button>
+    <button onclick="showEmployeeManagement()">ערוך עובדים</button>
   </div>
+  
+  <div class="content" id="employeeManagement" style="display: none;">
+    <button class="add-btn" onclick="openAddEmployeeModal()">הוסף עובד+</button>
+    <table id="employeesTable">
+      <thead>
+        <tr>
+          <th>שם מלא</th>
+          <th>סוג</th>
+          <th>סטודנט</th>
+          <th>מספר עובד</th>
+          <th>פעולות</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- נתוני העובדים יתמלאו כאן -->
+      </tbody>
+    </table>
+  </div>
+  
+  <!-- מודל הוספת עובד -->
+  <div id="addEmployeeModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeAddEmployeeModal()">&times;</span>
+      <h3>הוסף עובד</h3>
+      <label for="addFirstName">שם פרטי:</label>
+      <input type="text" id="addFirstName" placeholder="הזן שם פרטי">
+      <label for="addLastName">שם משפחה:</label>
+      <input type="text" id="addLastName" placeholder="הזן שם משפחה">
+      <div class="radio-group">
+        <label>סוג עובד:</label><br>
+        <label><input type="radio" name="addType" value="אחמ״ש" required> אחמ״ש</label>
+        <label><input type="radio" name="addType" value="קב״ט" required> קב״ט</label>
+      </div>
+      <div class="radio-group">
+        <label>סטודנט:</label><br>
+        <label><input type="radio" name="addStudent" value="כן" required> כן</label>
+        <label><input type="radio" name="addStudent" value="לא" required> לא</label>
+      </div>
+      <label for="addCode">מספר עובד (קוד):</label>
+      <input type="text" id="addCode" placeholder="הזן קוד">
+      <button onclick="saveNewEmployee()">שומר עובד</button>
+    </div>
+  </div>
+  
+  <!-- מודל עריכת עובד -->
+  <div id="editEmployeeModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeEditEmployeeModal()">&times;</span>
+      <h3>ערוך עובד</h3>
+      <label for="editFirstName">שם פרטי:</label>
+      <input type="text" id="editFirstName">
+      <label for="editLastName">שם משפחה:</label>
+      <input type="text" id="editLastName">
+      <div class="radio-group">
+        <label>סוג עובד:</label><br>
+        <label><input type="radio" name="editType" value="אחמ״ש" required> אחמ״ש</label>
+        <label><input type="radio" name="editType" value="קב״ט" required> קב״ט</label>
+      </div>
+      <div class="radio-group">
+        <label>סטודנט:</label><br>
+        <label><input type="radio" name="editStudent" value="כן" required> כן</label>
+        <label><input type="radio" name="editStudent" value="לא" required> לא</label>
+      </div>
+      <label for="editCode">מספר עובד (קוד):</label>
+      <input type="text" id="editCode">
+      <button onclick="updateEmployee()">עדכן עובד</button>
+    </div>
+  </div>
+  
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
+    import { getDatabase, ref, push, onValue, set, remove } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-database.js";
+    
+    const firebaseConfig = {
+      apiKey: "AIzaSyCeYVNOdp8N9BJdsO9eLeATX1_PX5LRG_A",
+      authDomain: "sidoravoda111.firebaseapp.com",
+      projectId: "sidoravoda111",
+      storageBucket: "sidoravoda111.firebasestorage.app",
+      messagingSenderId: "862141234850",
+      appId: "1:862141234850:web:12a616ff91e9a61002a1fb",
+      measurementId: "G-SFFCVQGW37",
+      databaseURL: "https://sidoravoda111-default-rtdb.europe-west1.firebasedatabase.app/"
+    };
+    
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    
+    let employees = {}; // יכיל את כל העובדים עם מפתחותיהם
+    let currentEditKey = ""; // כאשר עורכים עובד, נאחסן את מפתחו
+    
+    // מאזין לשינויים בנתוני העובדים
+    onValue(ref(db, "employees"), (snapshot) => {
+      const val = snapshot.val();
+      employees = val ? val : {};
+      renderEmployeesTable();
+    });
+    
+    // פונקציה להצגת אזור ניהול העובדים
+    function showEmployeeManagement(){
+      document.getElementById("employeeManagement").style.display = "block";
+    }
+    
+    // פונקציות לפתיחת וסגירת מודל הוספת עובד
+    function openAddEmployeeModal(){
+      document.getElementById("addEmployeeModal").style.display = "block";
+    }
+    function closeAddEmployeeModal(){
+      document.getElementById("addEmployeeModal").style.display = "none";
+      // אפס שדות
+      document.getElementById("addFirstName").value = "";
+      document.getElementById("addLastName").value = "";
+      document.getElementById("addCode").value = "";
+      const radiosType = document.getElementsByName("addType");
+      radiosType.forEach(radio => radio.checked = false);
+      const radiosStudent = document.getElementsByName("addStudent");
+      radiosStudent.forEach(radio => radio.checked = false);
+    }
+    
+    // שמירת עובד חדש ב-Firebase
+    function saveNewEmployee(){
+      const firstName = document.getElementById("addFirstName").value.trim();
+      const lastName = document.getElementById("addLastName").value.trim();
+      const code = document.getElementById("addCode").value.trim();
+      const type = document.querySelector('input[name="addType"]:checked')?.value;
+      const student = document.querySelector('input[name="addStudent"]:checked')?.value;
+      
+      if(!firstName || !lastName || !code || !type || !student){
+        alert("נא למלא את כל השדות.");
+        return;
+      }
+      
+      const newEmployee = {
+        firstName,
+        lastName,
+        code,
+        type,
+        student
+      };
+      
+      push(ref(db, "employees"), newEmployee)
+        .then(() => {
+          alert("העובד נוסף בהצלחה!");
+          closeAddEmployeeModal();
+        })
+        .catch(err => {
+          alert("אירעה שגיאה: " + err.message);
+        });
+    }
+    
+    // הצגת טבלת העובדים – סידור לפי: אחמ״ש, קב״ט (סטודנט = כן), קב״ט (סטודנט = לא)
+    function renderEmployeesTable(){
+      const tbody = document.querySelector("#employeesTable tbody");
+      tbody.innerHTML = "";
+      // המר את האובייקט למערך
+      const empArray = Object.entries(employees);
+      // הוספת קבוצת מיון: 1 עבור אחמ״ש, 2 עבור קב״ט עם סטודנט = כן, 3 עבור קב״ט עם סטודנט = לא.
+      empArray.sort((a, b) => {
+        const empA = a[1], empB = b[1];
+        const getGroup = (emp) => {
+          if(emp.type === "אחמ״ש") return 1;
+          if(emp.type === "קב״ט" && emp.student === "כן") return 2;
+          return 3;
+        };
+        const groupA = getGroup(empA), groupB = getGroup(empB);
+        if(groupA !== groupB) return groupA - groupB;
+        // אם באותה קבוצה – נשאיר את הסדר לפי הוספה (בהנחה שהמפתחות מייצגים את הסדר)
+        return a[0].localeCompare(b[0]);
+      });
+      
+      empArray.forEach(([key, emp]) => {
+        const tr = document.createElement("tr");
+        const fullName = emp.firstName + " " + emp.lastName;
+        tr.innerHTML = `
+          <td>${fullName}</td>
+          <td>${emp.type}</td>
+          <td>${emp.student}</td>
+          <td>${emp.code}</td>
+          <td>
+            <button class="action-btn edit-btn" onclick="openEditEmployeeModal('${key}')">ערוך</button>
+            <button class="action-btn delete-btn" onclick="deleteEmployee('${key}')">מחק</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+    
+    // פונקציות עריכה
+    function openEditEmployeeModal(key){
+      currentEditKey = key;
+      const emp = employees[key];
+      document.getElementById("editFirstName").value = emp.firstName;
+      document.getElementById("editLastName").value = emp.lastName;
+      document.getElementById("editCode").value = emp.code;
+      // סמן את סוג העובד
+      const radiosType = document.getElementsByName("editType");
+      radiosType.forEach(radio => {
+        radio.checked = (radio.value === emp.type);
+      });
+      // סמן את סטודנט
+      const radiosStudent = document.getElementsByName("editStudent");
+      radiosStudent.forEach(radio => {
+        radio.checked = (radio.value === emp.student);
+      });
+      document.getElementById("editEmployeeModal").style.display = "block";
+    }
+    
+    function closeEditEmployeeModal(){
+      document.getElementById("editEmployeeModal").style.display = "none";
+    }
+    
+    function updateEmployee(){
+      const firstName = document.getElementById("editFirstName").value.trim();
+      const lastName = document.getElementById("editLastName").value.trim();
+      const code = document.getElementById("editCode").value.trim();
+      const type = document.querySelector('input[name="editType"]:checked')?.value;
+      const student = document.querySelector('input[name="editStudent"]:checked')?.value;
+      
+      if(!firstName || !lastName || !code || !type || !student){
+        alert("נא למלא את כל השדות לעדכון.");
+        return;
+      }
+      
+      const updatedEmployee = {
+        firstName,
+        lastName,
+        code,
+        type,
+        student
+      };
+      
+      set(ref(db, "employees/" + currentEditKey), updatedEmployee)
+        .then(() => {
+          alert("העובד עודכן בהצלחה!");
+          closeEditEmployeeModal();
+        })
+        .catch(err => {
+          alert("אירעה שגיאה: " + err.message);
+        });
+    }
+    
+    function deleteEmployee(key){
+      if(confirm("האם אתה בטוח שברצונך למחוק עובד זה?")){
+        remove(ref(db, "employees/" + key))
+          .then(() => {
+            alert("העובד נמחק.");
+          })
+          .catch(err => {
+            alert("אירעה שגיאה: " + err.message);
+          });
+      }
+    }
+  </script>
 </body>
 </html>
