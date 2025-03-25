@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>סידור עבודה</title>
+  <!-- התאמה לנייד ומניעת זום כפול -->
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2, user-scalable=yes">
   <style>
     html, body {
@@ -87,8 +88,8 @@
   
   <h1>סידור עבודה</h1>
   
+  <!-- טופס הסידור -->
   <form id="shiftForm" onsubmit="return validateForm();">
-    
     <!-- שלב 1: בחירת תפקיד -->
     <div id="roleDiv">
       <label>בחר תפקיד:</label>
@@ -175,14 +176,18 @@
     <button type="submit">שלח</button>
   </form>
 
-  <!-- הוספת סקריפט מסוג module עם Firebase -->
+  <!-- סקריפט ה-Firebase והלוגיקה - using type="module" -->
   <script type="module">
-    // 1. ייבוא הפונקציות הדרושות
+    /********************************************
+     * 1. ייבוא הפונקציות הדרושות מ-SDK Firebase
+     ********************************************/
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-analytics.js";
     import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-database.js";
     
-    // 2. הגדרת קונפיגורציה (החלף בפרטים שלך)
+    /********************************************
+     * 2. הגדרות הפרויקט (הקוד שקיבלת מ-Firebase)
+     ********************************************/
     const firebaseConfig = {
       apiKey: "AIzaSyCeYVNOdp8N9BJdsO9eLeATX1_PX5LRG_A",
       authDomain: "sidoravoda111.firebaseapp.com",
@@ -190,21 +195,21 @@
       storageBucket: "sidoravoda111.firebasestorage.app",
       messagingSenderId: "862141234850",
       appId: "1:862141234850:web:12a616ff91e9a61002a1fb",
-      measurementId: "G-SFFCVQGW37",
-      // אם תרצה להשתמש ב-Realtime Database, צריך גם כתובת:
-      databaseURL: "https://sidoravoda111-default-rtdb.firebaseio.com"
+      measurementId: "G-SFFCVQGW37"
+      // אם יש לך כתובת ל-Realtime Database, הוסף:
+      // databaseURL: "https://sidoravoda111-default-rtdb.firebaseio.com"
     };
 
-    // 3. אתחול Firebase
+    /********************************************
+     * 3. אתחול Firebase
+     ********************************************/
     const app = initializeApp(firebaseConfig);
     const analytics = getAnalytics(app);
+    const db = getDatabase(app);  // שימוש ב-Realtime Database
 
-    // 4. אתחול ה-Database
-    const db = getDatabase(app);
-
-    // --- פונקציות ג'אווהסקריפט של הטופס ---
-
-    // התחברות מנהל
+    /********************************************
+     * 4. פונקציית התחברות מנהל
+     ********************************************/
     window.adminLogin = function() {
       const username = prompt("אנא הזן שם משתמש:");
       const password = prompt("אנא הזן סיסמא:");
@@ -216,7 +221,9 @@
       }
     };
 
-    // הצגת רשימת השמות בהתאם לתפקיד
+    /********************************************
+     * 5. פונקציה שמטפלת בהצגת רשימת השמות בהתאם לתפקיד
+     ********************************************/
     window.handleRoleChange = function() {
       var role = document.querySelector('input[name="role"]:checked').value;
       var nameSelect = document.getElementById("nameSelect");
@@ -241,19 +248,24 @@
       document.getElementById("nameDiv").style.display = "block";
     };
 
-    // הצגת טבלת המשמרות והעדפות לאחר בחירת שם
+    /********************************************
+     * 6. פונקציה שמציגה את טבלת המשמרות והעדפות לאחר בחירת שם
+     ********************************************/
     window.handleNameChange = function() {
       document.getElementById("shiftsDiv").style.display = "block";
     };
 
-    // ולידציה ושמירה ב-Firebase
+    /********************************************
+     * 7. פונקציית ולידציה לטופס + שמירת הנתונים ל-Firebase
+     ********************************************/
     window.validateForm = function() {
       // בדיקת תפקיד
-      const role = document.querySelector('input[name="role"]:checked');
-      if (!role) {
+      const roleInput = document.querySelector('input[name="role"]:checked');
+      if (!roleInput) {
         alert("אנא בחר תפקיד.");
         return false;
       }
+      const role = roleInput.value;
       
       // בדיקת שם
       const nameSelect = document.getElementById("nameSelect");
@@ -261,10 +273,11 @@
         alert("אנא בחר שם.");
         return false;
       }
+      const name = nameSelect.value;
       
       // בדיקת משמרות
-      const shiftsChecked = document.querySelectorAll('input[name="shift"]:checked');
-      const totalSelected = shiftsChecked.length;
+      const shifts = document.querySelectorAll('input[name="shift"]:checked');
+      const totalSelected = shifts.length;
       
       // תנאים מינימליים
       const minTotal = 14;
@@ -281,7 +294,7 @@
       // קבוצת משמרות מיוחדת: שישי ערב, שישי לילה, שבת בוקר, שבת ערב
       const specialShifts = new Set(["שישי-ערב", "שישי-לילה", "שבת-בוקר", "שבת-ערב"]);
       
-      shiftsChecked.forEach(shift => {
+      shifts.forEach(shift => {
         const value = shift.value;
         if (value.includes("בוקר")) countBoker++;
         if (value.includes("ערב")) countErev++;
@@ -312,26 +325,28 @@
         return false;
       }
       
-      // אם הגענו לכאן - הכל תקין, נשמור ב-Firebase
-      const shiftsArray = Array.from(shiftsChecked).map(ch => ch.value);
+      // אם הכל תקין, נשמור את הנתונים ב-Firebase
+      const preferences = document.getElementById("preferences").value;
+      const scheduleString = Array.from(shifts).map(s => s.value).join(", ");
+      
       const data = {
-        role: role.value,
-        name: nameSelect.value,
-        schedule: shiftsArray.join(", "),
-        preferences: document.getElementById("preferences").value,
+        role: role,
+        name: name,
+        schedule: scheduleString,
+        preferences: preferences,
         submissionTime: Date.now()
       };
-
-      // שמירה ב- Realtime Database
+      
+      // שמירה בנתיב "schedules"
       push(ref(db, "schedules"), data)
         .then(() => {
-          alert("הסידור נשמר בהצלחה!");
+          alert("הטופס נשלח ונשמר בהצלחה ב-Firebase!");
         })
-        .catch(err => {
-          alert("שגיאה בשמירה: " + err.message);
+        .catch((err) => {
+          alert("אירעה שגיאה בשמירה: " + err.message);
         });
-
-      return false; // מונע רענון של הטופס
+      
+      return false; // למנוע ריענון דף
     };
   </script>
 </body>
