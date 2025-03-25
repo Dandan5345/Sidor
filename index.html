@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+  <meta charset="UTF-8">
+  <title>סידור עבודה</title>
+  <style>
+    body {
+      font-family: "Arial", sans-serif;
+      background: linear-gradient(135deg, #e0f7fa, #ffffff);
+      margin: 0;
+      padding: 20px;
+      direction: rtl;
+      text-align: right;
+    }
+    h1 {
+      text-align: center;
+      color: #00796b;
+    }
+    form {
+      max-width: 800px;
+      margin: auto;
+      background-color: #fafafa;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+    label {
+      display: block;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+    select, textarea, input[type="text"] {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+    table, th, td {
+      border: 1px solid #ddd;
+    }
+    th, td {
+      padding: 10px;
+      text-align: center;
+    }
+    th {
+      background-color: #00796b;
+      color: #fff;
+    }
+    button {
+      background-color: #00796b;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      font-size: 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      display: inline-block;
+      margin: 10px 0;
+    }
+    button:hover {
+      background-color: #005b4f;
+    }
+    .admin-login {
+      float: left;
+      margin: 10px;
+    }
+    .clear {
+      clear: both;
+    }
+  </style>
+</head>
+<body>
+  <!-- כפתור התחברות מנהל -->
+  <button class="admin-login" onclick="adminLogin()">התחברות מנהל</button>
+  <div class="clear"></div>
+  
+  <h1>סידור עבודה</h1>
+  
+  <form id="shiftForm" onsubmit="return validateForm();">
+    
+    <!-- שלב 1: בחירת תפקיד -->
+    <div id="roleDiv">
+      <label>בחר תפקיד:</label>
+      <label><input type="radio" name="role" value="אחמ״ש" required onchange="handleRoleChange();"> אחמ״ש</label>
+      <label><input type="radio" name="role" value="קב״ט" required onchange="handleRoleChange();"> קב״ט</label>
+    </div>
+    
+    <br>
+    
+    <!-- שלב 2: בחירת שם (מופיע לאחר בחירת תפקיד) -->
+    <div id="nameDiv" style="display: none;">
+      <label for="nameSelect">בחר שם:</label>
+      <select id="nameSelect" name="name" required onchange="handleNameChange();">
+        <!-- אפשרויות יתמלאו דינמית בהתאם לתפקיד -->
+      </select>
+    </div>
+    
+    <br>
+    
+    <!-- שלב 3: טבלת משמרות והעדפות (מופיע לאחר בחירת שם) -->
+    <div id="shiftsDiv" style="display: none;">
+      <h3>בחר משמרות:</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>יום</th>
+            <th>בוקר</th>
+            <th>ערב</th>
+            <th>לילה</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>ראשון</td>
+            <td><input type="checkbox" name="shift" value="ראשון-בוקר"></td>
+            <td><input type="checkbox" name="shift" value="ראשון-ערב"></td>
+            <td><input type="checkbox" name="shift" value="ראשון-לילה"></td>
+          </tr>
+          <tr>
+            <td>שני</td>
+            <td><input type="checkbox" name="shift" value="שני-בוקר"></td>
+            <td><input type="checkbox" name="shift" value="שני-ערב"></td>
+            <td><input type="checkbox" name="shift" value="שני-לילה"></td>
+          </tr>
+          <tr>
+            <td>שלישי</td>
+            <td><input type="checkbox" name="shift" value="שלישי-בוקר"></td>
+            <td><input type="checkbox" name="shift" value="שלישי-ערב"></td>
+            <td><input type="checkbox" name="shift" value="שלישי-לילה"></td>
+          </tr>
+          <tr>
+            <td>רביעי</td>
+            <td><input type="checkbox" name="shift" value="רביעי-בוקר"></td>
+            <td><input type="checkbox" name="shift" value="רביעי-ערב"></td>
+            <td><input type="checkbox" name="shift" value="רביעי-לילה"></td>
+          </tr>
+          <tr>
+            <td>חמישי</td>
+            <td><input type="checkbox" name="shift" value="חמישי-בוקר"></td>
+            <td><input type="checkbox" name="shift" value="חמישי-ערב"></td>
+            <td><input type="checkbox" name="shift" value="חמישי-לילה"></td>
+          </tr>
+          <tr>
+            <td>שישי</td>
+            <td><input type="checkbox" name="shift" value="שישי-בוקר"></td>
+            <td><input type="checkbox" name="shift" value="שישי-ערב"></td>
+            <td><input type="checkbox" name="shift" value="שישי-לילה"></td>
+          </tr>
+          <tr>
+            <td>שבת</td>
+            <td><input type="checkbox" name="shift" value="שבת-בוקר"></td>
+            <td><input type="checkbox" name="shift" value="שבת-ערב"></td>
+            <td><input type="checkbox" name="shift" value="שבת-לילה"></td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <label for="preferences">העדפות (לא חובה):</label>
+      <textarea id="preferences" name="preferences" rows="3" placeholder="הזן כאן את העדפותיך (אם יש)"></textarea>
+    </div>
+    
+    <br>
+    
+    <button type="submit">שלח</button>
+  </form>
+  
+  <script>
+    // פונקציה לטיפול בהתחברות מנהל
+    function adminLogin() {
+      const username = prompt("אנא הזן שם משתמש:");
+      const password = prompt("אנא הזן סיסמא:");
+      
+      if (username === "מנהל" && password === "123") {
+        window.location.href = "סידורים.html";
+      } else {
+        alert("שם משתמש או סיסמא שגויים. נסה שוב.");
+      }
+    }
+    
+    // פונקציה שמטפלת בהצגת רשימת השמות בהתאם לתפקיד
+    function handleRoleChange() {
+      var role = document.querySelector('input[name="role"]:checked').value;
+      var nameSelect = document.getElementById("nameSelect");
+      
+      // איפוס אפשרויות
+      nameSelect.innerHTML = "";
+      var options = [];
+      if (role === "אחמ״ש") {
+        // 7 שמות עבור אחמ״ש
+        options = ["ישראל", "דוד", "משה", "אבי", "מיכל", "רחל", "יעקב"];
+      } else if (role === "קב״ט") {
+        // 10 שמות עבור קב״ט
+        options = ["משה", "יעקב", "שרה", "רחל", "דנה", "אברהם", "יוסף", "מרים", "אור", "ליאת"];
+      }
+      
+      options.forEach(function(name) {
+        var option = document.createElement("option");
+        option.value = name;
+        option.text = name;
+        nameSelect.add(option);
+      });
+      document.getElementById("nameDiv").style.display = "block";
+    }
+    
+    // פונקציה שמציגה את טבלת המשמרות והעדפות לאחר בחירת שם
+    function handleNameChange() {
+      document.getElementById("shiftsDiv").style.display = "block";
+    }
+    
+    // ולידציה לטופס
+    function validateForm() {
+      // בדיקת תפקיד
+      const role = document.querySelector('input[name="role"]:checked');
+      if (!role) {
+        alert("אנא בחר תפקיד.");
+        return false;
+      }
+      
+      // בדיקת שם
+      const nameSelect = document.getElementById("nameSelect");
+      if (!nameSelect.value) {
+        alert("אנא בחר שם.");
+        return false;
+      }
+      
+      // בדיקת משמרות
+      const shifts = document.querySelectorAll('input[name="shift"]:checked');
+      const totalSelected = shifts.length;
+      
+      // תנאים מינימליים
+      const minTotal = 14;
+      const minBoker = 2;
+      const minErev = 2;
+      const minLaila = 2;
+      const minSpecial = 2;
+      
+      let countBoker = 0;
+      let countErev = 0;
+      let countLaila = 0;
+      let countSpecial = 0;
+      
+      // קבוצת משמרות מיוחדת: שישי ערב, שישי לילה, שבת בוקר, שבת ערב
+      const specialShifts = new Set(["שישי-ערב", "שישי-לילה", "שבת-בוקר", "שבת-ערב"]);
+      
+      shifts.forEach(shift => {
+        const value = shift.value;
+        if (value.includes("בוקר")) countBoker++;
+        if (value.includes("ערב")) countErev++;
+        if (value.includes("לילה")) countLaila++;
+        if (specialShifts.has(value)) countSpecial++;
+      });
+      
+      let messages = [];
+      
+      if(totalSelected < minTotal) {
+        messages.push("יש לבחור מינימום 14 משמרות. נבחרו " + totalSelected + " משמרות.");
+      }
+      if(countBoker < minBoker) {
+        messages.push("יש לבחור מינימום 2 משמרות בוקר. נבחרו " + countBoker + " משמרות בוקר.");
+      }
+      if(countErev < minErev) {
+        messages.push("יש לבחור מינימום 2 משמרות ערב. נבחרו " + countErev + " משמרות ערב.");
+      }
+      if(countLaila < minLaila) {
+        messages.push("יש לבחור מינימום 2 משמרות לילה. נבחרו " + countLaila + " משמרות לילה.");
+      }
+      if(countSpecial < minSpecial) {
+        messages.push("יש לבחור מינימום 2 משמרות מהקבוצה (שישי ערב, שישי לילה, שבת בוקר, שבת ערב). נבחרו " + countSpecial + " משמרות.");
+      }
+      
+      if (messages.length > 0) {
+        alert(messages.join("\n"));
+        return false;
+      }
+      
+      alert("הטופס נשלח בהצלחה!");
+      return true;
+    }
+  </script>
+</body>
+</html>
