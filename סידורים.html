@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+  <meta charset="UTF-8">
+  <title>סידורים</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #fce4ec, #fff);
+      margin: 0;
+      padding: 20px;
+      direction: rtl;
+      color: #333;
+    }
+    h1 {
+      text-align: center;
+      color: #d81b60;
+    }
+    .category {
+      margin-top: 30px;
+    }
+    .category h2 {
+      border-bottom: 2px solid #c2185b;
+      padding-bottom: 5px;
+      color: #c2185b;
+    }
+    .submission {
+      border: 1px solid #ccc;
+      background-color: #fff;
+      border-radius: 6px;
+      padding: 15px;
+      margin-bottom: 15px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    }
+    .submission h3 {
+      margin-top: 0;
+      color: #c2185b;
+    }
+    .submission p {
+      margin: 5px 0;
+      line-height: 1.5;
+    }
+    .print-btn {
+      display: block;
+      width: 120px;
+      margin: 30px auto;
+      padding: 10px;
+      background-color: #c2185b;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      text-align: center;
+      font-size: 16px;
+    }
+    .print-btn:hover {
+      background-color: #ad1457;
+    }
+  </style>
+</head>
+<body>
+  <h1>סידורים</h1>
+  
+  <div id="submissionsContainer">
+    <!-- כאן יופיעו הסידורים -->
+  </div>
+  
+  <button class="print-btn" onclick="window.print()">הדפס</button>
+  
+  <script>
+    // סדרת הקטגוריות הרצויה (בדיוק כפי שהמשתמש הגיש)
+    const categoriesOrder = ["אחמ״ש", "סטודנטים", "קב״ט"];
+    
+    // פונקציה לטעינת הסידורים (נניח שהם נשמרו ב-localStorage במפתח "submissions")
+    function loadSubmissions() {
+      let submissions = JSON.parse(localStorage.getItem("submissions")) || [];
+      
+      // ודא שקיים שדה timestamp לכל סידור (אם לא, ניתן להגדיר 0 כברירת מחדל)
+      submissions.forEach(sub => {
+        if (!sub.timestamp) {
+          sub.timestamp = 0;
+        }
+      });
+      
+      // חלוקה לקטגוריות בהתאם לתפקיד
+      let categorized = {};
+      categoriesOrder.forEach(cat => categorized[cat] = []);
+      
+      submissions.forEach(sub => {
+        // במידה והערך של role תואם לאחת מהקטגוריות
+        if (categoriesOrder.includes(sub.role)) {
+          categorized[sub.role].push(sub);
+        } else {
+          // במידה ויש סידורים עם תפקיד שאינו מוכר – ניתן להוסיף קטגוריה "אחר"
+          if(!categorized["אחר"]) categorized["אחר"] = [];
+          categorized["אחר"].push(sub);
+        }
+      });
+      
+      // מיון הסידורים בכל קטגוריה לפי timestamp (מהישן לחדש)
+      for (let cat in categorized) {
+        categorized[cat].sort((a, b) => a.timestamp - b.timestamp);
+      }
+      
+      const container = document.getElementById("submissionsContainer");
+      container.innerHTML = "";
+      
+      // הצגה לפי הסדר הרצוי
+      categoriesOrder.forEach(cat => {
+        if (categorized[cat] && categorized[cat].length > 0) {
+          // יצירת כותרת לקטגוריה
+          let catDiv = document.createElement("div");
+          catDiv.className = "category";
+          let catHeader = document.createElement("h2");
+          
+          // שינוי תצוגה – לדוגמה: "אחמשי״ם" במקום "אחמ״ש" וכד'
+          if (cat === "אחמ״ש") {
+            catHeader.textContent = "אחמשי״ם";
+          } else if (cat === "קב״ט") {
+            catHeader.textContent = "קבטי״ם";
+          } else {
+            catHeader.textContent = cat;
+          }
+          
+          catDiv.appendChild(catHeader);
+          
+          // עבור כל סידור בקטגוריה
+          categorized[cat].forEach(sub => {
+            let subDiv = document.createElement("div");
+            subDiv.className = "submission";
+            
+            // שם העובד
+            let nameHeader = document.createElement("h3");
+            nameHeader.textContent = sub.name + ":";
+            subDiv.appendChild(nameHeader);
+            
+            // הצגת המשמרות
+            let shiftPara = document.createElement("p");
+            shiftPara.innerHTML = "<strong>הסידור שלו:</strong> " + (sub.shifts && sub.shifts.length > 0 ? sub.shifts.join(", ") : "לא נבחרו משמרות");
+            subDiv.appendChild(shiftPara);
+            
+            // הצגת העדפות (אם קיימות)
+            let prefPara = document.createElement("p");
+            prefPara.innerHTML = "<strong>העדפות:</strong> " + (sub.preferences ? sub.preferences : "אין העדפות");
+            subDiv.appendChild(prefPara);
+            
+            catDiv.appendChild(subDiv);
+          });
+          
+          container.appendChild(catDiv);
+        }
+      });
+      
+      // במידה וקיימת קטגוריה "אחר" – מציגים גם אותה בסוף
+      if (categorized["אחר"] && categorized["אחר"].length > 0) {
+        let otherDiv = document.createElement("div");
+        otherDiv.className = "category";
+        let otherHeader = document.createElement("h2");
+        otherHeader.textContent = "אחר";
+        otherDiv.appendChild(otherHeader);
+        
+        categorized["אחר"].forEach(sub => {
+          let subDiv = document.createElement("div");
+          subDiv.className = "submission";
+          
+          let nameHeader = document.createElement("h3");
+          nameHeader.textContent = sub.name + ":";
+          subDiv.appendChild(nameHeader);
+          
+          let shiftPara = document.createElement("p");
+          shiftPara.innerHTML = "<strong>הסידור שלו:</strong> " + (sub.shifts && sub.shifts.length > 0 ? sub.shifts.join(", ") : "לא נבחרו משמרות");
+          subDiv.appendChild(shiftPara);
+          
+          let prefPara = document.createElement("p");
+          prefPara.innerHTML = "<strong>העדפות:</strong> " + (sub.preferences ? sub.preferences : "אין העדפות");
+          subDiv.appendChild(prefPara);
+          
+          otherDiv.appendChild(subDiv);
+        });
+        container.appendChild(otherDiv);
+      }
+    }
+    
+    document.addEventListener("DOMContentLoaded", loadSubmissions);
+  </script>
+</body>
+</html>
