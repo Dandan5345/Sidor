@@ -16,18 +16,37 @@
       padding: 20px;
       color: #333;
     }
+    .top-buttons {
+      margin-bottom: 20px;
+      display: flex;
+      gap: 10px;
+    }
+    .top-buttons button {
+      background-color: #00796b;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      font-size: 14px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .top-buttons button:hover {
+      background-color: #005b4f;
+    }
+
     h1 {
       text-align: center;
       color: #00796b;
       margin-bottom: 30px;
     }
     .group-header {
-      background-color: #00796b;
+      background: linear-gradient(135deg, #009688, #4db6ac);
       color: #fff;
       padding: 10px;
       margin-top: 20px;
       border-radius: 4px;
       font-size: 1.2em;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
     }
     .schedule-entry {
       background: #fff;
@@ -39,11 +58,12 @@
     .schedule-entry h3 {
       margin: 0 0 10px 0;
       color: #00796b;
+      font-size: 1.1em;
     }
-    .schedule-details,
     .preferences {
-      margin-bottom: 10px;
+      margin-top: 10px;
       line-height: 1.4;
+      font-size: 0.95em;
     }
     .print-btn {
       display: block;
@@ -59,9 +79,54 @@
     .print-btn:hover {
       background-color: #005b4f;
     }
+
+    /* טבלת המשמרות */
+    .schedule-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      border: 1px solid #ccc;
+    }
+    .schedule-table th, .schedule-table td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: center;
+    }
+    .schedule-table th {
+      background-color: #eee;
+      font-weight: bold;
+    }
+    .schedule-day {
+      background-color: #fafafa;
+    }
+    .schedule-boker {
+      background-color: #e1f5fe; /* צבע רקע בהיר לכחול */
+    }
+    .schedule-erev {
+      background-color: #ffe0b2; /* צבע רקע בהיר לכתום */
+    }
+    .schedule-laila {
+      background-color: #f3e5f5; /* צבע רקע בהיר לסגול */
+    }
+    .schedule-title {
+      font-weight: bold;
+      margin-bottom: 5px;
+      color: #555;
+    }
+    /* סימן וי מעוצב */
+    .checkmark {
+      color: #2e7d32; /* ירוק */
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
+  <!-- כפתורי ניווט למעלה -->
+  <div class="top-buttons">
+    <button onclick="window.location.href='index.html'">חזרה לטופס הראשי</button>
+    <button onclick="window.location.href='manager.html'">חזרה למנהל</button>
+  </div>
+
   <h1>סידורים</h1>
   
   <div id="schedulesContainer"></div>
@@ -76,14 +141,14 @@
 
     // קונפיגורציה (אותה בדיוק כמו ב-index.html)
     const firebaseConfig = {
-      apiKey: "AIzaSyCeYVNOdp8N9BJdsO9eLeATX1_PX5LRG_A",
-      authDomain: "sidoravoda111.firebaseapp.com",
-      projectId: "sidoravoda111",
-      storageBucket: "sidoravoda111.firebasestorage.app",
-      messagingSenderId: "862141234850",
-      appId: "1:862141234850:web:12a616ff91e9a61002a1fb",
-      measurementId: "G-SFFCVQGW37",
-      databaseURL: "https://sidoravoda111-default-rtdb.europe-west1.firebasedatabase.app/"
+      apiKey: "YOUR_API_KEY_HERE",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID",
+      measurementId: "YOUR_MEASUREMENT_ID",
+      databaseURL: "YOUR_DB_URL"
     };
 
     // אתחול Firebase
@@ -91,7 +156,62 @@
     const analytics = getAnalytics(app);
     const db = getDatabase(app);
 
-    // אנו מאזינים לכל שינוי בנתיב "schedules"
+    // פונקציה יוצרת טבלת משמרות יפה מתוך מחרוזת המשמרות
+    function createScheduleTable(scheduleString) {
+      const days = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
+      const times = [
+        { name: "בוקר", className: "schedule-boker" },
+        { name: "ערב", className: "schedule-erev" },
+        { name: "לילה", className: "schedule-laila" }
+      ];
+
+      // טבלת 4 עמודות: יום, בוקר, ערב, לילה
+      const table = document.createElement("table");
+      table.className = "schedule-table";
+
+      const thead = document.createElement("thead");
+      thead.innerHTML = `
+        <tr>
+          <th class="schedule-day">יום</th>
+          <th class="schedule-boker">בוקר</th>
+          <th class="schedule-erev">ערב</th>
+          <th class="schedule-laila">לילה</th>
+        </tr>
+      `;
+      table.appendChild(thead);
+
+      const tbody = document.createElement("tbody");
+      days.forEach(day => {
+        const row = document.createElement("tr");
+        
+        // תא של שם היום (class="schedule-day")
+        const dayCell = document.createElement("td");
+        dayCell.className = "schedule-day";
+        dayCell.textContent = day;
+        row.appendChild(dayCell);
+
+        // שלושה תאים: בוקר, ערב, לילה
+        times.forEach(timeObj => {
+          const cell = document.createElement("td");
+          cell.className = timeObj.className;
+          const pattern = `${day}-${timeObj.name}`; 
+          // אם scheduleString כולל day-time, נסמן "✓"
+          if (scheduleString.includes(pattern)) {
+            cell.innerHTML = `<span class="checkmark">✓</span>`;
+          } else {
+            cell.innerHTML = "";
+          }
+          row.appendChild(cell);
+        });
+
+        tbody.appendChild(row);
+      });
+
+      table.appendChild(tbody);
+      return table;
+    }
+
+    // מאזינים לכל שינוי בנתיב "schedules"
     onValue(ref(db, "schedules"), (snapshot) => {
       const container = document.getElementById("schedulesContainer");
       container.innerHTML = ""; // נקה לפני שמציגים מחדש
@@ -103,7 +223,6 @@
       });
       
       // מיון לפי groupOrder: אחמ״ש (1), סטודנטים (2), קב״ט (3)
-      // כאן הטופס מייצר רק אחמ״ש או קב״ט, אבל אם תרצה להוסיף סטודנטים – יש מוכן.
       const groupOrder = { "אחמ״ש": 1, "סטודנטים": 2, "קב״ט": 3 };
 
       submissions.sort((a, b) => {
@@ -138,15 +257,21 @@
             const entryDiv = document.createElement("div");
             entryDiv.className = "schedule-entry";
             
+            // כותרת: שם העובד
             const nameEl = document.createElement("h3");
             nameEl.textContent = entry.name + ":";
             entryDiv.appendChild(nameEl);
+
+            // טבלת משמרות
+            const scheduleTitle = document.createElement("div");
+            scheduleTitle.className = "schedule-title";
+            scheduleTitle.textContent = "סידור משמרות:";
+            entryDiv.appendChild(scheduleTitle);
+
+            const table = createScheduleTable(entry.schedule || "");
+            entryDiv.appendChild(table);
             
-            const scheduleEl = document.createElement("div");
-            scheduleEl.className = "schedule-details";
-            scheduleEl.innerHTML = "<strong>הסידור:</strong> " + (entry.schedule || "");
-            entryDiv.appendChild(scheduleEl);
-            
+            // העדפות (אם קיימות)
             if (entry.preferences && entry.preferences.trim() !== "") {
               const prefEl = document.createElement("div");
               prefEl.className = "preferences";
