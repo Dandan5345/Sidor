@@ -89,7 +89,8 @@
   <h1>סידור עבודה</h1>
   
   <!-- טופס הסידור -->
-  <form id="shiftForm" onsubmit="return validateForm();">
+  <!-- הוספנו id="shiftForm" ונסיר את onsubmit מה-HTML -->
+  <form id="shiftForm">
     <!-- שלב 1: בחירת תפקיד -->
     <div id="roleDiv">
       <label>בחר תפקיד:</label>
@@ -256,14 +257,24 @@
     };
 
     /********************************************
-     * 7. פונקציית ולידציה לטופס + שמירת הנתונים ל-Firebase
+     * 7. התחברות לאירוע "submit" של הטופס
      ********************************************/
-    window.validateForm = function() {
+    const form = document.getElementById("shiftForm");
+    form.addEventListener("submit", function(event) {
+      event.preventDefault(); // מונע שליחת טופס רגילה
+      
+      validateForm(); // קורא לפונקציית הוולידציה והשמירה
+    });
+
+    /********************************************
+     * 8. פונקציית ולידציה ושמירה ל-Firebase
+     ********************************************/
+    function validateForm() {
       // בדיקת תפקיד
       const roleInput = document.querySelector('input[name="role"]:checked');
       if (!roleInput) {
         alert("אנא בחר תפקיד.");
-        return false;
+        return;
       }
       const role = roleInput.value;
       
@@ -271,7 +282,7 @@
       const nameSelect = document.getElementById("nameSelect");
       if (!nameSelect.value) {
         alert("אנא בחר שם.");
-        return false;
+        return;
       }
       const name = nameSelect.value;
       
@@ -322,7 +333,7 @@
       
       if (messages.length > 0) {
         alert(messages.join("\n"));
-        return false;
+        return;
       }
       
       // אם הכל תקין, נשמור את הנתונים ב-Firebase
@@ -341,13 +352,13 @@
       push(ref(db, "schedules"), data)
         .then(() => {
           alert("הטופס נשלח ונשמר בהצלחה ב-Firebase!");
+          // כעת נרענן את הדף
+          window.location.reload();
         })
         .catch((err) => {
           alert("אירעה שגיאה בשמירה: " + err.message);
         });
-      
-      return false; // למנוע ריענון דף
-    };
+    }
   </script>
 </body>
 </html>
