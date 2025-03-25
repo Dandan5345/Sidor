@@ -16,6 +16,7 @@
       padding: 20px;
       direction: rtl;
       text-align: right;
+      color: #333;
     }
     h1 {
       text-align: center;
@@ -79,11 +80,73 @@
     .clear {
       clear: both;
     }
+
+    /* עיצוב החלון הקופץ (מודל) */
+    .modal {
+      display: none; 
+      position: fixed; 
+      z-index: 999; 
+      left: 0;
+      top: 0;
+      width: 100%; 
+      height: 100%; 
+      overflow: auto;
+      background-color: rgba(0,0,0,0.4);
+    }
+    .modal-content {
+      background-color: #fff;
+      margin: 10% auto; 
+      padding: 20px;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      position: relative;
+    }
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+      position: absolute;
+      top: 10px;
+      right: 15px;
+    }
+    .close:hover {
+      color: #000;
+    }
+    .modal-content h2 {
+      margin-top: 0;
+      color: #00796b;
+      text-align: center;
+    }
+    .modal-content input {
+      width: 100%;
+      margin-bottom: 10px;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .login-btn {
+      width: 100%;
+      margin-top: 10px;
+      background-color: #00796b;
+      color: #fff;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 4px;
+      border: none;
+      cursor: pointer;
+    }
+    .login-btn:hover {
+      background-color: #005b4f;
+    }
   </style>
 </head>
 <body>
-  <!-- כפתור התחברות מנהל -->
-  <button class="admin-login" onclick="adminLogin()">התחברות מנהל</button>
+  <!-- כפתור התחברות מנהל (פותח מודל) -->
+  <button class="admin-login" onclick="openAdminModal()">התחברות מנהל</button>
   <div class="clear"></div>
   
   <h1>סידור עבודה</h1>
@@ -176,6 +239,17 @@
     <button type="submit">שלח</button>
   </form>
 
+  <!-- חלון קופץ (Modal) עבור התחברות מנהל -->
+  <div id="adminModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeAdminModal()">&times;</span>
+      <h2>התחברות מנהל</h2>
+      <input type="email" id="adminEmail" placeholder="אימייל">
+      <input type="password" id="adminPassword" placeholder="סיסמה">
+      <button class="login-btn" onclick="adminLogin()">התחבר</button>
+    </div>
+  </div>
+
   <!-- סקריפט ה-Firebase והלוגיקה - using type="module" -->
   <script type="module">
     /********************************************
@@ -184,19 +258,20 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-analytics.js";
     import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-database.js";
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-auth.js";
     
     /********************************************
      * 2. הגדרות הפרויקט (הקוד שקיבלת מ-Firebase)
      ********************************************/
     const firebaseConfig = {
-      apiKey: "AIzaSyCeYVNOdp8N9BJdsO9eLeATX1_PX5LRG_A",
-      authDomain: "sidoravoda111.firebaseapp.com",
-      projectId: "sidoravoda111",
-      storageBucket: "sidoravoda111.firebasestorage.app",
-      messagingSenderId: "862141234850",
-      appId: "1:862141234850:web:12a616ff91e9a61002a1fb",
-      measurementId: "G-SFFCVQGW37",
-      databaseURL: "https://sidoravoda111-default-rtdb.europe-west1.firebasedatabase.app/"
+      apiKey: "YOUR_API_KEY_HERE",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID",
+      measurementId: "YOUR_MEASUREMENT_ID",
+      databaseURL: "YOUR_DB_URL"
     };
 
     /********************************************
@@ -205,23 +280,38 @@
     const app = initializeApp(firebaseConfig);
     const analytics = getAnalytics(app);
     const db = getDatabase(app);  // שימוש ב-Realtime Database
+    const auth = getAuth(app);
 
     /********************************************
-     * 4. פונקציית התחברות מנהל
+     * 4. פונקציות לפתיחת/סגירת המודל
      ********************************************/
-    window.adminLogin = function() {
-      const username = prompt("אנא הזן שם משתמש:");
-      const password = prompt("אנא הזן סיסמא:");
-      
-      if (username === "מנהל" && password === "123") {
-        window.location.href = "סידורים.html";
-      } else {
-        alert("שם משתמש או סיסמא שגויים. נסה שוב.");
-      }
+    window.openAdminModal = function() {
+      document.getElementById("adminModal").style.display = "block";
+    };
+    window.closeAdminModal = function() {
+      document.getElementById("adminModal").style.display = "none";
     };
 
     /********************************************
-     * 5. פונקציה שמטפלת בהצגת רשימת השמות בהתאם לתפקיד
+     * 5. פונקציית התחברות מנהל באמצעות Email/Password
+     ********************************************/
+    window.adminLogin = function() {
+      const email = document.getElementById("adminEmail").value;
+      const password = document.getElementById("adminPassword").value;
+      
+      signInWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          // התחברות הצליחה
+          alert("התחברת בהצלחה!");
+          window.location.href = "manager.html";
+        })
+        .catch((error) => {
+          alert("שגיאה בהתחברות: " + error.message);
+        });
+    };
+
+    /********************************************
+     * 6. פונקציה שמטפלת בהצגת רשימת השמות בהתאם לתפקיד
      ********************************************/
     window.handleRoleChange = function() {
       var role = document.querySelector('input[name="role"]:checked').value;
@@ -248,14 +338,14 @@
     };
 
     /********************************************
-     * 6. פונקציה שמציגה את טבלת המשמרות והעדפות לאחר בחירת שם
+     * 7. פונקציה שמציגה את טבלת המשמרות והעדפות לאחר בחירת שם
      ********************************************/
     window.handleNameChange = function() {
       document.getElementById("shiftsDiv").style.display = "block";
     };
 
     /********************************************
-     * 7. התחברות לאירוע "submit" של הטופס
+     * 8. התחברות לאירוע "submit" של הטופס
      ********************************************/
     const form = document.getElementById("shiftForm");
     form.addEventListener("submit", function(event) {
@@ -265,7 +355,7 @@
     });
 
     /********************************************
-     * 8. פונקציית ולידציה ושמירה ל-Firebase
+     * 9. פונקציית ולידציה ושמירה ל-Firebase
      ********************************************/
     function validateForm() {
       // בדיקת תפקיד
