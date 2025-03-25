@@ -82,8 +82,11 @@
     .clear {
       clear: both;
     }
-
-    /* עיצוב החלון הקופץ (מודל) */
+    /* הסתרת אזור המשמרות כברירת מחדל */
+    #shiftsDiv {
+      display: none;
+    }
+    /* מודלים */
     .modal {
       display: none; 
       position: fixed; 
@@ -118,7 +121,7 @@
     .close:hover {
       color: #000;
     }
-    .modal-content h2 {
+    .modal-content h2, .modal-content h3 {
       margin-top: 0;
       color: #00796b;
       text-align: center;
@@ -130,7 +133,7 @@
       border: 1px solid #ccc;
       border-radius: 4px;
     }
-    .login-btn {
+    .login-btn, .code-btns button {
       width: 100%;
       margin-top: 10px;
       background-color: #00796b;
@@ -141,19 +144,32 @@
       border: none;
       cursor: pointer;
     }
-    .login-btn:hover {
+    .login-btn:hover, .code-btns button:hover {
       background-color: #005b4f;
+    }
+    .code-btns {
+      display: flex;
+      justify-content: space-between;
+    }
+    .code-btns button {
+      width: 48%;
+    }
+    .error-msg {
+      color: red;
+      text-align: center;
+      margin-bottom: 10px;
+      display: none;
     }
   </style>
 </head>
 <body>
-  <!-- כפתור התחברות מנהל (פותח מודל) -->
+  <!-- כפתור התחברות מנהל -->
   <button class="admin-login" onclick="openAdminModal()">התחברות מנהל</button>
   <div class="clear"></div>
   
   <h1>סידור עבודה</h1>
   
-  <!-- טופס הסידור -->
+  <!-- טופס סידור העבודה -->
   <form id="shiftForm">
     <!-- שלב 1: בחירת תפקיד -->
     <div id="roleDiv">
@@ -164,18 +180,18 @@
     
     <br>
     
-    <!-- שלב 2: בחירת שם (מופיע לאחר בחירת תפקיד) -->
+    <!-- שלב 2: בחירת שם (מתמלא מדאטה ב-Firebase) -->
     <div id="nameDiv" style="display: none;">
       <label for="nameSelect">בחר שם:</label>
-      <select id="nameSelect" name="name" required onchange="handleNameChange();">
-        <!-- אפשרויות יתמלאו דינמית בהתאם לתפקיד -->
+      <select id="nameSelect" name="name" required>
+        <!-- אפשרויות יתמלאו דינמית -->
       </select>
     </div>
     
     <br>
     
-    <!-- שלב 3: טבלת משמרות והעדפות (מופיע לאחר בחירת שם) -->
-    <div id="shiftsDiv" style="display: none;">
+    <!-- שלב 3: טבלת משמרות והעדפות -->
+    <div id="shiftsDiv">
       <h3>בחר משמרות:</h3>
       <table>
         <thead>
@@ -241,30 +257,36 @@
     <button type="submit">שלח</button>
   </form>
 
-  <!-- חלון קופץ (Modal) עבור התחברות מנהל -->
+  <!-- מודל התחברות מנהל -->
   <div id="adminModal" class="modal">
     <div class="modal-content">
       <span class="close" onclick="closeAdminModal()">&times;</span>
       <h2>התחברות מנהל</h2>
       <input type="email" id="adminEmail" placeholder="אימייל">
       <input type="password" id="adminPassword" placeholder="סיסמה">
-      <button class="login-btn" onclick="adminLogin()">התחבר</button>
+      <button class="login-btn" id="adminLoginBtn">התחבר</button>
     </div>
   </div>
 
-  <!-- סקריפט ה-Firebase והלוגיקה - using type="module" -->
+  <!-- מודל קוד עובד -->
+  <div id="employeeCodeModal" class="modal">
+    <div class="modal-content">
+      <h3>הקלד מספר עובד</h3>
+      <input type="text" id="employeeCodeInput" placeholder="מספר עובד (קוד)">
+      <div class="error-msg" id="employeeCodeError">הקוד שהוזן שגוי.</div>
+      <div class="code-btns">
+        <button id="cancelCodeBtn">ביטול</button>
+        <button id="confirmCodeBtn">אישור</button>
+      </div>
+    </div>
+  </div>
+
   <script type="module">
-    /********************************************
-     * 1. ייבוא הפונקציות הדרושות מ-SDK Firebase
-     ********************************************/
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-analytics.js";
-    import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-database.js";
+    import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-database.js";
     import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-auth.js";
-    
-    /********************************************
-     * 2. הגדרות הפרויקט (API וכו’)
-     ********************************************/
+
     const firebaseConfig = {
       apiKey: "AIzaSyCeYVNOdp8N9BJdsO9eLeATX1_PX5LRG_A",
       authDomain: "sidoravoda111.firebaseapp.com",
@@ -276,17 +298,25 @@
       databaseURL: "https://sidoravoda111-default-rtdb.europe-west1.firebasedatabase.app/"
     };
 
-    /********************************************
-     * 3. אתחול Firebase
-     ********************************************/
     const app = initializeApp(firebaseConfig);
     const analytics = getAnalytics(app);
-    const db = getDatabase(app);  // שימוש ב-Realtime Database
+    const db = getDatabase(app);
     const auth = getAuth(app);
 
-    /********************************************
-     * 4. פונקציות לפתיחת/סגירת המודל
-     ********************************************/
+    // נתונים של עובדים מתוך Firebase – נאחסן במשתנה גלובלי
+    let employeesData = {};
+
+    // מאזין לשינויים בנתוני העובדים
+    onValue(ref(db, "employees"), (snapshot) => {
+      const val = snapshot.val();
+      employeesData = val ? val : {};
+    });
+
+    // משתנים לשמירת בחירת העובד הנוכחית
+    let currentEmployeeId = "";
+    let currentEmployeeData = {};
+
+    // מודל מנהל
     window.openAdminModal = function() {
       document.getElementById("adminModal").style.display = "block";
     };
@@ -294,104 +324,115 @@
       document.getElementById("adminModal").style.display = "none";
     };
 
-    /********************************************
-     * 5. פונקציית התחברות מנהל באמצעות Email/Password
-     ********************************************/
-    window.adminLogin = function() {
+    const adminLoginBtn = document.getElementById("adminLoginBtn");
+    adminLoginBtn.addEventListener("click", () => {
       const email = document.getElementById("adminEmail").value;
       const password = document.getElementById("adminPassword").value;
-      
       signInWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-          // התחברות הצליחה
+        .then(() => {
           alert("התחברת בהצלחה!");
-          window.location.href = "manager.html"; // מעבר לדף מנהל
+          window.location.href = "manager.html";
         })
-        .catch((error) => {
-          alert("שגיאה בהתחברות: " + error.message);
+        .catch(err => {
+          alert("שגיאה בהתחברות: " + err.message);
         });
-    };
+    });
 
-    /********************************************
-     * 6. פונקציה שמטפלת בהצגת רשימת השמות בהתאם לתפקיד
-     ********************************************/
+    // בעת בחירת תפקיד – מלא את רשימת השמות לפי העובדים מה-Firebase
     window.handleRoleChange = function() {
-      var role = document.querySelector('input[name="role"]:checked').value;
-      var nameSelect = document.getElementById("nameSelect");
-      
-      // איפוס אפשרויות
+      const role = document.querySelector('input[name="role"]:checked').value;
+      const nameSelect = document.getElementById("nameSelect");
       nameSelect.innerHTML = "";
-      var options = [];
-      if (role === "אחמ״ש") {
-        options = ["ישראל", "דוד", "משה", "אבי", "מיכל", "רחל", "יעקב"];
-      } else if (role === "קב״ט") {
-        options = ["משה", "יעקב", "שרה", "רחל", "דנה", "אברהם", "יוסף", "מרים", "אור", "ליאת"];
-      }
-      
-      options.forEach(function(name) {
-        var option = document.createElement("option");
-        option.value = name;
-        option.text = name;
+      // מסננים את העובדים לפי תפקיד
+      const filtered = Object.entries(employeesData).filter(([key, emp]) => emp.type === role);
+      // למקרה ואין עובדים מתאימים
+      if(filtered.length === 0){
+        const option = document.createElement("option");
+        option.value = "";
+        option.text = "אין עובדים זמינים";
         nameSelect.add(option);
-      });
+      } else {
+        filtered.forEach(([key, emp]) => {
+          const option = document.createElement("option");
+          option.value = key;
+          option.text = emp.firstName + " " + emp.lastName;
+          nameSelect.add(option);
+        });
+      }
       document.getElementById("nameDiv").style.display = "block";
     };
 
-    /********************************************
-     * 7. פונקציה שמציגה את טבלת המשמרות והעדפות לאחר בחירת שם
-     ********************************************/
-    window.handleNameChange = function() {
-      document.getElementById("shiftsDiv").style.display = "block";
-    };
-
-    /********************************************
-     * 8. התחברות לאירוע "submit" של הטופס
-     ********************************************/
-    const form = document.getElementById("shiftForm");
-    form.addEventListener("submit", function(event) {
-      event.preventDefault(); // מונע שליחת טופס רגילה
-      validateForm(); 
+    // בעת בחירת שם – יש לשמור את המזהה והנתונים של העובד הנבחר
+    const nameSelect = document.getElementById("nameSelect");
+    nameSelect.addEventListener("change", () => {
+      currentEmployeeId = nameSelect.value;
+      if(!currentEmployeeId) return;
+      currentEmployeeData = employeesData[currentEmployeeId];
+      // הסתרת אזור המשמרות עד אימות הקוד
+      document.getElementById("shiftsDiv").style.display = "none";
+      // אפס את שדות המודל
+      document.getElementById("employeeCodeInput").value = "";
+      document.getElementById("employeeCodeError").style.display = "none";
+      // פתח את מודל קוד העובד
+      document.getElementById("employeeCodeModal").style.display = "block";
     });
 
-    /********************************************
-     * 9. פונקציית ולידציה ושמירה ל-Firebase
-     ********************************************/
+    // מודל קוד עובד
+    const employeeCodeModal = document.getElementById("employeeCodeModal");
+    const employeeCodeInput = document.getElementById("employeeCodeInput");
+    const employeeCodeError = document.getElementById("employeeCodeError");
+    const cancelCodeBtn = document.getElementById("cancelCodeBtn");
+    const confirmCodeBtn = document.getElementById("confirmCodeBtn");
+
+    cancelCodeBtn.addEventListener("click", () => {
+      employeeCodeModal.style.display = "none";
+      employeeCodeInput.value = "";
+      employeeCodeError.style.display = "none";
+    });
+
+    confirmCodeBtn.addEventListener("click", () => {
+      const codeTyped = employeeCodeInput.value.trim();
+      if(!currentEmployeeData.code){
+        employeeCodeError.textContent = "לא נמצא קוד עבור עובד זה.";
+        employeeCodeError.style.display = "block";
+        return;
+      }
+      if(codeTyped === currentEmployeeData.code){
+        employeeCodeModal.style.display = "none";
+        employeeCodeInput.value = "";
+        employeeCodeError.style.display = "none";
+        // הצגת אזור המשמרות
+        document.getElementById("shiftsDiv").style.display = "block";
+      } else {
+        employeeCodeError.textContent = "הקוד שהוזן שגוי.";
+        employeeCodeError.style.display = "block";
+      }
+    });
+
+    // שליחת הטופס – לוגיקה קיימת (בדיקת מינימום משמרות ושמירה)
+    const form = document.getElementById("shiftForm");
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      validateForm();
+    });
+
     function validateForm() {
-      // בדיקת תפקיד
       const roleInput = document.querySelector('input[name="role"]:checked');
       if (!roleInput) {
         alert("אנא בחר תפקיד.");
         return;
       }
       const role = roleInput.value;
-      
-      // בדיקת שם
-      const nameSelect = document.getElementById("nameSelect");
-      if (!nameSelect.value) {
+      if(!currentEmployeeId){
         alert("אנא בחר שם.");
         return;
       }
-      const name = nameSelect.value;
       
-      // בדיקת משמרות
       const shifts = document.querySelectorAll('input[name="shift"]:checked');
       const totalSelected = shifts.length;
-      
-      // תנאים מינימליים
-      const minTotal = 14;
-      const minBoker = 2;
-      const minErev = 2;
-      const minLaila = 2;
-      const minSpecial = 2;
-      
-      let countBoker = 0;
-      let countErev = 0;
-      let countLaila = 0;
-      let countSpecial = 0;
-      
-      // קבוצת משמרות מיוחדת: שישי ערב, שישי לילה, שבת בוקר, שבת ערב
+      const minTotal = 14, minBoker = 2, minErev = 2, minLaila = 2, minSpecial = 2;
+      let countBoker = 0, countErev = 0, countLaila = 0, countSpecial = 0;
       const specialShifts = new Set(["שישי-ערב", "שישי-לילה", "שבת-בוקר", "שבת-ערב"]);
-      
       shifts.forEach(shift => {
         const value = shift.value;
         if (value.includes("בוקר")) countBoker++;
@@ -416,19 +457,16 @@
       if(countSpecial < minSpecial) {
         messages.push("יש לבחור מינימום 2 משמרות מהקבוצה (שישי ערב, שישי לילה, שבת בוקר, שבת ערב). נבחרו " + countSpecial + " משמרות.");
       }
-      
       if (messages.length > 0) {
         alert(messages.join("\n"));
         return;
       }
       
-      // אם הכל תקין, נשמור את הנתונים ב-Firebase
       const preferences = document.getElementById("preferences").value;
       const scheduleString = Array.from(shifts).map(s => s.value).join(", ");
-      
       const data = {
         role: role,
-        name: name,
+        name: currentEmployeeData.firstName + " " + currentEmployeeData.lastName,
         schedule: scheduleString,
         preferences: preferences,
         submissionTime: Date.now()
