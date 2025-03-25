@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+  <meta charset="UTF-8">
+  <title>ניהול טופס</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #ffffff, #e0f7fa);
+      margin: 0;
+      padding: 20px;
+      direction: rtl;
+      text-align: center;
+      color: #333;
+    }
+    h1 {
+      color: #00796b;
+      margin-bottom: 30px;
+    }
+    .buttons-container {
+      margin: 0 auto;
+      max-width: 400px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    button {
+      background-color: #00796b;
+      color: #fff;
+      border: none;
+      padding: 15px;
+      font-size: 16px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #005b4f;
+    }
+  </style>
+</head>
+<body>
+  <h1>ניהול טופס</h1>
+  <div class="buttons-container">
+    <button onclick="window.location.href='index.html'">חזרה לטופס הראשי</button>
+    <button onclick="window.location.href='סידורים.html'">מעבר לסידורים</button>
+    <button onclick="alert('כאן יבוצע עריכת עובדים בעתיד...')">ערוך עובדים</button>
+  </div>
+</body>
+</html>
