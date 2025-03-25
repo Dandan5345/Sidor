@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>סידורים</title>
+  <!-- התאמה לנייד ומניעת זום כפול -->
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2, user-scalable=yes">
   <style>
     html, body {
@@ -67,11 +68,13 @@
   
   <button class="print-btn" onclick="window.print()">הדפס</button>
   
+  <!-- Firebase code - using type="module" -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-analytics.js";
     import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-database.js";
-    
+
+    // קונפיגורציה (אותה בדיוק כמו ב-index.html)
     const firebaseConfig = {
       apiKey: "AIzaSyCeYVNOdp8N9BJdsO9eLeATX1_PX5LRG_A",
       authDomain: "sidoravoda111.firebaseapp.com",
@@ -79,56 +82,58 @@
       storageBucket: "sidoravoda111.firebasestorage.app",
       messagingSenderId: "862141234850",
       appId: "1:862141234850:web:12a616ff91e9a61002a1fb",
-      measurementId: "G-SFFCVQGW37",
-      databaseURL: "https://sidoravoda111-default-rtdb.firebaseio.com"
+      measurementId: "G-SFFCVQGW37"
+      // databaseURL: "https://sidoravoda111-default-rtdb.firebaseio.com"
     };
 
+    // אתחול Firebase
     const app = initializeApp(firebaseConfig);
     const analytics = getAnalytics(app);
     const db = getDatabase(app);
 
-    // נקרא לנתונים מ- Realtime Database
-    const schedulesRef = ref(db, "schedules");
-
-    onValue(schedulesRef, (snapshot) => {
+    // אנו מאזינים לכל שינוי בנתיב "schedules"
+    onValue(ref(db, "schedules"), (snapshot) => {
       const container = document.getElementById("schedulesContainer");
-      container.innerHTML = "";
-
+      container.innerHTML = ""; // נקה לפני שמציגים מחדש
+      
+      // המרת הסנאפשוט למערך
       const submissions = [];
-      snapshot.forEach(child => {
-        submissions.push(child.val());
+      snapshot.forEach((childSnapshot) => {
+        submissions.push(childSnapshot.val());
       });
-
-      // סדר הקבוצות הרצוי
+      
+      // מיון לפי groupOrder: אחמ״ש (1), סטודנטים (2), קב״ט (3)
+      // כאן הטופס מייצר רק אחמ״ש או קב״ט, אבל אם תרצה להוסיף סטודנטים – יש מוכן.
       const groupOrder = { "אחמ״ש": 1, "סטודנטים": 2, "קב״ט": 3 };
 
-      // ייתכן שיש לך רק אחמ״ש וקב״ט כרגע, אבל אם תרצה להוסיף סטודנטים, תוכל
-      // או להחליף את זה בסדר אחר
       submissions.sort((a, b) => {
-        // אם שני פריטים באותה קבוצה
-        if (groupOrder[a.role] === groupOrder[b.role]) {
-          // מיון לפי זמן שליחה
+        const aGroup = groupOrder[a.role] || 99;
+        const bGroup = groupOrder[b.role] || 99;
+        if (aGroup === bGroup) {
           return a.submissionTime - b.submissionTime;
         }
-        // אחרת, לפי סדר הקבוצות
-        return (groupOrder[a.role] || 99) - (groupOrder[b.role] || 99);
+        return aGroup - bGroup;
       });
-
+      
       // קיבוץ לפי role
       const grouped = {};
       submissions.forEach(entry => {
-        if (!grouped[entry.role]) grouped[entry.role] = [];
+        if (!grouped[entry.role]) {
+          grouped[entry.role] = [];
+        }
         grouped[entry.role].push(entry);
       });
-
-      // הצגה בדף
-      ["אחמ״ש","סטודנטים","קב״ט"].forEach(role => {
-        if (grouped[role] && grouped[role].length > 0) {
+      
+      // מעבר על הקבוצות לפי הסדר (אחמ״ש, סטודנטים, קב״ט)
+      ["אחמ״ש", "סטודנטים", "קב״ט"].forEach(role => {
+        if (grouped[role]) {
+          // כותרת קבוצה
           const groupHeader = document.createElement("div");
           groupHeader.className = "group-header";
           groupHeader.textContent = role;
           container.appendChild(groupHeader);
-
+          
+          // הצגת כל הרשומות בקבוצה
           grouped[role].forEach(entry => {
             const entryDiv = document.createElement("div");
             entryDiv.className = "schedule-entry";
@@ -136,19 +141,19 @@
             const nameEl = document.createElement("h3");
             nameEl.textContent = entry.name + ":";
             entryDiv.appendChild(nameEl);
-
+            
             const scheduleEl = document.createElement("div");
             scheduleEl.className = "schedule-details";
-            scheduleEl.innerHTML = "<strong>הסידור:</strong> " + entry.schedule;
+            scheduleEl.innerHTML = "<strong>הסידור:</strong> " + (entry.schedule || "");
             entryDiv.appendChild(scheduleEl);
-
+            
             if (entry.preferences && entry.preferences.trim() !== "") {
               const prefEl = document.createElement("div");
               prefEl.className = "preferences";
               prefEl.innerHTML = "<strong>העדפות:</strong> " + entry.preferences;
               entryDiv.appendChild(prefEl);
             }
-
+            
             container.appendChild(entryDiv);
           });
         }
