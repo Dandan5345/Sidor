@@ -8,19 +8,21 @@
   <style>
     html, body {
       touch-action: manipulation;
+      margin: 0;
+      padding: 0;
+      direction: rtl;
+      color: #333;
+      font-family: Arial, sans-serif;
     }
     body {
-      font-family: "Arial", sans-serif;
       background: linear-gradient(135deg, #e0f7fa, #ffffff);
-      margin: 0;
       padding: 20px;
-      direction: rtl;
       text-align: right;
-      color: #333;
     }
     h1 {
       text-align: center;
       color: #00796b;
+      margin-top: 0;
     }
     form {
       max-width: 800px;
@@ -261,17 +263,17 @@
     import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-auth.js";
     
     /********************************************
-     * 2. הגדרות הפרויקט (הקוד שקיבלת מ-Firebase)
+     * 2. הגדרות הפרויקט (API וכו’)
      ********************************************/
     const firebaseConfig = {
-      apiKey: "YOUR_API_KEY_HERE",
-      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-      projectId: "YOUR_PROJECT_ID",
-      storageBucket: "YOUR_PROJECT_ID.appspot.com",
-      messagingSenderId: "YOUR_SENDER_ID",
-      appId: "YOUR_APP_ID",
-      measurementId: "YOUR_MEASUREMENT_ID",
-      databaseURL: "YOUR_DB_URL"
+      apiKey: "AIzaSyCeYVNOdp8N9BJdsO9eLeATX1_PX5LRG_A",
+      authDomain: "sidoravoda111.firebaseapp.com",
+      projectId: "sidoravoda111",
+      storageBucket: "sidoravoda111.firebasestorage.app",
+      messagingSenderId: "862141234850",
+      appId: "1:862141234850:web:12a616ff91e9a61002a1fb",
+      measurementId: "G-SFFCVQGW37",
+      databaseURL: "https://sidoravoda111-default-rtdb.europe-west1.firebasedatabase.app/"
     };
 
     /********************************************
@@ -303,7 +305,7 @@
         .then((userCredential) => {
           // התחברות הצליחה
           alert("התחברת בהצלחה!");
-          window.location.href = "manager.html";
+          window.location.href = "manager.html"; // מעבר לדף מנהל
         })
         .catch((error) => {
           alert("שגיאה בהתחברות: " + error.message);
@@ -321,10 +323,8 @@
       nameSelect.innerHTML = "";
       var options = [];
       if (role === "אחמ״ש") {
-        // 7 שמות עבור אחמ״ש
         options = ["ישראל", "דוד", "משה", "אבי", "מיכל", "רחל", "יעקב"];
       } else if (role === "קב״ט") {
-        // 10 שמות עבור קב״ט
         options = ["משה", "יעקב", "שרה", "רחל", "דנה", "אברהם", "יוסף", "מרים", "אור", "ליאת"];
       }
       
@@ -350,8 +350,7 @@
     const form = document.getElementById("shiftForm");
     form.addEventListener("submit", function(event) {
       event.preventDefault(); // מונע שליחת טופס רגילה
-      
-      validateForm(); // קורא לפונקציית הוולידציה והשמירה
+      validateForm(); 
     });
 
     /********************************************
@@ -402,7 +401,6 @@
       });
       
       let messages = [];
-      
       if(totalSelected < minTotal) {
         messages.push("יש לבחור מינימום 14 משמרות. נבחרו " + totalSelected + " משמרות.");
       }
@@ -436,11 +434,9 @@
         submissionTime: Date.now()
       };
       
-      // שמירה בנתיב "schedules"
       push(ref(db, "schedules"), data)
         .then(() => {
           alert("הטופס נשלח ונשמר בהצלחה ב-Firebase!");
-          // כעת נרענן את הדף
           window.location.reload();
         })
         .catch((err) => {
