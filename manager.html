@@ -259,16 +259,16 @@
       renderEmployeesTable();
     });
     
-    // פונקציה להצגת אזור ניהול העובדים
-    function showEmployeeManagement(){
+    // הפיכת הפונקציות לזמינות גלובלי על ידי הקצאתן ל-window
+    window.showEmployeeManagement = function(){
       document.getElementById("employeeManagement").style.display = "block";
-    }
+    };
     
-    // פונקציות לפתיחת וסגירת מודל הוספת עובד
-    function openAddEmployeeModal(){
+    window.openAddEmployeeModal = function(){
       document.getElementById("addEmployeeModal").style.display = "block";
-    }
-    function closeAddEmployeeModal(){
+    };
+    
+    window.closeAddEmployeeModal = function(){
       document.getElementById("addEmployeeModal").style.display = "none";
       // אפס שדות
       document.getElementById("addFirstName").value = "";
@@ -278,10 +278,9 @@
       radiosType.forEach(radio => radio.checked = false);
       const radiosStudent = document.getElementsByName("addStudent");
       radiosStudent.forEach(radio => radio.checked = false);
-    }
+    };
     
-    // שמירת עובד חדש ב-Firebase
-    function saveNewEmployee(){
+    window.saveNewEmployee = function(){
       const firstName = document.getElementById("addFirstName").value.trim();
       const lastName = document.getElementById("addLastName").value.trim();
       const code = document.getElementById("addCode").value.trim();
@@ -309,15 +308,14 @@
         .catch(err => {
           alert("אירעה שגיאה: " + err.message);
         });
-    }
+    };
     
-    // הצגת טבלת העובדים – סידור לפי: אחמ״ש, קב״ט (סטודנט = כן), קב״ט (סטודנט = לא)
     function renderEmployeesTable(){
       const tbody = document.querySelector("#employeesTable tbody");
       tbody.innerHTML = "";
       // המר את האובייקט למערך
       const empArray = Object.entries(employees);
-      // הוספת קבוצת מיון: 1 עבור אחמ״ש, 2 עבור קב״ט עם סטודנט = כן, 3 עבור קב״ט עם סטודנט = לא.
+      // סידור לפי: 1 - אחמ״ש, 2 - קב״ט עם סטודנט = כן, 3 - קב״ט עם סטודנט = לא
       empArray.sort((a, b) => {
         const empA = a[1], empB = b[1];
         const getGroup = (emp) => {
@@ -327,7 +325,7 @@
         };
         const groupA = getGroup(empA), groupB = getGroup(empB);
         if(groupA !== groupB) return groupA - groupB;
-        // אם באותה קבוצה – נשאיר את הסדר לפי הוספה (בהנחה שהמפתחות מייצגים את הסדר)
+        // אם באותה קבוצה – שמירת הסדר לפי המפתח (כמו סדר ההוספה)
         return a[0].localeCompare(b[0]);
       });
       
@@ -348,8 +346,7 @@
       });
     }
     
-    // פונקציות עריכה
-    function openEditEmployeeModal(key){
+    window.openEditEmployeeModal = function(key){
       currentEditKey = key;
       const emp = employees[key];
       document.getElementById("editFirstName").value = emp.firstName;
@@ -366,13 +363,13 @@
         radio.checked = (radio.value === emp.student);
       });
       document.getElementById("editEmployeeModal").style.display = "block";
-    }
+    };
     
-    function closeEditEmployeeModal(){
+    window.closeEditEmployeeModal = function(){
       document.getElementById("editEmployeeModal").style.display = "none";
-    }
+    };
     
-    function updateEmployee(){
+    window.updateEmployee = function(){
       const firstName = document.getElementById("editFirstName").value.trim();
       const lastName = document.getElementById("editLastName").value.trim();
       const code = document.getElementById("editCode").value.trim();
@@ -400,9 +397,9 @@
         .catch(err => {
           alert("אירעה שגיאה: " + err.message);
         });
-    }
+    };
     
-    function deleteEmployee(key){
+    window.deleteEmployee = function(key){
       if(confirm("האם אתה בטוח שברצונך למחוק עובד זה?")){
         remove(ref(db, "employees/" + key))
           .then(() => {
@@ -412,7 +409,7 @@
             alert("אירעה שגיאה: " + err.message);
           });
       }
-    }
+    };
   </script>
 </body>
 </html>
