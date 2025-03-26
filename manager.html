@@ -5,180 +5,315 @@
   <title>ניהול טופס</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: linear-gradient(135deg, #ffffff, #e0f7fa);
+    /* יבוא גופן Rubik מודרני */
+    @import url('https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap');
+
+    /* עיצוב כללי */
+    html, body {
       margin: 0;
-      padding: 20px;
+      padding: 0;
       direction: rtl;
-      text-align: center;
+      font-family: 'Rubik', sans-serif;
+      background: #f0f2f5;
       color: #333;
     }
-    h1 {
-      color: #00796b;
-      margin-bottom: 30px;
+    body {
+      padding: 0;
+      text-align: center;
     }
+    /* Header מלא עם רקע ותפריט פנימי */
+    header {
+      width: 100%;
+      background-color: #2c3e50;
+      color: #fff;
+      padding: 20px;
+      box-sizing: border-box;
+      position: relative;
+      cursor: pointer;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 2.8rem;
+    }
+    header p {
+      margin: 5px 0 0;
+      font-size: 1.2rem;
+      color: #dfe6e9;
+    }
+    /* תפריט בתוך ה-header */
     .menu {
       display: flex;
       justify-content: center;
       gap: 15px;
-      margin-bottom: 20px;
+      margin-top: 15px;
     }
     .menu button {
-      background-color: #00796b;
+      background-color: #00695c; /* ירוק כהה */
       color: #fff;
       border: none;
-      padding: 10px 15px;
+      padding: 10px 20px;
       font-size: 16px;
-      border-radius: 4px;
+      border-radius: 30px;
       cursor: pointer;
+      transition: background-color 0.3s;
     }
     .menu button:hover {
-      background-color: #005b4f;
+      background-color: #004d40;
     }
+    /* אזור ההגדרות – תצוגת הבית של "ניהול טופס" */
     .content {
-      max-width: 900px;
-      margin: auto;
+      width: 100%;
+      background-color: #fff;
+      padding: 25px;
+      box-sizing: border-box;
+    }
+    /* הגדרות (Settings Section) – מוצגות כברירת מחדל */
+    #settingsSection {
+      display: block;
+    }
+    /* אזור ניהול העובדים – מוסתר כברירת מחדל */
+    #employeeManagement {
+      display: none;
+    }
+    /* עיצוב Toggle Buttons לשאלות ההגדרות */
+    .settings-question {
+      margin-bottom: 20px;
+      text-align: right;
+      font-size: 1.1rem;
+    }
+    .settings-question label {
+      margin-right: 10px;
+      font-weight: 500;
+    }
+    .toggle-group {
+      display: inline-flex;
+      gap: 10px;
+      vertical-align: middle;
+    }
+    .toggle-btn {
+      padding: 10px 20px;
+      border: 1px solid #2c3e50;
+      border-radius: 30px;
+      background-color: #fff;
+      color: #2c3e50;
+      cursor: pointer;
+      transition: background-color 0.3s, color 0.3s;
+      font-size: 1rem;
+    }
+    .toggle-btn.active {
+      background-color: #2c3e50;
+      color: #fff;
+    }
+    /* עוטף לטבלה עם קצוות מעוגלים */
+    .table-container {
+      overflow-x: auto;
+      margin-top: 20px;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid #ccc;
     }
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 20px;
+      margin: 0 auto;
     }
-    table, th, td {
-      border: 1px solid #ddd;
+    table thead th {
+      background-color: #2c3e50;
+      color: #fff;
+      padding: 12px;
+      border: 1px solid #ccc;
     }
-    th, td {
-      padding: 10px;
+    table tbody td {
+      border: 1px solid #ccc;
+      padding: 12px;
       text-align: center;
     }
-    th {
-      background-color: #00796b;
-      color: #fff;
+    /* הזזת תא "פעולות" לימין – padding-left 40px */
+    table thead th:last-child,
+    table tbody td:last-child {
+      padding-left: 40px;
     }
+    /* כפתורי פעולות בטבלה */
     button.action-btn {
-      padding: 5px 10px;
+      padding: 6px 12px;
       font-size: 14px;
       border: none;
-      border-radius: 4px;
+      border-radius: 20px;
       cursor: pointer;
+      transition: background-color 0.3s;
+      margin: 2px;
     }
     button.edit-btn {
       background-color: #4CAF50;
       color: #fff;
     }
+    button.edit-btn:hover {
+      background-color: #3e8e41;
+    }
     button.delete-btn {
       background-color: #f44336;
       color: #fff;
     }
+    button.delete-btn:hover {
+      background-color: #d32f2f;
+    }
+    /* כפתור הוספת עובד */
     button.add-btn {
-      background-color: #00796b;
+      background-color: #2c3e50;
       color: #fff;
-      padding: 10px 20px;
+      padding: 12px 25px;
       font-size: 16px;
       border: none;
-      border-radius: 4px;
+      border-radius: 30px;
       cursor: pointer;
-      margin-top: 10px;
+      transition: background-color 0.3s;
+      margin-bottom: 20px;
     }
     button.add-btn:hover {
-      background-color: #005b4f;
+      background-color: #1a252f;
     }
-    /* מודלים */
+    /* מודלים – חלונות קופצים */
     .modal {
-      display: none; 
-      position: fixed; 
-      z-index: 999; 
+      display: none;
+      position: fixed;
+      z-index: 999;
       left: 0;
       top: 0;
-      width: 100%; 
-      height: 100%; 
+      width: 100%;
+      height: 100%;
       overflow: auto;
-      background-color: rgba(0,0,0,0.4);
+      background-color: rgba(0,0,0,0.5);
     }
     .modal-content {
       background-color: #fff;
-      margin: 10% auto; 
+      margin: 10% auto;
       padding: 20px;
-      border-radius: 8px;
+      border-radius: 10px;
       width: 90%;
       max-width: 400px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
       position: relative;
+      text-align: center;
     }
-    .close {
-      color: #aaa;
-      float: right;
-      font-size: 28px;
-      font-weight: bold;
-      cursor: pointer;
-      position: absolute;
-      top: 10px;
-      right: 15px;
-    }
-    .close:hover {
-      color: #000;
-    }
-    .modal-content input, .modal-content select {
-      width: 100%;
-      padding: 8px;
-      margin-bottom: 10px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
+    .modal-content h3 {
+      margin-top: 0;
+      color: #2c3e50;
     }
     .modal-content label {
-      font-weight: bold;
+      font-weight: 500;
       margin-bottom: 5px;
       display: block;
+      text-align: right;
     }
-    .modal-content .radio-group {
-      margin-bottom: 10px;
-      text-align: left;
+    .modal-content input, 
+    .modal-content select {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 1rem;
+      box-sizing: border-box;
     }
-    .modal-content .radio-group label {
-      display: inline-block;
-      margin-right: 15px;
-      font-weight: normal;
+    /* עיצוב Toggle Buttons במודלים (למקרה של הוספה/עריכה) */
+    .modal-toggle-group {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+    .modal-toggle-btn {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid #2c3e50;
+      border-radius: 30px;
+      background-color: #fff;
+      color: #2c3e50;
+      cursor: pointer;
+      transition: background-color 0.3s, color 0.3s;
+      font-size: 1rem;
+    }
+    .modal-toggle-btn.active {
+      background-color: #2c3e50;
+      color: #fff;
     }
     .modal-content button {
-      background-color: #00796b;
+      background-color: #2c3e50;
       color: #fff;
       border: none;
       padding: 10px;
       font-size: 16px;
-      border-radius: 4px;
+      border-radius: 30px;
       cursor: pointer;
       width: 100%;
+      transition: background-color 0.3s;
     }
     .modal-content button:hover {
-      background-color: #005b4f;
+      background-color: #1a252f;
+    }
+    .close {
+      color: #aaa;
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .close:hover {
+      color: #000;
     }
   </style>
 </head>
 <body>
-  <h1>ניהול טופס</h1>
-  <div class="menu">
-    <button onclick="window.location.href='index.html'">חזרה לטופס הראשי</button>
-    <button onclick="window.location.href='סידורים.html'">מעבר לסידורים</button>
-    <button onclick="showEmployeeManagement()">ערוך עובדים</button>
+  <!-- Header: לחיצה על הכותרת מחזירה לתצוגת ההגדרות -->
+  <header onclick="showSettingsSection()">
+    <h1>ניהול טופס</h1>
+    <p>סידור עבודה מחלקת ביטחון</p>
+    <div class="menu">
+      <button onclick="showSettingsSection(); event.stopPropagation();">חזרה לטופס הראשי</button>
+      <button onclick="window.location.href='סידורים.html'; event.stopPropagation();">מעבר לסידורים</button>
+      <button onclick="showEmployeeManagement(); event.stopPropagation();">ערוך עובדים</button>
+    </div>
+  </header>
+  
+  <!-- תצוגת הגדרות (Settings Section) – מוצגת כברירת מחדל -->
+  <div class="content" id="settingsSection">
+    <div class="settings-question">
+      <label>האם לאפשר הגשת סידור עבודה:</label>
+      <div class="toggle-group" id="scheduleSubmissionGroup">
+        <div class="toggle-btn" data-value="כן" onclick="selectToggle(this, 'scheduleSubmission'); updateSubmissionSetting('כן');">כן</div>
+        <div class="toggle-btn" data-value="לא" onclick="selectToggle(this, 'scheduleSubmission'); updateSubmissionSetting('לא');">לא</div>
+      </div>
+    </div>
+    <div class="settings-question">
+      <label>האם לבקש קוד עובד בעת בחירת שם:</label>
+      <div class="toggle-group" id="requireEmployeeCodeGroup">
+        <div class="toggle-btn" data-value="כן" onclick="selectToggle(this, 'requireEmployeeCode'); updateRequireCodeSetting('כן');">כן</div>
+        <div class="toggle-btn" data-value="לא" onclick="selectToggle(this, 'requireEmployeeCode'); updateRequireCodeSetting('לא');">לא</div>
+      </div>
+    </div>
   </div>
   
+  <!-- אזור ניהול העובדים – מוסתר כברירת מחדל -->
   <div class="content" id="employeeManagement" style="display: none;">
-    <button class="add-btn" onclick="openAddEmployeeModal()">הוסף עובד+</button>
-    <table id="employeesTable">
-      <thead>
-        <tr>
-          <th>שם מלא</th>
-          <th>סוג</th>
-          <th>סטודנט</th>
-          <th>מספר עובד</th>
-          <th>פעולות</th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- נתוני העובדים יתמלאו כאן -->
-      </tbody>
-    </table>
+    <button class="add-btn" onclick="openAddEmployeeModal()">+ הוספת עובד</button>
+    <div class="table-container">
+      <table id="employeesTable">
+        <thead>
+          <tr>
+            <th>שם מלא</th>
+            <th>סוג</th>
+            <th>סטודנט</th>
+            <th>מספר עובד</th>
+            <th>פעולות</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- נתוני העובדים יתמלאו כאן -->
+        </tbody>
+      </table>
+    </div>
   </div>
   
   <!-- מודל הוספת עובד -->
@@ -190,19 +325,19 @@
       <input type="text" id="addFirstName" placeholder="הזן שם פרטי">
       <label for="addLastName">שם משפחה:</label>
       <input type="text" id="addLastName" placeholder="הזן שם משפחה">
-      <div class="radio-group">
-        <label>סוג עובד:</label><br>
-        <label><input type="radio" name="addType" value="אחמ״ש" required> אחמ״ש</label>
-        <label><input type="radio" name="addType" value="קב״ט" required> קב״ט</label>
+      <label>סוג עובד:</label>
+      <div class="toggle-group" id="addTypeGroup">
+        <div class="toggle-btn" data-value="אחמ״ש" onclick="selectToggle(this, 'addType')">אחמ״ש</div>
+        <div class="toggle-btn" data-value="קב״ט" onclick="selectToggle(this, 'addType')">קב״ט</div>
       </div>
-      <div class="radio-group">
-        <label>סטודנט:</label><br>
-        <label><input type="radio" name="addStudent" value="כן" required> כן</label>
-        <label><input type="radio" name="addStudent" value="לא" required> לא</label>
+      <label>סטודנט:</label>
+      <div class="toggle-group" id="addStudentGroup">
+        <div class="toggle-btn" data-value="כן" onclick="selectToggle(this, 'addStudent')">כן</div>
+        <div class="toggle-btn" data-value="לא" onclick="selectToggle(this, 'addStudent')">לא</div>
       </div>
       <label for="addCode">מספר עובד (קוד):</label>
-      <input type="text" id="addCode" placeholder="הזן קוד">
-      <button onclick="saveNewEmployee()">שומר עובד</button>
+      <input type="text" id="addCode" placeholder="00000" maxlength="5">
+      <button onclick="saveNewEmployee()">שמור עובד</button>
     </div>
   </div>
   
@@ -215,15 +350,15 @@
       <input type="text" id="editFirstName">
       <label for="editLastName">שם משפחה:</label>
       <input type="text" id="editLastName">
-      <div class="radio-group">
-        <label>סוג עובד:</label><br>
-        <label><input type="radio" name="editType" value="אחמ״ש" required> אחמ״ש</label>
-        <label><input type="radio" name="editType" value="קב״ט" required> קב״ט</label>
+      <label>סוג עובד:</label>
+      <div class="toggle-group" id="editTypeGroup">
+        <div class="toggle-btn" data-value="אחמ״ש" onclick="selectToggle(this, 'editType')">אחמ״ש</div>
+        <div class="toggle-btn" data-value="קב״ט" onclick="selectToggle(this, 'editType')">קב״ט</div>
       </div>
-      <div class="radio-group">
-        <label>סטודנט:</label><br>
-        <label><input type="radio" name="editStudent" value="כן" required> כן</label>
-        <label><input type="radio" name="editStudent" value="לא" required> לא</label>
+      <label>סטודנט:</label>
+      <div class="toggle-group" id="editStudentGroup">
+        <div class="toggle-btn" data-value="כן" onclick="selectToggle(this, 'editStudent')">כן</div>
+        <div class="toggle-btn" data-value="לא" onclick="selectToggle(this, 'editStudent')">לא</div>
       </div>
       <label for="editCode">מספר עובד (קוד):</label>
       <input type="text" id="editCode">
@@ -249,18 +384,24 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
     
-    let employees = {}; // יכיל את כל העובדים עם מפתחותיהם
-    let currentEditKey = ""; // כאשר עורכים עובד, נאחסן את מפתחו
+    let employees = {}; 
+    let currentEditKey = "";
     
-    // מאזין לשינויים בנתוני העובדים
     onValue(ref(db, "employees"), (snapshot) => {
       const val = snapshot.val();
       employees = val ? val : {};
       renderEmployeesTable();
     });
     
-    // הפיכת הפונקציות לזמינות גלובלי על ידי הקצאתן ל-window
+    // מציג את תצוגת ההגדרות ומסתיר את ניהול העובדים
+    window.showSettingsSection = function() {
+      document.getElementById("employeeManagement").style.display = "none";
+      document.getElementById("settingsSection").style.display = "block";
+    };
+    
+    // מציג את ניהול העובדים ומסתיר את תצוגת ההגדרות
     window.showEmployeeManagement = function(){
+      document.getElementById("settingsSection").style.display = "none";
       document.getElementById("employeeManagement").style.display = "block";
     };
     
@@ -270,35 +411,26 @@
     
     window.closeAddEmployeeModal = function(){
       document.getElementById("addEmployeeModal").style.display = "none";
-      // אפס שדות
       document.getElementById("addFirstName").value = "";
       document.getElementById("addLastName").value = "";
       document.getElementById("addCode").value = "";
-      const radiosType = document.getElementsByName("addType");
-      radiosType.forEach(radio => radio.checked = false);
-      const radiosStudent = document.getElementsByName("addStudent");
-      radiosStudent.forEach(radio => radio.checked = false);
+      clearToggleGroup("addTypeGroup");
+      clearToggleGroup("addStudentGroup");
     };
     
     window.saveNewEmployee = function(){
       const firstName = document.getElementById("addFirstName").value.trim();
       const lastName = document.getElementById("addLastName").value.trim();
       const code = document.getElementById("addCode").value.trim();
-      const type = document.querySelector('input[name="addType"]:checked')?.value;
-      const student = document.querySelector('input[name="addStudent"]:checked')?.value;
+      const type = document.getElementById("addTypeGroup").getAttribute("data-selected") || "";
+      const student = document.getElementById("addStudentGroup").getAttribute("data-selected") || "";
       
       if(!firstName || !lastName || !code || !type || !student){
         alert("נא למלא את כל השדות.");
         return;
       }
       
-      const newEmployee = {
-        firstName,
-        lastName,
-        code,
-        type,
-        student
-      };
+      const newEmployee = { firstName, lastName, code, type, student };
       
       push(ref(db, "employees"), newEmployee)
         .then(() => {
@@ -313,9 +445,7 @@
     function renderEmployeesTable(){
       const tbody = document.querySelector("#employeesTable tbody");
       tbody.innerHTML = "";
-      // המר את האובייקט למערך
       const empArray = Object.entries(employees);
-      // סידור לפי: 1 - אחמ״ש, 2 - קב״ט עם סטודנט = כן, 3 - קב״ט עם סטודנט = לא
       empArray.sort((a, b) => {
         const empA = a[1], empB = b[1];
         const getGroup = (emp) => {
@@ -325,7 +455,6 @@
         };
         const groupA = getGroup(empA), groupB = getGroup(empB);
         if(groupA !== groupB) return groupA - groupB;
-        // אם באותה קבוצה – שמירת הסדר לפי המפתח (כמו סדר ההוספה)
         return a[0].localeCompare(b[0]);
       });
       
@@ -337,7 +466,7 @@
           <td>${emp.type}</td>
           <td>${emp.student}</td>
           <td>${emp.code}</td>
-          <td>
+          <td style="padding-left:40px;">
             <button class="action-btn edit-btn" onclick="openEditEmployeeModal('${key}')">ערוך</button>
             <button class="action-btn delete-btn" onclick="deleteEmployee('${key}')">מחק</button>
           </td>
@@ -352,16 +481,8 @@
       document.getElementById("editFirstName").value = emp.firstName;
       document.getElementById("editLastName").value = emp.lastName;
       document.getElementById("editCode").value = emp.code;
-      // סמן את סוג העובד
-      const radiosType = document.getElementsByName("editType");
-      radiosType.forEach(radio => {
-        radio.checked = (radio.value === emp.type);
-      });
-      // סמן את סטודנט
-      const radiosStudent = document.getElementsByName("editStudent");
-      radiosStudent.forEach(radio => {
-        radio.checked = (radio.value === emp.student);
-      });
+      setToggleGroupValue("editTypeGroup", emp.type);
+      setToggleGroupValue("editStudentGroup", emp.student);
       document.getElementById("editEmployeeModal").style.display = "block";
     };
     
@@ -373,21 +494,15 @@
       const firstName = document.getElementById("editFirstName").value.trim();
       const lastName = document.getElementById("editLastName").value.trim();
       const code = document.getElementById("editCode").value.trim();
-      const type = document.querySelector('input[name="editType"]:checked')?.value;
-      const student = document.querySelector('input[name="editStudent"]:checked')?.value;
+      const type = document.getElementById("editTypeGroup").getAttribute("data-selected") || "";
+      const student = document.getElementById("editStudentGroup").getAttribute("data-selected") || "";
       
       if(!firstName || !lastName || !code || !type || !student){
         alert("נא למלא את כל השדות לעדכון.");
         return;
       }
       
-      const updatedEmployee = {
-        firstName,
-        lastName,
-        code,
-        type,
-        student
-      };
+      const updatedEmployee = { firstName, lastName, code, type, student };
       
       set(ref(db, "employees/" + currentEditKey), updatedEmployee)
         .then(() => {
@@ -410,6 +525,71 @@
           });
       }
     };
+
+    /* פונקציות לטיפול ב-Toggle Buttons */
+    window.selectToggle = function(el, groupId) {
+      const group = document.getElementById(groupId + "Group");
+      Array.from(group.children).forEach(btn => btn.classList.remove("active"));
+      el.classList.add("active");
+      group.setAttribute("data-selected", el.getAttribute("data-value"));
+    };
+    window.clearToggleGroup = function(groupId) {
+      const group = document.getElementById(groupId);
+      if(group) {
+        Array.from(group.children).forEach(btn => btn.classList.remove("active"));
+        group.removeAttribute("data-selected");
+      }
+    };
+    window.setToggleGroupValue = function(groupId, value) {
+      const group = document.getElementById(groupId);
+      Array.from(group.children).forEach(btn => {
+        if(btn.getAttribute("data-value") === value) {
+          btn.classList.add("active");
+          group.setAttribute("data-selected", value);
+        } else {
+          btn.classList.remove("active");
+        }
+      });
+    };
+
+    // עדכון הגדרות במאגר (ניתן להרחיב לפי הצורך)
+    window.updateSubmissionSetting = function(value) {
+      // עדכון הגדרת "allowScheduleSubmission" ב-Firebase
+      set(ref(db, "settings/allowScheduleSubmission"), value)
+        .then(() => {
+          alert("עודכן: הגשת סידור עבודה " + value);
+        })
+        .catch(err => {
+          alert("אירעה שגיאה בעדכון: " + err.message);
+        });
+    };
+
+    window.updateRequireCodeSetting = function(value) {
+      // עדכון הגדרת "requireEmployeeCode" ב-Firebase
+      set(ref(db, "settings/requireEmployeeCode"), value)
+        .then(() => {
+          alert("עודכן: דרישת קוד עובד " + value);
+        })
+        .catch(err => {
+          alert("אירעה שגיאה בעדכון: " + err.message);
+        });
+    };
+
+    // בעת טעינת הדף, נעדכן את מצב הכפתורים לפי הערכים השמורים ב-Firebase
+    onValue(ref(db, "settings/allowScheduleSubmission"), (snapshot) => {
+      const val = snapshot.val();
+      if(val) {
+        // עדכון כפתורי הגשת הסידור
+        setToggleGroupValue("scheduleSubmissionGroup", val);
+      }
+    });
+    onValue(ref(db, "settings/requireEmployeeCode"), (snapshot) => {
+      const val = snapshot.val();
+      if(val) {
+        // עדכון כפתורי דרישת הקוד
+        setToggleGroupValue("requireEmployeeCodeGroup", val);
+      }
+    });
   </script>
 </body>
 </html>
