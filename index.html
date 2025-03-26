@@ -132,7 +132,7 @@
       display: none;
       margin-top: 20px;
     }
-    /* טבלת משמרות עם קווי הפרדה */
+    /* טבלת משמרות (בטופס) */
     table {
       width: 100%;
       border-collapse: collapse;
@@ -148,7 +148,7 @@
       color: #fff;
       font-size: 1rem;
     }
-    /* תא משמרת – כל התיבה (הריבוע) מתעצב */
+    /* תא משמרת – עיצוב ריבוע */
     .shift-cell {
       display: block;
       border: none;
@@ -160,7 +160,7 @@
       transition: background-color 0.3s, color 0.3s;
       font-weight: 500;
     }
-    /* כאשר נבחר, כל הריבוע מתחלף לתכלת וטקסט לבן */
+    /* כאשר נבחר, הריבוע מתחלף לתכלת וטקסט לבן */
     .shift-cell:has(input[type="checkbox"]:checked) {
       background-color: #00bcd4;
       color: #fff;
@@ -208,7 +208,7 @@
       height: 20px;
       fill: #fff;
     }
-    /* מודל התחברות מנהל – חלון דק ונקי */
+    /* מודל התחברות מנהל – חלון קופץ */
     .modal {
       display: none; 
       position: fixed; 
@@ -222,25 +222,27 @@
     }
     .modal-content {
       background-color: #fff;
-      margin: 15% auto; 
+      margin: 10% auto; 
       padding: 20px;
       border-radius: 8px;
       width: 90%;
-      max-width: 400px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      max-width: 500px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
       position: relative;
       text-align: center;
     }
-    /* קלטי התחברות – גודל קצרים יותר */
-    .modal-content input {
-      width: 80%;
-      max-width: 250px;
-      margin: 10px auto;
-      display: block;
+    .modal-content h2, .modal-content h3 {
+      margin-top: 0;
+      color: #2c3e50;
+    }
+    .modal-content input, .modal-content textarea {
+      width: 100%;
       padding: 10px;
-      border: 2px solid #2c3e50;
-      border-radius: 30px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
       font-size: 1rem;
+      box-sizing: border-box;
     }
     .close {
       color: #aaa;
@@ -253,10 +255,6 @@
     }
     .close:hover {
       color: #000;
-    }
-    .modal-content h2, .modal-content h3 {
-      margin-top: 0;
-      color: #2c3e50;
     }
     .login-btn, .code-btns button {
       width: 80%;
@@ -294,6 +292,53 @@
       margin: auto;
       text-align: center;
       font-size: 1.2rem;
+    }
+    /* עיצוב טבלת סידור (למודל תצוגה) – דומה לעמוד הסידורים */
+    .schedule-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      border: 1px solid #ccc;
+    }
+    .schedule-table th, .schedule-table td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: center;
+    }
+    .schedule-table th {
+      background-color: #eee;
+      font-weight: bold;
+    }
+    .schedule-day {
+      background-color: #fafafa;
+    }
+    .schedule-boker {
+      background-color: #e1f5fe;
+    }
+    .schedule-erev {
+      background-color: #ffe0b2;
+    }
+    .schedule-laila {
+      background-color: #f3e5f5;
+    }
+    /* עיצוב כפתורי בחירה במודול תצוגה */
+    .preview-buttons {
+      margin-top: 20px;
+      display: flex;
+      justify-content: space-around;
+    }
+    .preview-buttons button {
+      background-color: #2c3e50;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      font-size: 1rem;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    .preview-buttons button:hover {
+      background-color: #1a252f;
     }
   </style>
 </head>
@@ -497,7 +542,7 @@
       <label for="preferences">העדפות (לא חובה):</label>
       <textarea id="preferences" name="preferences" rows="3" placeholder="הזן כאן את העדפותיך (אם יש)"></textarea>
       
-      <!-- כפתור שליחה עם אייקון – מופיע רק באזור המשמרות והעדפות -->
+      <!-- כפתור שליחה – מופיע רק באזור המשמרות והעדפות -->
       <div class="submit-container">
         <button type="submit" class="submit-btn">
           <span>שלח</span>
@@ -529,6 +574,19 @@
       <div class="code-btns">
         <button id="cancelCodeBtn">ביטול</button>
         <button id="confirmCodeBtn">אישור</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- מודל תצוגת הסידור (Preview Modal) -->
+  <div id="previewModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closePreviewModal()">&times;</span>
+      <h3>תצוגה מקדימה של הסידור</h3>
+      <div id="previewContent"></div>
+      <div class="preview-buttons">
+        <button id="editPreviewBtn" onclick="closePreviewModal()">ערוך</button>
+        <button id="submitPreviewBtn" onclick="submitFinalSchedule()">שלח</button>
       </div>
     </div>
   </div>
@@ -640,7 +698,6 @@
     }
 
     // בעת בחירת שם – שמירת הבחירה
-    // אם דרישת קוד עובד היא "כן" – יוצג מודל קוד, אחרת יוצגו המשמרות ישירות
     const nameSelect = document.getElementById("nameSelect");
     nameSelect.addEventListener("change", () => {
       currentEmployeeId = nameSelect.value;
@@ -690,14 +747,61 @@
       }
     });
 
-    // שליחת הטופס – בדיקות ושמירה
+    // יצירת טבלת תצוגה של הסידור – דומה לעמוד הסידורים
+    function createScheduleTable(scheduleString) {
+      const days = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
+      const times = [
+        { name: "בוקר", className: "schedule-boker" },
+        { name: "ערב", className: "schedule-erev" },
+        { name: "לילה", className: "schedule-laila" }
+      ];
+      
+      const table = document.createElement("table");
+      table.className = "schedule-table";
+      
+      const thead = document.createElement("thead");
+      thead.innerHTML = `
+        <tr>
+          <th class="schedule-day">יום</th>
+          <th class="schedule-boker">בוקר</th>
+          <th class="schedule-erev">ערב</th>
+          <th class="schedule-laila">לילה</th>
+        </tr>
+      `;
+      table.appendChild(thead);
+      
+      const tbody = document.createElement("tbody");
+      days.forEach(day => {
+        const row = document.createElement("tr");
+        const dayCell = document.createElement("td");
+        dayCell.className = "schedule-day";
+        dayCell.textContent = day;
+        row.appendChild(dayCell);
+        times.forEach(timeObj => {
+          const cell = document.createElement("td");
+          cell.className = timeObj.className;
+          const pattern = `${day}-${timeObj.name}`;
+          if (scheduleString.includes(pattern)) {
+            cell.innerHTML = `<span class="checkmark">✓</span>`;
+          } else {
+            cell.innerHTML = "";
+          }
+          row.appendChild(cell);
+        });
+        tbody.appendChild(row);
+      });
+      table.appendChild(tbody);
+      return table;
+    }
+
+    // במקום לשלוח ישירות, בעת לחיצת "שלח" בטופס מוצגת תצוגה מקדימה במודל
     const form = document.getElementById("shiftForm");
     form.addEventListener("submit", (event) => {
       event.preventDefault();
-      validateForm();
+      validateAndPreview();
     });
 
-    function validateForm() {
+    function validateAndPreview() {
       const roleInput = document.querySelector('input[name="role"]:checked');
       if (!roleInput) {
         alert("אנא בחר תפקיד.");
@@ -743,8 +847,42 @@
         return;
       }
       
+      // הכנת נתוני הסידור להצגה במודול התצוגה
       const preferences = document.getElementById("preferences").value;
       const scheduleString = Array.from(shifts).map(s => s.value).join(", ");
+      const previewDiv = document.getElementById("previewContent");
+      previewDiv.innerHTML = "";
+      
+      const header = document.createElement("h3");
+      header.textContent = currentEmployeeData.firstName + " " + currentEmployeeData.lastName;
+      previewDiv.appendChild(header);
+      
+      const scheduleTitle = document.createElement("div");
+      scheduleTitle.style.fontWeight = "bold";
+      scheduleTitle.style.marginTop = "10px";
+      scheduleTitle.textContent = "סידור משמרות:";
+      previewDiv.appendChild(scheduleTitle);
+      
+      const table = createScheduleTable(scheduleString);
+      previewDiv.appendChild(table);
+      
+      if (preferences && preferences.trim() !== "") {
+        const prefEl = document.createElement("div");
+        prefEl.style.marginTop = "10px";
+        prefEl.innerHTML = "<strong>העדפות:</strong> " + preferences;
+        previewDiv.appendChild(prefEl);
+      }
+      
+      // פתיחת מודל התצוגה
+      document.getElementById("previewModal").style.display = "block";
+    }
+
+    // פעולה בעת לחיצה על "שלח" במודל התצוגה – שיגור הנתונים למסד
+    function submitFinalSchedule() {
+      const role = document.querySelector('input[name="role"]:checked').value;
+      const shifts = document.querySelectorAll('input[name="shift"]:checked');
+      const scheduleString = Array.from(shifts).map(s => s.value).join(", ");
+      const preferences = document.getElementById("preferences").value;
       const data = {
         role: role,
         name: currentEmployeeData.firstName + " " + currentEmployeeData.lastName,
@@ -761,6 +899,11 @@
         .catch((err) => {
           alert("אירעה שגיאה בשמירה: " + err.message);
         });
+    }
+
+    // פעולה לסגירת מודל התצוגה
+    function closePreviewModal() {
+      document.getElementById("previewModal").style.display = "none";
     }
 
     // התחברות מנהל
@@ -784,6 +927,10 @@
           alert("שגיאה בהתחברות: " + err.message);
         });
     });
+
+    // חשוב: הגדירו את הפונקציות שישמשו ב־onclick כמשתנים גלובליים:
+    window.closePreviewModal = closePreviewModal;
+    window.submitFinalSchedule = submitFinalSchedule;
   </script>
 </body>
 </html>
