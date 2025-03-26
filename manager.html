@@ -128,7 +128,7 @@
       padding: 12px;
       text-align: center;
     }
-    /* הזזת תא "פעולות" לימין – padding-left 40px */
+    /* הזזת תא "פעולות" לימין – padding-left: 40px */
     table thead th:last-child,
     table tbody td:last-child {
       padding-left: 40px;
@@ -271,7 +271,8 @@
     <h1>ניהול טופס</h1>
     <p>סידור עבודה מחלקת ביטחון</p>
     <div class="menu">
-      <button onclick="showSettingsSection(); event.stopPropagation();">חזרה לטופס הראשי</button>
+      <!-- כאן הכפתור "חזרה לטופס הראשי" מנווט לדף index -->
+      <button onclick="window.location.href='index.html'; event.stopPropagation();">חזרה לטופס הראשי</button>
       <button onclick="window.location.href='סידורים.html'; event.stopPropagation();">מעבר לסידורים</button>
       <button onclick="showEmployeeManagement(); event.stopPropagation();">ערוך עובדים</button>
     </div>
@@ -387,6 +388,7 @@
     let employees = {}; 
     let currentEditKey = "";
     
+    // טעינת נתוני עובדים ועדכון הטבלה
     onValue(ref(db, "employees"), (snapshot) => {
       const val = snapshot.val();
       employees = val ? val : {};
@@ -552,9 +554,8 @@
       });
     };
 
-    // עדכון הגדרות במאגר (ניתן להרחיב לפי הצורך)
+    // עדכון הגדרות במסד הנתונים
     window.updateSubmissionSetting = function(value) {
-      // עדכון הגדרת "allowScheduleSubmission" ב-Firebase
       set(ref(db, "settings/allowScheduleSubmission"), value)
         .then(() => {
           alert("עודכן: הגשת סידור עבודה " + value);
@@ -565,7 +566,6 @@
     };
 
     window.updateRequireCodeSetting = function(value) {
-      // עדכון הגדרת "requireEmployeeCode" ב-Firebase
       set(ref(db, "settings/requireEmployeeCode"), value)
         .then(() => {
           alert("עודכן: דרישת קוד עובד " + value);
@@ -575,18 +575,16 @@
         });
     };
 
-    // בעת טעינת הדף, נעדכן את מצב הכפתורים לפי הערכים השמורים ב-Firebase
+    // בעת טעינת הדף – עדכון מצב הכפתורים לפי הערכים במסד הנתונים
     onValue(ref(db, "settings/allowScheduleSubmission"), (snapshot) => {
       const val = snapshot.val();
       if(val) {
-        // עדכון כפתורי הגשת הסידור
         setToggleGroupValue("scheduleSubmissionGroup", val);
       }
     });
     onValue(ref(db, "settings/requireEmployeeCode"), (snapshot) => {
       const val = snapshot.val();
       if(val) {
-        // עדכון כפתורי דרישת הקוד
         setToggleGroupValue("requireEmployeeCodeGroup", val);
       }
     });
