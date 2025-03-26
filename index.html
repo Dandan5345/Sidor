@@ -497,7 +497,7 @@
       <label for="preferences">העדפות (לא חובה):</label>
       <textarea id="preferences" name="preferences" rows="3" placeholder="הזן כאן את העדפותיך (אם יש)"></textarea>
       
-      <!-- כפתור שליחה עם אייקון – מופיע רק לאחר בחירת שם -->
+      <!-- כפתור שליחה עם אייקון – מופיע רק באזור המשמרות והעדפות -->
       <div class="submit-container">
         <button type="submit" class="submit-btn">
           <span>שלח</span>
@@ -555,6 +555,9 @@
     const db = getDatabase(app);
     const auth = getAuth(app);
 
+    // משתנה גלובלי לשמירת ערך דרישת קוד עובד
+    let requireEmployeeCodeSetting = "לא";
+
     // --- בדיקת הגדרת הגשת סידור עבודה ---
     onValue(ref(db, "settings/allowScheduleSubmission"), (snapshot) => {
       const allowSubmission = snapshot.val();
@@ -565,6 +568,14 @@
         const messageDiv = document.getElementById("submissionDisabledMessage");
         messageDiv.textContent = "לא ניתן להגיש סידור עבודה (זמן ההגשה חלף).";
         messageDiv.style.display = "block";
+      }
+    });
+
+    // בדיקת הגדרת דרישת קוד עובד
+    onValue(ref(db, "settings/requireEmployeeCode"), (snapshot) => {
+      const val = snapshot.val();
+      if(val) {
+        requireEmployeeCodeSetting = val;
       }
     });
 
@@ -580,17 +591,30 @@
     let currentEmployeeId = "";
     let currentEmployeeData = {};
 
-    // טיפול בעיצוב כפתורי תפקיד – הדגשת הכפתור שנבחר
+    // טיפול בעיצוב כפתורי תפקיד והצגת רשימת העובדים
     window.handleRoleChange = function(el) {
       // הסרת active מכל כפתור
       document.querySelectorAll('.role-button').forEach(btn => btn.classList.remove('active'));
       // הוספת active לכפתור שנלחץ
       el.parentElement.classList.add('active');
-
-      // עדכון תפריט השמות בהתאם לתפקיד
+      
+      // קבלת התפקיד הנבחר
       const role = el.value;
+      
+      // אם נתוני העובדים טרם נטענו, המתנה קלה לפני עדכון תפריט הבחירה
+      if (Object.keys(employeesData).length === 0) {
+        setTimeout(() => {
+          updateNameSelect(role);
+        }, 500);
+      } else {
+        updateNameSelect(role);
+      }
+    };
+
+    function updateNameSelect(role) {
       const nameSelect = document.getElementById("nameSelect");
       nameSelect.innerHTML = "";
+      
       const defaultOption = document.createElement("option");
       defaultOption.value = "";
       defaultOption.text = "בחר שם";
@@ -613,19 +637,25 @@
         });
       }
       document.getElementById("nameDiv").style.display = "block";
-    };
+    }
 
-    // בעת בחירת שם – שמירת הבחירה והפעלת מודל קוד העובד
+    // בעת בחירת שם – שמירת הבחירה
+    // אם דרישת קוד עובד היא "כן" – יוצג מודל קוד, אחרת יוצגו המשמרות ישירות
     const nameSelect = document.getElementById("nameSelect");
     nameSelect.addEventListener("change", () => {
       currentEmployeeId = nameSelect.value;
       if(!currentEmployeeId) return;
       currentEmployeeData = employeesData[currentEmployeeId];
-      // הסתרת אזור המשמרות עד אימות הקוד
-      document.getElementById("shiftsDiv").style.display = "none";
-      document.getElementById("employeeCodeInput").value = "";
-      document.getElementById("employeeCodeError").style.display = "none";
-      document.getElementById("employeeCodeModal").style.display = "block";
+      if(requireEmployeeCodeSetting === "כן") {
+        // הסתרת אזור המשמרות עד אימות הקוד והצגת מודל קוד העובד
+        document.getElementById("shiftsDiv").style.display = "none";
+        document.getElementById("employeeCodeInput").value = "";
+        document.getElementById("employeeCodeError").style.display = "none";
+        document.getElementById("employeeCodeModal").style.display = "block";
+      } else {
+        // אם דרישת הקוד היא "לא" – הצגת אזור המשמרות ישירות
+        document.getElementById("shiftsDiv").style.display = "block";
+      }
     });
 
     // מודל קוד עובד
