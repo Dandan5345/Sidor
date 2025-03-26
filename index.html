@@ -3,90 +3,212 @@
 <head>
   <meta charset="UTF-8">
   <title>סידור עבודה</title>
-  <!-- התאמה לנייד ומניעת זום כפול -->
+  <!-- התאמה לנייד -->
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2, user-scalable=yes">
   <style>
+    /* יבוא גופן מודרני */
+    @import url('https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap');
+
+    /* עיצוב כללי */
     html, body {
-      touch-action: manipulation;
       margin: 0;
       padding: 0;
       direction: rtl;
+      font-family: 'Rubik', sans-serif;
+      background: #f0f2f5;
       color: #333;
-      font-family: Arial, sans-serif;
     }
     body {
-      background: linear-gradient(135deg, #e0f7fa, #ffffff);
       padding: 20px;
-      text-align: right;
-    }
-    h1 {
       text-align: center;
-      color: #00796b;
-      margin-top: 0;
     }
+    /* כותרות */
+    .page-title {
+      font-size: 3rem;
+      font-weight: 700;
+      margin-bottom: 5px;
+      color: #2c3e50;
+    }
+    .page-subtitle {
+      font-size: 1.2rem;
+      font-weight: 400;
+      margin-bottom: 30px;
+      color: #7f8c8d;
+    }
+    /* עיצוב טופס */
     form {
       max-width: 800px;
       margin: auto;
-      background-color: #fafafa;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      text-align: right;
+      position: relative;
     }
     label {
       display: block;
       margin-bottom: 10px;
-      font-weight: bold;
+      font-weight: 500;
     }
-    select, textarea, input[type="text"] {
-      width: 100%;
-      padding: 8px;
+    /* כפתור התחברות מנהל */
+    .admin-login {
+      float: left;
+      margin: 10px;
+      background-color: #2c3e50;
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    .admin-login:hover {
+      background-color: #1a252f;
+    }
+    .clear {
+      clear: both;
+    }
+    /* בחירת תפקיד – כפתורי בחירה */
+    .role-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
       margin-bottom: 20px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      box-sizing: border-box;
     }
+    .role-button {
+      background-color: #ecf0f1;
+      border: 2px solid #bdc3c7;
+      border-radius: 30px;
+      padding: 10px 20px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background-color 0.3s, border-color 0.3s;
+      min-width: 120px;
+      text-align: center;
+      user-select: none;
+    }
+    .role-button.active, .role-button:hover {
+      background-color: #2c3e50;
+      border-color: #1a252f;
+      color: #fff;
+    }
+    .role-button input {
+      display: none;
+    }
+    /* תפריט בחירת שם מעודכן – dropdown יפה */
+    #nameSelect {
+      appearance: none;
+      -webkit-appearance: none;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      padding: 10px 40px 10px 15px;
+      font-size: 1rem;
+      color: #000;
+      background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D'12'%20height%3D'12'%20viewBox%3D'0%200%2012%2012'%20xmlns%3D'http://www.w3.org/2000/svg'%3E%3Cpath%20d%3D'M6%208L2%204h8L6%208z'%20fill%3D'%23000'%2F%3E%3C%2Fsvg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      background-size: 12px;
+      margin-bottom: 20px;
+      width: 100%;
+      box-sizing: border-box;
+      text-align: right;
+      transition: box-shadow 0.3s;
+    }
+    #nameSelect:focus {
+      outline: none;
+      box-shadow: 0 0 5px rgba(0,0,0,0.5);
+    }
+    /* עיצוב אפשרויות התפריט */
+    #nameSelect option {
+      background-color: #fff;
+      color: #000;
+      padding: 8px;
+      border-bottom: 1px solid #ccc;
+    }
+    /* אזור משמרות והעדפות – יוצג רק לאחר בחירת שם */
+    #shiftsDiv {
+      display: none;
+      margin-top: 20px;
+    }
+    /* טבלת משמרות עם קווי הפרדה */
     table {
       width: 100%;
       border-collapse: collapse;
       margin-bottom: 20px;
     }
-    table, th, td {
-      border: 1px solid #ddd;
-    }
     th, td {
-      padding: 10px;
+      border: 1px solid #ccc;
+      padding: 12px;
       text-align: center;
     }
     th {
-      background-color: #00796b;
+      background-color: #2c3e50;
       color: #fff;
+      font-size: 1rem;
     }
-    button {
-      background-color: #00796b;
-      color: #fff;
+    /* תא משמרת – כל התיבה (הריבוע) מתעצב */
+    .shift-cell {
+      display: block;
       border: none;
-      padding: 10px 20px;
-      font-size: 16px;
-      border-radius: 4px;
+      border-radius: 5px;
+      padding: 10px;
+      background-color: #ccc;
+      color: #000;
       cursor: pointer;
-      display: inline-block;
-      margin: 10px 0;
+      transition: background-color 0.3s, color 0.3s;
+      font-weight: 500;
     }
-    button:hover {
-      background-color: #005b4f;
+    /* כאשר נבחר, כל הריבוע מתחלף לתכלת וטקסט לבן */
+    .shift-cell:has(input[type="checkbox"]:checked) {
+      background-color: #00bcd4;
+      color: #fff;
     }
-    .admin-login {
-      float: left;
-      margin: 10px;
-    }
-    .clear {
-      clear: both;
-    }
-    /* הסתרת אזור המשמרות כברירת מחדל */
-    #shiftsDiv {
+    /* הסתרת ה-checkbox המקורי */
+    .shift-cell input[type="checkbox"] {
       display: none;
     }
-    /* מודלים */
+    .shift-cell span {
+      display: block;
+      width: 100%;
+    }
+    /* תיבת העדפות */
+    #preferences {
+      width: 100%;
+      padding: 10px;
+      border: 2px solid #2c3e50;
+      border-radius: 10px;
+      font-size: 1rem;
+      resize: vertical;
+    }
+    /* כפתור שליחה – מופיע רק באזור המשמרות והעדפות */
+    .submit-container {
+      text-align: center;
+      margin-top: 20px;
+    }
+    .submit-btn {
+      background-color: #2c3e50;
+      color: #fff;
+      border: none;
+      padding: 12px 25px;
+      font-size: 1.1rem;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .submit-btn:hover {
+      background-color: #1a252f;
+    }
+    .submit-btn svg {
+      width: 20px;
+      height: 20px;
+      fill: #fff;
+    }
+    /* מודל התחברות מנהל – חלון דק ונקי */
     .modal {
       display: none; 
       position: fixed; 
@@ -96,56 +218,62 @@
       width: 100%; 
       height: 100%; 
       overflow: auto;
-      background-color: rgba(0,0,0,0.4);
+      background-color: rgba(0,0,0,0.5);
     }
     .modal-content {
       background-color: #fff;
-      margin: 10% auto; 
+      margin: 15% auto; 
       padding: 20px;
       border-radius: 8px;
       width: 90%;
       max-width: 400px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.2);
       position: relative;
+      text-align: center;
+    }
+    /* קלטי התחברות – גודל קצרים יותר */
+    .modal-content input {
+      width: 80%;
+      max-width: 250px;
+      margin: 10px auto;
+      display: block;
+      padding: 10px;
+      border: 2px solid #2c3e50;
+      border-radius: 30px;
+      font-size: 1rem;
     }
     .close {
       color: #aaa;
-      float: right;
-      font-size: 28px;
-      font-weight: bold;
-      cursor: pointer;
       position: absolute;
       top: 10px;
       right: 15px;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
     }
     .close:hover {
       color: #000;
     }
     .modal-content h2, .modal-content h3 {
       margin-top: 0;
-      color: #00796b;
-      text-align: center;
-    }
-    .modal-content input {
-      width: 100%;
-      margin-bottom: 10px;
-      padding: 8px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
+      color: #2c3e50;
     }
     .login-btn, .code-btns button {
-      width: 100%;
-      margin-top: 10px;
-      background-color: #00796b;
+      width: 80%;
+      max-width: 250px;
+      margin: 10px auto;
+      display: block;
+      background-color: #2c3e50;
       color: #fff;
       padding: 10px;
-      font-size: 16px;
-      border-radius: 4px;
+      font-size: 1rem;
+      border-radius: 30px;
       border: none;
       cursor: pointer;
+      transition: background-color 0.3s;
     }
     .login-btn:hover, .code-btns button:hover {
-      background-color: #005b4f;
+      background-color: #1a252f;
     }
     .code-btns {
       display: flex;
@@ -160,6 +288,13 @@
       margin-bottom: 10px;
       display: none;
     }
+    /* קלט קוד עובד מוגדר ל־5 ספרות */
+    #employeeCodeInput {
+      width: 80px;
+      margin: auto;
+      text-align: center;
+      font-size: 1.2rem;
+    }
   </style>
 </head>
 <body>
@@ -167,30 +302,33 @@
   <button class="admin-login" onclick="openAdminModal()">התחברות מנהל</button>
   <div class="clear"></div>
   
-  <h1>סידור עבודה</h1>
+  <!-- כותרות הדף -->
+  <h1 class="page-title">סידור עבודה</h1>
+  <div class="page-subtitle">מחלקת ביטחון מלון ממילא</div>
   
   <!-- טופס סידור העבודה -->
   <form id="shiftForm">
     <!-- שלב 1: בחירת תפקיד -->
-    <div id="roleDiv">
-      <label>בחר תפקיד:</label>
-      <label><input type="radio" name="role" value="אחמ״ש" required onchange="handleRoleChange();"> אחמ״ש</label>
-      <label><input type="radio" name="role" value="קב״ט" required onchange="handleRoleChange();"> קב״ט</label>
+    <div id="roleDiv" class="role-buttons">
+      <label class="role-button" id="roleA">
+        <input type="radio" name="role" value="אחמ״ש" required onchange="handleRoleChange(this);">
+        אחמ״ש
+      </label>
+      <label class="role-button" id="roleB">
+        <input type="radio" name="role" value="קב״ט" required onchange="handleRoleChange(this);">
+        קב״ט
+      </label>
     </div>
     
-    <br>
-    
     <!-- שלב 2: בחירת שם (מתמלא מדאטה ב-Firebase) -->
-    <div id="nameDiv" style="display: none;">
+    <div id="nameDiv" style="display: none; text-align: left;">
       <label for="nameSelect">בחר שם:</label>
       <select id="nameSelect" name="name" required>
-        <!-- אפשרויות יתמלאו דינמית -->
+        <option value="" disabled selected>בחר שם</option>
       </select>
     </div>
     
-    <br>
-    
-    <!-- שלב 3: טבלת משמרות והעדפות -->
+    <!-- שלב 3: אזור משמרות והעדפות – יוצג רק לאחר בחירת שם -->
     <div id="shiftsDiv">
       <h3>בחר משמרות:</h3>
       <table>
@@ -205,56 +343,167 @@
         <tbody>
           <tr>
             <td>ראשון</td>
-            <td><input type="checkbox" name="shift" value="ראשון-בוקר"></td>
-            <td><input type="checkbox" name="shift" value="ראשון-ערב"></td>
-            <td><input type="checkbox" name="shift" value="ראשון-לילה"></td>
+            <td>
+              <label class="shift-cell">
+                <input type="checkbox" name="shift" value="ראשון-בוקר">
+                <span>בוקר</span>
+              </label>
+            </td>
+            <td>
+              <label class="shift-cell">
+                <input type="checkbox" name="shift" value="ראשון-ערב">
+                <span>ערב</span>
+              </label>
+            </td>
+            <td>
+              <label class="shift-cell">
+                <input type="checkbox" name="shift" value="ראשון-לילה">
+                <span>לילה</span>
+              </label>
+            </td>
           </tr>
           <tr>
             <td>שני</td>
-            <td><input type="checkbox" name="shift" value="שני-בוקר"></td>
-            <td><input type="checkbox" name="shift" value="שני-ערב"></td>
-            <td><input type="checkbox" name="shift" value="שני-לילה"></td>
+            <td>
+              <label class="shift-cell">
+                <input type="checkbox" name="shift" value="שני-בוקר">
+                <span>בוקר</span>
+              </label>
+            </td>
+            <td>
+              <label class="shift-cell">
+                <input type="checkbox" name="shift" value="שני-ערב">
+                <span>ערב</span>
+              </label>
+            </td>
+            <td>
+              <label class="shift-cell">
+                <input type="checkbox" name="shift" value="שני-לילה">
+                <span>לילה</span>
+              </label>
+            </td>
           </tr>
           <tr>
             <td>שלישי</td>
-            <td><input type="checkbox" name="shift" value="שלישי-בוקר"></td>
-            <td><input type="checkbox" name="shift" value="שלישי-ערב"></td>
-            <td><input type="checkbox" name="shift" value="שלישי-לילה"></td>
+            <td>
+              <label class="shift-cell">
+                <input type="checkbox" name="shift" value="שלישי-בוקר">
+                <span>בוקר</span>
+              </label>
+            </td>
+            <td>
+              <label class="shift-cell">
+                <input type="checkbox" name="shift" value="שלישי-ערב">
+                <span>ערב</span>
+              </label>
+            </td>
+            <td>
+              <label class="shift-cell">
+                <input type="checkbox" name="shift" value="שלישי-לילה">
+                <span>לילה</span>
+              </label>
+            </td>
           </tr>
           <tr>
             <td>רביעי</td>
-            <td><input type="checkbox" name="shift" value="רביעי-בוקר"></td>
-            <td><input type="checkbox" name="shift" value="רביעי-ערב"></td>
-            <td><input type="checkbox" name="shift" value="רביעי-לילה"></td>
+            <td>
+              <label class="shift-cell">
+                <input type="checkbox" name="shift" value="רביעי-בוקר">
+                <span>בוקר</span>
+              </label>
+            </td>
+            <td>
+              <label class="shift-cell">
+                <input type="checkbox" name="shift" value="רביעי-ערב">
+                <span>ערב</span>
+              </label>
+            </td>
+            <td>
+              <label class="shift-cell">
+                <input type="checkbox" name="shift" value="רביעי-לילה">
+                <span>לילה</span>
+              </label>
+            </td>
           </tr>
           <tr>
             <td>חמישי</td>
-            <td><input type="checkbox" name="shift" value="חמישי-בוקר"></td>
-            <td><input type="checkbox" name="shift" value="חמישי-ערב"></td>
-            <td><input type="checkbox" name="shift" value="חמישי-לילה"></td>
+            <td>
+              <label class="shift-cell">
+                <input type="checkbox" name="shift" value="חמישי-בוקר">
+                <span>בוקר</span>
+              </label>
+            </td>
+            <td>
+              <label class="shift-cell">
+                <input type="checkbox" name="shift" value="חמישי-ערב">
+                <span>ערב</span>
+              </label>
+            </td>
+            <td>
+              <label class="shift-cell">
+                <input type="checkbox" name="shift" value="חמישי-לילה">
+                <span>לילה</span>
+              </label>
+            </td>
           </tr>
           <tr>
             <td>שישי</td>
-            <td><input type="checkbox" name="shift" value="שישי-בוקר"></td>
-            <td><input type="checkbox" name="shift" value="שישי-ערב"></td>
-            <td><input type="checkbox" name="shift" value="שישי-לילה"></td>
+            <td>
+              <label class="shift-cell">
+                <input type="checkbox" name="shift" value="שישי-בוקר">
+                <span>בוקר</span>
+              </label>
+            </td>
+            <td>
+              <label class="shift-cell">
+                <input type="checkbox" name="shift" value="שישי-ערב">
+                <span>ערב</span>
+              </label>
+            </td>
+            <td>
+              <label class="shift-cell">
+                <input type="checkbox" name="shift" value="שישי-לילה">
+                <span>לילה</span>
+              </label>
+            </td>
           </tr>
           <tr>
             <td>שבת</td>
-            <td><input type="checkbox" name="shift" value="שבת-בוקר"></td>
-            <td><input type="checkbox" name="shift" value="שבת-ערב"></td>
-            <td><input type="checkbox" name="shift" value="שבת-לילה"></td>
+            <td>
+              <label class="shift-cell">
+                <input type="checkbox" name="shift" value="שבת-בוקר">
+                <span>בוקר</span>
+              </label>
+            </td>
+            <td>
+              <label class="shift-cell">
+                <input type="checkbox" name="shift" value="שבת-ערב">
+                <span>ערב</span>
+              </label>
+            </td>
+            <td>
+              <label class="shift-cell">
+                <input type="checkbox" name="shift" value="שבת-לילה">
+                <span>לילה</span>
+              </label>
+            </td>
           </tr>
         </tbody>
       </table>
       
       <label for="preferences">העדפות (לא חובה):</label>
       <textarea id="preferences" name="preferences" rows="3" placeholder="הזן כאן את העדפותיך (אם יש)"></textarea>
+      
+      <!-- כפתור שליחה עם אייקון – מופיע רק לאחר בחירת שם -->
+      <div class="submit-container">
+        <button type="submit" class="submit-btn">
+          <span>שלח</span>
+          <svg viewBox="0 0 512 512">
+            <path d="M476.5 3.5c-11.1-4.7-23.8-1.1-31.4 8.6L31.4 239.9c-9.8 7.3-12.2 20.5-5.2 30.1s20.5 12.2 30.1 5.2l102.2-76.4 172 172c4.5 4.5 10.6 6.7 16.8 6.7 4.3 0 8.7-1.2 12.5-3.6 9.3-5.6 13.3-17 10.4-26.3L201.3 256l255.2-185.8c9.2-6.7 11.8-19.8 5.8-29.7z"/>
+          </svg>
+        </button>
+      </div>
     </div>
-    
-    <br>
-    
-    <button type="submit">שלח</button>
   </form>
 
   <!-- מודל התחברות מנהל -->
@@ -271,8 +520,8 @@
   <!-- מודל קוד עובד -->
   <div id="employeeCodeModal" class="modal">
     <div class="modal-content">
-      <h3>הקלד מספר עובד</h3>
-      <input type="text" id="employeeCodeInput" placeholder="מספר עובד (קוד)">
+      <h3>מספר עובד</h3>
+      <input type="text" id="employeeCodeInput" placeholder="00000" maxlength="5">
       <div class="error-msg" id="employeeCodeError">הקוד שהוזן שגוי.</div>
       <div class="code-btns">
         <button id="cancelCodeBtn">ביטול</button>
@@ -303,49 +552,37 @@
     const db = getDatabase(app);
     const auth = getAuth(app);
 
-    // נתונים של עובדים מתוך Firebase – נאחסן במשתנה גלובלי
+    // נתוני עובדים מ-Firebase – יאוחסנו במשתנה גלובלי
     let employeesData = {};
 
-    // מאזין לשינויים בנתוני העובדים
     onValue(ref(db, "employees"), (snapshot) => {
       const val = snapshot.val();
       employeesData = val ? val : {};
     });
 
-    // משתנים לשמירת בחירת העובד הנוכחית
+    // משתנים לבחירת עובד נוכחי
     let currentEmployeeId = "";
     let currentEmployeeData = {};
 
-    // מודל מנהל
-    window.openAdminModal = function() {
-      document.getElementById("adminModal").style.display = "block";
-    };
-    window.closeAdminModal = function() {
-      document.getElementById("adminModal").style.display = "none";
-    };
+    // טיפול בעיצוב כפתורי תפקיד – הדגשת הכפתור שנבחר
+    window.handleRoleChange = function(el) {
+      // הסרת active מכל כפתור
+      document.querySelectorAll('.role-button').forEach(btn => btn.classList.remove('active'));
+      // הוספת active לכפתור שנלחץ
+      el.parentElement.classList.add('active');
 
-    const adminLoginBtn = document.getElementById("adminLoginBtn");
-    adminLoginBtn.addEventListener("click", () => {
-      const email = document.getElementById("adminEmail").value;
-      const password = document.getElementById("adminPassword").value;
-      signInWithEmailAndPassword(auth, email, password)
-        .then(() => {
-          alert("התחברת בהצלחה!");
-          window.location.href = "manager.html";
-        })
-        .catch(err => {
-          alert("שגיאה בהתחברות: " + err.message);
-        });
-    });
-
-    // בעת בחירת תפקיד – מלא את רשימת השמות לפי העובדים מה-Firebase
-    window.handleRoleChange = function() {
-      const role = document.querySelector('input[name="role"]:checked').value;
+      // עדכון תפריט השמות בהתאם לתפקיד
+      const role = el.value;
       const nameSelect = document.getElementById("nameSelect");
       nameSelect.innerHTML = "";
-      // מסננים את העובדים לפי תפקיד
+      const defaultOption = document.createElement("option");
+      defaultOption.value = "";
+      defaultOption.text = "בחר שם";
+      defaultOption.disabled = true;
+      defaultOption.selected = true;
+      nameSelect.add(defaultOption);
+      
       const filtered = Object.entries(employeesData).filter(([key, emp]) => emp.type === role);
-      // למקרה ואין עובדים מתאימים
       if(filtered.length === 0){
         const option = document.createElement("option");
         option.value = "";
@@ -362,7 +599,7 @@
       document.getElementById("nameDiv").style.display = "block";
     };
 
-    // בעת בחירת שם – יש לשמור את המזהה והנתונים של העובד הנבחר
+    // בעת בחירת שם – שמירת הבחירה והפעלת מודל קוד העובד
     const nameSelect = document.getElementById("nameSelect");
     nameSelect.addEventListener("change", () => {
       currentEmployeeId = nameSelect.value;
@@ -370,10 +607,8 @@
       currentEmployeeData = employeesData[currentEmployeeId];
       // הסתרת אזור המשמרות עד אימות הקוד
       document.getElementById("shiftsDiv").style.display = "none";
-      // אפס את שדות המודל
       document.getElementById("employeeCodeInput").value = "";
       document.getElementById("employeeCodeError").style.display = "none";
-      // פתח את מודל קוד העובד
       document.getElementById("employeeCodeModal").style.display = "block";
     });
 
@@ -393,7 +628,7 @@
     confirmCodeBtn.addEventListener("click", () => {
       const codeTyped = employeeCodeInput.value.trim();
       if(!currentEmployeeData.code){
-        employeeCodeError.textContent = "לא נמצא קוד עבור עובד זה.";
+        employeeCodeError.textContent = "הקוד שהוזן שגוי.";
         employeeCodeError.style.display = "block";
         return;
       }
@@ -401,7 +636,7 @@
         employeeCodeModal.style.display = "none";
         employeeCodeInput.value = "";
         employeeCodeError.style.display = "none";
-        // הצגת אזור המשמרות
+        // הצגת אזור המשמרות והעדפות
         document.getElementById("shiftsDiv").style.display = "block";
       } else {
         employeeCodeError.textContent = "הקוד שהוזן שגוי.";
@@ -409,7 +644,7 @@
       }
     });
 
-    // שליחת הטופס – לוגיקה קיימת (בדיקת מינימום משמרות ושמירה)
+    // שליחת הטופס – בדיקות ושמירה
     const form = document.getElementById("shiftForm");
     form.addEventListener("submit", (event) => {
       event.preventDefault();
@@ -481,6 +716,28 @@
           alert("אירעה שגיאה בשמירה: " + err.message);
         });
     }
+
+    // התחברות מנהל
+    window.openAdminModal = function() {
+      document.getElementById("adminModal").style.display = "block";
+    };
+    window.closeAdminModal = function() {
+      document.getElementById("adminModal").style.display = "none";
+    };
+
+    const adminLoginBtn = document.getElementById("adminLoginBtn");
+    adminLoginBtn.addEventListener("click", () => {
+      const email = document.getElementById("adminEmail").value;
+      const password = document.getElementById("adminPassword").value;
+      signInWithEmailAndPassword(auth, email, password)
+        .then(() => {
+          alert("התחברת בהצלחה!");
+          window.location.href = "manager.html";
+        })
+        .catch(err => {
+          alert("שגיאה בהתחברות: " + err.message);
+        });
+    });
   </script>
 </body>
 </html>
