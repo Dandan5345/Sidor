@@ -208,7 +208,7 @@
       font-size: 1.5rem;
       color: #f00;
     }
-    /* לחצן צפייה בסידור שנשלח – יוצג רק אם הגשה אסורה */
+    /* לחצן צפייה בסידור שנשלח – יוצג רק כאשר הגשה אסורה */
     #viewSubmittedScheduleBtn {
       display: none;
       margin: 20px auto;
@@ -307,7 +307,7 @@
       text-align: center;
       font-size: 1.2rem;
     }
-    /* מודל צפייה בסידור שכבר נשלח – "קיים" */
+    /* מודל צפייה/עריכת סידור קיים – "קיים" */
     #existingScheduleModal, #viewScheduleModal {
       display: none;
       position: fixed;
@@ -389,6 +389,49 @@
       font-size: 1rem;
     }
     #viewScheduleSelectionModal .modal-content button:hover {
+      background-color: #1a252f;
+    }
+    /* מודל צפייה בסידור (בחלק מהדפים) */
+    #previewModal {
+      display: none;
+      position: fixed;
+      z-index: 1500;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+    }
+    #previewModal .modal-content {
+      background: #fff;
+      margin: 10% auto;
+      padding: 20px;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 500px;
+      position: relative;
+      text-align: center;
+    }
+    #previewModal .modal-content h3 {
+      margin-top: 0;
+      color: #2c3e50;
+    }
+    #previewModal .modal-buttons {
+      margin-top: 20px;
+      display: flex;
+      justify-content: space-around;
+    }
+    #previewModal .modal-buttons button {
+      background-color: #2c3e50;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 30px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background-color 0.3s;
+    }
+    #previewModal .modal-buttons button:hover {
       background-color: #1a252f;
     }
   </style>
@@ -591,7 +634,7 @@
       
       <div class="submit-container">
         <button type="submit" class="submit-btn">
-          <span>שלח</span>
+          <span>הצג תצוגה מקדימה</span>
           <svg viewBox="0 0 512 512">
             <path d="M476.5 3.5c-11.1-4.7-23.8-1.1-31.4 8.6L31.4 239.9c-9.8 7.3-12.2 20.5-5.2 30.1s20.5 12.2 30.1 5.2l102.2-76.4 172 172c4.5 4.5 10.6 6.7 16.8 6.7 4.3 0 8.7-1.2 12.5-3.6 9.3-5.6 13.3-17 10.4-26.3L201.3 256l255.2-185.8c9.2-6.7 11.8-19.8 5.8-29.7z"/>
           </svg>
@@ -627,7 +670,7 @@
     </div>
   </div>
   
-  <!-- מודל קיים – כאשר העובד כבר שלח סידור -->
+  <!-- מודל צפייה/עריכת סידור קיים -->
   <div id="existingScheduleModal" class="modal">
     <div class="modal-content">
       <span class="close" onclick="window.closeExistingScheduleModal()">&times;</span>
@@ -651,20 +694,23 @@
     </div>
   </div>
   
-  <!-- מודל צפייה בסידור -->
-  <div id="viewScheduleModal" class="modal">
+  <!-- מודל תצוגה מקדימה של הסידור (Preview) -->
+  <div id="previewModal" class="modal">
     <div class="modal-content">
-      <span class="close" onclick="window.closeViewScheduleModal()">&times;</span>
-      <h3>הסידור שלך</h3>
-      <div id="viewScheduleContent"></div>
-      <button onclick="window.closeViewScheduleModal()">סיום</button>
+      <span class="close" onclick="closePreviewModal()">&times;</span>
+      <h3>תצוגה מקדימה של הסידור</h3>
+      <div id="previewContent"></div>
+      <div class="modal-buttons">
+        <button id="finalSubmitBtn">שלח</button>
+        <button id="editBtn">חזור</button>
+      </div>
     </div>
   </div>
   
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-analytics.js";
-    import { getDatabase, ref, push, onValue, set, remove } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-database.js";
+    import { getDatabase, ref, push, onValue, set } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-database.js";
     import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-auth.js";
 
     const firebaseConfig = {
@@ -701,6 +747,51 @@
     let currentEmployeeData = {};
     let existingSchedule = null;
     let currentScheduleKey = null;
+    let pendingSubmission = null; // משתנה לשמירת הנתונים לפני שליחה סופית
+
+    // פונקציה ליצירת טבלת משמרות (כמו בעמוד הסידורים)
+    function createScheduleTable(scheduleString) {
+      const days = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
+      const times = [
+        { name: "בוקר", className: "schedule-boker" },
+        { name: "ערב", className: "schedule-erev" },
+        { name: "לילה", className: "schedule-laila" }
+      ];
+      const table = document.createElement("table");
+      table.className = "schedule-table";
+      const thead = document.createElement("thead");
+      thead.innerHTML = `
+        <tr>
+          <th class="schedule-day">יום</th>
+          <th class="schedule-boker">בוקר</th>
+          <th class="schedule-erev">ערב</th>
+          <th class="schedule-laila">לילה</th>
+        </tr>
+      `;
+      table.appendChild(thead);
+      const tbody = document.createElement("tbody");
+      days.forEach(day => {
+        const row = document.createElement("tr");
+        const dayCell = document.createElement("td");
+        dayCell.className = "schedule-day";
+        dayCell.textContent = day;
+        row.appendChild(dayCell);
+        times.forEach(timeObj => {
+          const cell = document.createElement("td");
+          cell.className = timeObj.className;
+          const pattern = `${day}-${timeObj.name}`;
+          if (scheduleString.includes(pattern)) {
+            cell.innerHTML = `<span class="checkmark">✓</span>`;
+          } else {
+            cell.innerHTML = "";
+          }
+          row.appendChild(cell);
+        });
+        tbody.appendChild(row);
+      });
+      table.appendChild(tbody);
+      return table;
+    }
 
     // טיפול בתפקיד ובחירת שם
     window.handleRoleChange = function(el) {
@@ -791,56 +882,13 @@
       document.getElementById("shiftsDiv").style.display = "block";
     });
 
-    // פונקציה ליצירת טבלת משמרות
-    function createScheduleTable(scheduleString) {
-      const days = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
-      const times = [
-        { name: "בוקר", className: "schedule-boker" },
-        { name: "ערב", className: "schedule-erev" },
-        { name: "לילה", className: "schedule-laila" }
-      ];
-      const table = document.createElement("table");
-      table.className = "schedule-table";
-      const thead = document.createElement("thead");
-      thead.innerHTML = `
-        <tr>
-          <th class="schedule-day">יום</th>
-          <th class="schedule-boker">בוקר</th>
-          <th class="schedule-erev">ערב</th>
-          <th class="schedule-laila">לילה</th>
-        </tr>
-      `;
-      table.appendChild(thead);
-      const tbody = document.createElement("tbody");
-      days.forEach(day => {
-        const row = document.createElement("tr");
-        const dayCell = document.createElement("td");
-        dayCell.className = "schedule-day";
-        dayCell.textContent = day;
-        row.appendChild(dayCell);
-        times.forEach(timeObj => {
-          const cell = document.createElement("td");
-          cell.className = timeObj.className;
-          const pattern = `${day}-${timeObj.name}`;
-          if (scheduleString.includes(pattern)) {
-            cell.innerHTML = `<span class="checkmark">✓</span>`;
-          } else {
-            cell.innerHTML = "";
-          }
-          row.appendChild(cell);
-        });
-        tbody.appendChild(row);
-      });
-      table.appendChild(tbody);
-      return table;
-    }
-
-    // טיפול בשליחת הטופס – אם currentScheduleKey קיים, עדכון; אחרת יצירה חדשה
+    // טיפול בשליחת הטופס – במקום לשלוח ישירות, נפתח מודל תצוגה מקדימה
     const form = document.getElementById("shiftForm");
     form.addEventListener("submit", (event) => {
       event.preventDefault();
       validateForm();
     });
+
     function validateForm() {
       const roleInput = document.querySelector('input[name="role"]:checked');
       if (!roleInput) {
@@ -854,47 +902,111 @@
       }
       const shifts = document.querySelectorAll('input[name="shift"]:checked');
       const totalSelected = shifts.length;
-      const minTotal = 14, minBoker = 2, minErev = 2, minLaila = 2, minSpecial = 2;
-      let countBoker = 0, countErev = 0, countLaila = 0, countSpecial = 0;
-      const specialShifts = new Set(["שישי-ערב", "שישי-לילה", "שבת-בוקר", "שבת-ערב"]);
-      shifts.forEach(shift => {
-        const value = shift.value;
-        if (value.includes("בוקר")) countBoker++;
-        if (value.includes("ערב")) countErev++;
-        if (value.includes("לילה")) countLaila++;
-        if (specialShifts.has(value)) countSpecial++;
-      });
-      let messages = [];
-      if(totalSelected < minTotal) {
-        messages.push("יש לבחור מינימום 14 משמרות. נבחרו " + totalSelected + " משמרות.");
+      
+      // בדיקות ולידציה (לדוגמא – עבור עובדים רגילים, או סטודנטים לפי לוגיקה קיימת)
+      if (currentEmployeeData.student === "כן") {
+        let countNight = 0;
+        let countSaturday = 0;
+        const daysForNight = new Set(["ראשון", "שני", "שלישי", "רביעי", "חמישי"]);
+        const saturdayGroup = new Set(["שישי-ערב", "שישי-לילה", "שבת-בוקר", "שבת-לילה"]);
+        shifts.forEach(shift => {
+          const value = shift.value;
+          if(value.includes("לילה")){
+            const parts = value.split("-");
+            if(parts.length === 2 && daysForNight.has(parts[0])){
+              countNight++;
+            }
+          }
+          if(saturdayGroup.has(value)){
+            countSaturday++;
+          }
+        });
+        let messages = [];
+        if(totalSelected < 8) {
+          messages.push("יש לבחור מינימום 8 משמרות. נבחרו " + totalSelected + " משמרות.");
+        }
+        if(countNight < 1) {
+          messages.push("יש לבחור לפחות משמרת לילה אחת מיום ראשון עד חמישי. נבחרו " + countNight + " משמרות לילה.");
+        }
+        if(countSaturday < 1) {
+          messages.push("יש לבחור לפחות משמרת אחת מתוך הקבוצה (שישי ערב, שישי לילה, שבת בוקר, שבת-לילה). נבחרו " + countSaturday + " משמרות.");
+        }
+        if(messages.length > 0) {
+          alert(messages.join("\n"));
+          return;
+        }
+      } else {
+        const minTotal = 14, minBoker = 2, minErev = 2, minLaila = 2, minSpecial = 2;
+        let countBoker = 0, countErev = 0, countLaila = 0, countSpecial = 0;
+        const specialShifts = new Set(["שישי-ערב", "שישי-לילה", "שבת-בוקר", "שבת-ערב"]);
+        shifts.forEach(shift => {
+          const value = shift.value;
+          if (value.includes("בוקר")) countBoker++;
+          if (value.includes("ערב")) countErev++;
+          if (value.includes("לילה")) countLaila++;
+          if (specialShifts.has(value)) countSpecial++;
+        });
+        let messages = [];
+        if(totalSelected < minTotal) {
+          messages.push("יש לבחור מינימום 14 משמרות. נבחרו " + totalSelected + " משמרות.");
+        }
+        if(countBoker < minBoker) {
+          messages.push("יש לבחור מינימום 2 משמרות בוקר. נבחרו " + countBoker + " משמרות בוקר.");
+        }
+        if(countErev < minErev) {
+          messages.push("יש לבחור מינימום 2 משמרות ערב. נבחרו " + countErev + " משמרות ערב.");
+        }
+        if(countLaila < minLaila) {
+          messages.push("יש לבחור מינימום 2 משמרות לילה. נבחרו " + countLaila + " משמרות לילה.");
+        }
+        if(countSpecial < minSpecial) {
+          messages.push("יש לבחור מינימום 2 משמרות מהקבוצה (שישי ערב, שישי לילה, שבת בוקר, שבת ערב). נבחרו " + countSpecial + " משמרות.");
+        }
+        if(messages.length > 0) {
+          alert(messages.join("\n"));
+          return;
+        }
       }
-      if(countBoker < minBoker) {
-        messages.push("יש לבחור מינימום 2 משמרות בוקר. נבחרו " + countBoker + " משמרות בוקר.");
-      }
-      if(countErev < minErev) {
-        messages.push("יש לבחור מינימום 2 משמרות ערב. נבחרו " + countErev + " משמרות ערב.");
-      }
-      if(countLaila < minLaila) {
-        messages.push("יש לבחור מינימום 2 משמרות לילה. נבחרו " + countLaila + " משמרות לילה.");
-      }
-      if(countSpecial < minSpecial) {
-        messages.push("יש לבחור מינימום 2 משמרות מהקבוצה (שישי ערב, שישי לילה, שבת בוקר, שבת ערב). נבחרו " + countSpecial + " משמרות.");
-      }
-      if (messages.length > 0) {
-        alert(messages.join("\n"));
-        return;
-      }
-      const preferences = document.getElementById("preferences").value;
+      
+      // יצירת מחרוזת סידור
       const scheduleString = Array.from(shifts).map(s => s.value).join(", ");
-      const data = {
+      // בניית נתוני הסידור ללא שליחה מיידית
+      pendingSubmission = {
         role: role,
         name: currentEmployeeData.firstName + " " + currentEmployeeData.lastName,
         schedule: scheduleString,
-        preferences: preferences,
+        preferences: document.getElementById("preferences").value,
         submissionTime: Date.now()
       };
+      // פתיחת מודל התצוגה המקדימה
+      openPreviewModal(pendingSubmission);
+    }
+
+    // פתיחת מודל תצוגה מקדימה של הסידור
+    function openPreviewModal(data) {
+      const previewContent = document.getElementById("previewContent");
+      previewContent.innerHTML = "";
+      const table = createScheduleTable(data.schedule);
+      previewContent.appendChild(table);
+      if (data.preferences && data.preferences.trim() !== "") {
+        const prefEl = document.createElement("div");
+        prefEl.className = "preferences";
+        prefEl.innerHTML = "<strong>העדפות:</strong> " + data.preferences;
+        previewContent.appendChild(prefEl);
+      }
+      document.getElementById("previewModal").style.display = "block";
+    }
+
+    // סגירת מודל התצוגה המקדימה (לחצן "חזור")
+    function closePreviewModal() {
+      document.getElementById("previewModal").style.display = "none";
+    }
+
+    // לחצן "שלח" בתוך המודל – ביצוע ההגשה הסופית
+    document.getElementById("finalSubmitBtn").addEventListener("click", () => {
+      if (!pendingSubmission) return;
       if (currentScheduleKey) {
-        set(ref(db, "schedules/" + currentScheduleKey), data)
+        set(ref(db, "schedules/" + currentScheduleKey), pendingSubmission)
           .then(() => {
             alert("הסידור עודכן בהצלחה!");
             window.location.reload();
@@ -903,7 +1015,7 @@
             alert("אירעה שגיאה בעדכון: " + err.message);
           });
       } else {
-        push(ref(db, "schedules"), data)
+        push(ref(db, "schedules"), pendingSubmission)
           .then(() => {
             alert("הסידור נשלח ונשמר בהצלחה ב-Firebase!");
             window.location.reload();
@@ -912,7 +1024,12 @@
             alert("אירעה שגיאה בשמירה: " + err.message);
           });
       }
-    }
+    });
+
+    // לחצן "חזור" במודל – סוגר את המודל ומאפשר חזרה לעריכה
+    document.getElementById("editBtn").addEventListener("click", () => {
+      closePreviewModal();
+    });
 
     /* מודל קיים – כאשר העובד כבר שלח סידור */
     window.openExistingScheduleModal = function() {
