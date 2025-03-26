@@ -302,6 +302,9 @@
   <button class="admin-login" onclick="openAdminModal()">התחברות מנהל</button>
   <div class="clear"></div>
   
+  <!-- הודעת חסימת הגשה (תופיע אם allowScheduleSubmission = "לא") -->
+  <div id="submissionDisabledMessage" style="display: none; text-align: center; padding: 20px; font-size: 1.5rem; color: #f00;"></div>
+  
   <!-- כותרות הדף -->
   <h1 class="page-title">סידור עבודה</h1>
   <div class="page-subtitle">מחלקת ביטחון מלון ממילא</div>
@@ -551,6 +554,19 @@
     const analytics = getAnalytics(app);
     const db = getDatabase(app);
     const auth = getAuth(app);
+
+    // --- בדיקת הגדרת הגשת סידור עבודה ---
+    onValue(ref(db, "settings/allowScheduleSubmission"), (snapshot) => {
+      const allowSubmission = snapshot.val();
+      if (allowSubmission === "לא" || allowSubmission === false) {
+        // הסתרת הטופס
+        document.getElementById("shiftForm").style.display = "none";
+        // הצגת הודעה קבועה
+        const messageDiv = document.getElementById("submissionDisabledMessage");
+        messageDiv.textContent = "לא ניתן להגיש סידור עבודה (זמן ההגשה חלף).";
+        messageDiv.style.display = "block";
+      }
+    });
 
     // נתוני עובדים מ-Firebase – יאוחסנו במשתנה גלובלי
     let employeesData = {};
