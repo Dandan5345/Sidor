@@ -33,7 +33,6 @@
     .top-buttons button:hover {
       background-color: #005b4f;
     }
-
     h1 {
       text-align: center;
       color: #00796b;
@@ -47,6 +46,7 @@
       border-radius: 4px;
       font-size: 1.2em;
       box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+      position: relative;
     }
     .schedule-entry {
       background: #fff;
@@ -54,6 +54,7 @@
       margin-top: 10px;
       border-radius: 4px;
       box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      position: relative;
     }
     .schedule-entry h3 {
       margin: 0 0 10px 0;
@@ -79,7 +80,6 @@
     .print-btn:hover {
       background-color: #005b4f;
     }
-
     /* טבלת המשמרות */
     .schedule-table {
       width: 100%;
@@ -100,13 +100,13 @@
       background-color: #fafafa;
     }
     .schedule-boker {
-      background-color: #e1f5fe; /* צבע רקע בהיר לכחול */
+      background-color: #e1f5fe;
     }
     .schedule-erev {
-      background-color: #ffe0b2; /* צבע רקע בהיר לכתום */
+      background-color: #ffe0b2;
     }
     .schedule-laila {
-      background-color: #f3e5f5; /* צבע רקע בהיר לסגול */
+      background-color: #f3e5f5;
     }
     .schedule-title {
       font-weight: bold;
@@ -115,31 +115,113 @@
     }
     /* סימן וי מעוצב */
     .checkmark {
-      color: #2e7d32; /* ירוק */
+      color: #2e7d32;
       font-weight: bold;
+    }
+    /* מחלקה לאייקוני מחיקה – לא יודפסו */
+    .delete-icon {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 20px;
+    }
+    /* Print styles */
+    @media print {
+      .print-group {
+        page-break-after: always;
+        break-after: page;
+      }
+      .group-header {
+        font-weight: bold;
+        font-size: 1.4em;
+      }
+      .schedule-entry {
+        page-break-inside: avoid;
+      }
+      .top-buttons, .print-btn, #printModal {
+        display: none;
+      }
+      .delete-icon {
+        display: none;
+      }
+    }
+    /* סטייל למודל בחירת מצב הדפסה */
+    #printModal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+    }
+    #printModal .modal-content {
+      background: #fff;
+      margin: 20% auto;
+      padding: 20px;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+      position: relative;
+    }
+    #printModal .modal-content h3 {
+      margin-top: 0;
+    }
+    #printModal .modal-content button {
+      background-color: #2c3e50;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      margin: 10px;
+      border-radius: 30px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    #printModal .modal-content button:hover {
+      background-color: #1a252f;
+    }
+    #printModal .close {
+      color: #aaa;
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    #printModal .close:hover {
+      color: #000;
     }
   </style>
 </head>
 <body>
-  <!-- כפתורי ניווט למעלה -->
+  <!-- כפתורי ניווט -->
   <div class="top-buttons">
     <button onclick="window.location.href='index.html'">חזרה לטופס הראשי</button>
     <button onclick="window.location.href='manager.html'">חזרה למנהל</button>
   </div>
-
   <h1>סידורים</h1>
-  
   <div id="schedulesContainer"></div>
+  <button class="print-btn" id="printBtn">הדפס</button>
   
-  <button class="print-btn" onclick="window.print()">הדפס</button>
+  <!-- מודל בחירת מצב הדפסה -->
+  <div id="printModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closePrintModal()">&times;</span>
+      <h3>בחר מצב הדפסה</h3>
+      <button onclick="choosePrintMode('double')">2 סידורים בכל דף</button>
+      <button onclick="choosePrintMode('single')">סידור בכל דף</button>
+    </div>
+  </div>
   
-  <!-- Firebase code - using type="module" -->
+  <!-- Firebase code -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-analytics.js";
-    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-database.js";
+    import { getDatabase, ref, onValue, remove, push } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-database.js";
 
-    // קונפיגורציה (אותה בדיוק כמו ב-index.html)
     const firebaseConfig = {
       apiKey: "AIzaSyCeYVNOdp8N9BJdsO9eLeATX1_PX5LRG_A",
       authDomain: "sidoravoda111.firebaseapp.com",
@@ -151,12 +233,11 @@
       databaseURL: "https://sidoravoda111-default-rtdb.europe-west1.firebasedatabase.app/"
     };
 
-    // אתחול Firebase
     const app = initializeApp(firebaseConfig);
     const analytics = getAnalytics(app);
     const db = getDatabase(app);
 
-    // פונקציה יוצרת טבלת משמרות יפה מתוך מחרוזת המשמרות
+    // פונקציה ליצירת טבלת משמרות
     function createScheduleTable(scheduleString) {
       const days = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
       const times = [
@@ -164,10 +245,8 @@
         { name: "ערב", className: "schedule-erev" },
         { name: "לילה", className: "schedule-laila" }
       ];
-
       const table = document.createElement("table");
       table.className = "schedule-table";
-
       const thead = document.createElement("thead");
       thead.innerHTML = `
         <tr>
@@ -178,22 +257,17 @@
         </tr>
       `;
       table.appendChild(thead);
-
       const tbody = document.createElement("tbody");
       days.forEach(day => {
         const row = document.createElement("tr");
-        
-        // תא של שם היום (class="schedule-day")
         const dayCell = document.createElement("td");
         dayCell.className = "schedule-day";
         dayCell.textContent = day;
         row.appendChild(dayCell);
-
-        // שלושה תאים: בוקר, ערב, לילה
         times.forEach(timeObj => {
           const cell = document.createElement("td");
           cell.className = timeObj.className;
-          const pattern = `${day}-${timeObj.name}`; 
+          const pattern = `${day}-${timeObj.name}`;
           if (scheduleString.includes(pattern)) {
             cell.innerHTML = `<span class="checkmark">✓</span>`;
           } else {
@@ -201,76 +275,218 @@
           }
           row.appendChild(cell);
         });
-
         tbody.appendChild(row);
       });
-
       table.appendChild(tbody);
       return table;
     }
 
+    // שמירת כל הסידורים במשתנה גלובלי
+    window.allSubmissions = [];
     onValue(ref(db, "schedules"), (snapshot) => {
+      let subs = [];
+      snapshot.forEach(childSnapshot => {
+        subs.push({ key: childSnapshot.key, ...childSnapshot.val() });
+      });
+      window.allSubmissions = subs;
+      renderSchedules();
+    });
+
+    // פונקציה להצגת הסידורים בדף (ללא ארגון הדפסה)
+    function renderSchedules() {
       const container = document.getElementById("schedulesContainer");
       container.innerHTML = "";
       
-      const submissions = [];
-      snapshot.forEach((childSnapshot) => {
-        submissions.push(childSnapshot.val());
-      });
-      
-      const groupOrder = { "אחמ״ש": 1, "סטודנטים": 2, "קב״ט": 3 };
-      submissions.sort((a, b) => {
-        const aGroup = groupOrder[a.role] || 99;
-        const bGroup = groupOrder[b.role] || 99;
-        if (aGroup === bGroup) {
-          return a.submissionTime - b.submissionTime;
+      const deleteAllBtn = document.createElement("button");
+      deleteAllBtn.style.backgroundColor = "#f44336";
+      deleteAllBtn.style.color = "#fff";
+      deleteAllBtn.style.border = "none";
+      deleteAllBtn.style.padding = "10px 20px";
+      deleteAllBtn.style.fontSize = "14px";
+      deleteAllBtn.style.borderRadius = "4px";
+      deleteAllBtn.style.cursor = "pointer";
+      deleteAllBtn.textContent = "🗑️ מחק את כל הסידורים";
+      deleteAllBtn.addEventListener("click", () => {
+        if (confirm("האם אתה בטוח שברצונך למחוק את כל הסידורים?")) {
+          window.allSubmissions.forEach(entry => {
+            remove(ref(db, "schedules/" + entry.key));
+          });
         }
-        return aGroup - bGroup;
       });
+      container.appendChild(deleteAllBtn);
       
-      const grouped = {};
-      submissions.forEach(entry => {
-        if (!grouped[entry.role]) {
-          grouped[entry.role] = [];
-        }
-        grouped[entry.role].push(entry);
-      });
-      
-      ["אחמ״ש", "סטודנטים", "קב״ט"].forEach(role => {
-        if (grouped[role]) {
+      const roles = ["אחמ״ש", "סטודנטים", "קב״ט"];
+      roles.forEach(role => {
+        const groupSubmissions = window.allSubmissions.filter(s => s.role === role);
+        if (groupSubmissions.length > 0) {
           const groupHeader = document.createElement("div");
           groupHeader.className = "group-header";
           groupHeader.textContent = role;
           container.appendChild(groupHeader);
-          
-          grouped[role].forEach(entry => {
+          groupSubmissions.forEach(entry => {
             const entryDiv = document.createElement("div");
             entryDiv.className = "schedule-entry";
-            
             const nameEl = document.createElement("h3");
             nameEl.textContent = entry.name + ":";
             entryDiv.appendChild(nameEl);
-
             const scheduleTitle = document.createElement("div");
             scheduleTitle.className = "schedule-title";
             scheduleTitle.textContent = "סידור משמרות:";
             entryDiv.appendChild(scheduleTitle);
-
             const table = createScheduleTable(entry.schedule || "");
             entryDiv.appendChild(table);
-            
             if (entry.preferences && entry.preferences.trim() !== "") {
               const prefEl = document.createElement("div");
               prefEl.className = "preferences";
               prefEl.innerHTML = "<strong>העדפות:</strong> " + entry.preferences;
               entryDiv.appendChild(prefEl);
             }
-            
+            const deleteBtn = document.createElement("button");
+            deleteBtn.className = "delete-icon";
+            deleteBtn.textContent = "🗑️";
+            deleteBtn.addEventListener("click", () => {
+              if (confirm("האם אתה בטוח שברצונך למחוק סידור זה?")) {
+                remove(ref(db, "schedules/" + entry.key));
+              }
+            });
+            entryDiv.appendChild(deleteBtn);
             container.appendChild(entryDiv);
           });
         }
       });
-    });
+    }
+
+    /* onbeforeprint – ארגון תוכן ההדפסה לפי בחירת המשתמש */
+    window.onbeforeprint = function() {
+      const container = document.getElementById("schedulesContainer");
+      window.originalSchedulesHTML = container.innerHTML;
+      let newContainer = document.createElement("div");
+      const roles = ["אחמ״ש", "סטודנטים", "קב״ט"];
+      roles.forEach(role => {
+        let submissionsForRole = window.allSubmissions.filter(s => s.role === role);
+        if (submissionsForRole.length > 0) {
+          if (window.printMode === "single") {
+            // מצב "סידור בכל דף" – לכל סידור כותרת מעליו בדף משלו
+            submissionsForRole.forEach(entry => {
+              let groupDiv = document.createElement("div");
+              groupDiv.className = "print-group";
+              let header = document.createElement("div");
+              header.className = "group-header";
+              header.textContent = role;
+              groupDiv.appendChild(header);
+              let entryDiv = document.createElement("div");
+              entryDiv.className = "schedule-entry";
+              let nameEl = document.createElement("h3");
+              nameEl.textContent = entry.name + ":";
+              entryDiv.appendChild(nameEl);
+              let scheduleTitle = document.createElement("div");
+              scheduleTitle.className = "schedule-title";
+              scheduleTitle.textContent = "סידור משמרות:";
+              entryDiv.appendChild(scheduleTitle);
+              let table = createScheduleTable(entry.schedule || "");
+              entryDiv.appendChild(table);
+              if (entry.preferences && entry.preferences.trim() !== "") {
+                let prefEl = document.createElement("div");
+                prefEl.className = "preferences";
+                prefEl.innerHTML = "<strong>העדפות:</strong> " + entry.preferences;
+                entryDiv.appendChild(prefEl);
+              }
+              groupDiv.appendChild(entryDiv);
+              newContainer.appendChild(groupDiv);
+            });
+          } else if (window.printMode === "double") {
+            // מצב "2 סידורים בכל דף" – כותרת הקבוצה תופיע פעם אחת בראש הקבוצה
+            let groupContainer = document.createElement("div");
+            let header = document.createElement("div");
+            header.className = "group-header";
+            header.textContent = role;
+            groupContainer.appendChild(header);
+            // נבנה מערך עבור כל סידור, ונחשב "ארוך" לפי סף גבוה יותר:
+            // אם מחרוזת הסידור מעל 200 תווים או ההעדפות מעל 300 תווים – נחשב ארוך.
+            let scheduleContainers = submissionsForRole.map(entry => {
+              let containerDiv = document.createElement("div");
+              containerDiv.className = "schedule-entry";
+              let nameEl = document.createElement("h3");
+              nameEl.textContent = entry.name + ":";
+              containerDiv.appendChild(nameEl);
+              let scheduleTitle = document.createElement("div");
+              scheduleTitle.className = "schedule-title";
+              scheduleTitle.textContent = "סידור משמרות:";
+              containerDiv.appendChild(scheduleTitle);
+              let table = createScheduleTable(entry.schedule || "");
+              containerDiv.appendChild(table);
+              if (entry.preferences && entry.preferences.trim() !== "") {
+                let prefEl = document.createElement("div");
+                prefEl.className = "preferences";
+                prefEl.innerHTML = "<strong>העדפות:</strong> " + entry.preferences;
+                containerDiv.appendChild(prefEl);
+              }
+              let isLong = false;
+              if ((entry.schedule && entry.schedule.length > 200) || (entry.preferences && entry.preferences.length > 300)) {
+                isLong = true;
+              }
+              containerDiv.dataset.isLong = isLong ? "true" : "false";
+              return containerDiv;
+            });
+            // אריזת הסידורים בזוגות – סידורים לא ארוכים נארזים בזוג, ארוכים יקבלו דף משלהם
+            let pages = [];
+            let currentPage = [];
+            scheduleContainers.forEach(sc => {
+              if (sc.dataset.isLong === "true") {
+                if (currentPage.length > 0) {
+                  pages.push(currentPage);
+                  currentPage = [];
+                }
+                pages.push([sc]);
+              } else {
+                currentPage.push(sc);
+                if (currentPage.length === 2) {
+                  pages.push(currentPage);
+                  currentPage = [];
+                }
+              }
+            });
+            if (currentPage.length > 0) {
+              pages.push(currentPage);
+            }
+            pages.forEach(pageGroup => {
+              let pageDiv = document.createElement("div");
+              pageDiv.className = "print-group";
+              pageGroup.forEach(sc => {
+                pageDiv.appendChild(sc);
+              });
+              groupContainer.appendChild(pageDiv);
+            });
+            newContainer.appendChild(groupContainer);
+          }
+        }
+      });
+      container.innerHTML = "";
+      container.appendChild(newContainer);
+    };
+
+    window.onafterprint = function() {
+      const container = document.getElementById("schedulesContainer");
+      if (window.originalSchedulesHTML) {
+        container.innerHTML = window.originalSchedulesHTML;
+      }
+    };
+  </script>
+  <script>
+    function openPrintModal() {
+      document.getElementById("printModal").style.display = "block";
+    }
+    function closePrintModal() {
+      document.getElementById("printModal").style.display = "none";
+    }
+    function choosePrintMode(mode) {
+      window.printMode = mode;
+      closePrintModal();
+      window.print();
+    }
+    document.getElementById("printBtn").onclick = function() {
+      openPrintModal();
+    };
   </script>
 </body>
 </html>
