@@ -66,7 +66,7 @@
       line-height: 1.4;
       font-size: 0.95em;
     }
-    .print-btn {
+    .print-btn, .copy-btn {
       display: block;
       margin: 30px auto;
       padding: 10px 20px;
@@ -77,7 +77,7 @@
       border-radius: 4px;
       cursor: pointer;
     }
-    .print-btn:hover {
+    .print-btn:hover, .copy-btn:hover {
       background-color: #005b4f;
     }
     /* טבלת המשמרות */
@@ -138,15 +138,15 @@
       .schedule-entry {
         page-break-inside: avoid;
       }
-      .top-buttons, .print-btn, #printModal {
+      .top-buttons, .print-btn, .copy-btn, #printModal, #copyModal {
         display: none;
       }
       .delete-icon {
         display: none;
       }
     }
-    /* סטייל למודל בחירת מצב הדפסה */
-    #printModal {
+    /* סטייל למודלים (בחירת מצב הדפסה והעתקה) */
+    .modal {
       display: none;
       position: fixed;
       z-index: 1000;
@@ -156,7 +156,7 @@
       height: 100%;
       background: rgba(0,0,0,0.5);
     }
-    #printModal .modal-content {
+    .modal .modal-content {
       background: #fff;
       margin: 20% auto;
       padding: 20px;
@@ -166,10 +166,10 @@
       text-align: center;
       position: relative;
     }
-    #printModal .modal-content h3 {
+    .modal .modal-content h3 {
       margin-top: 0;
     }
-    #printModal .modal-content button {
+    .modal .modal-content button {
       background-color: #2c3e50;
       color: #fff;
       border: none;
@@ -179,10 +179,10 @@
       cursor: pointer;
       font-size: 1rem;
     }
-    #printModal .modal-content button:hover {
+    .modal .modal-content button:hover {
       background-color: #1a252f;
     }
-    #printModal .close {
+    .modal .close {
       color: #aaa;
       position: absolute;
       top: 10px;
@@ -191,7 +191,7 @@
       font-weight: bold;
       cursor: pointer;
     }
-    #printModal .close:hover {
+    .modal .close:hover {
       color: #000;
     }
   </style>
@@ -205,6 +205,7 @@
   <h1>סידורים</h1>
   <div id="schedulesContainer"></div>
   <button class="print-btn" id="printBtn">הדפס</button>
+  <button class="copy-btn" id="copyBtn">העתקה להודעה</button>
   
   <!-- מודל בחירת מצב הדפסה -->
   <div id="printModal" class="modal">
@@ -216,11 +217,21 @@
     </div>
   </div>
   
+  <!-- מודל בחירת סוג העתקה -->
+  <div id="copyModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeCopyModal()">&times;</span>
+      <h3>בחר סוג הודעה להעתקה</h3>
+      <button onclick="chooseCopyMode('normal')">הודעה רגילה</button>
+      <button onclick="chooseCopyMode('chatgpt')">הודעה לצאט גי פי טי</button>
+    </div>
+  </div>
+  
   <!-- Firebase code -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-analytics.js";
-    import { getDatabase, ref, onValue, remove, push } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-database.js";
+    import { getDatabase, ref, onValue, remove } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyCeYVNOdp8N9BJdsO9eLeATX1_PX5LRG_A",
@@ -237,7 +248,7 @@
     const analytics = getAnalytics(app);
     const db = getDatabase(app);
 
-    // פונקציה ליצירת טבלת משמרות
+    // פונקציה ליצירת טבלת משמרות להצגה בדף
     function createScheduleTable(scheduleString) {
       const days = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
       const times = [
@@ -280,6 +291,59 @@
       table.appendChild(tbody);
       return table;
     }
+
+    // פונקציה ליצירת טקסט של הסידור עבור העתקה להודעה
+    function generateScheduleText() {
+      // נרצה לכלול רק את הסידורים עבור תפקידים "אחמ״ש" ו-"קב״ט"
+      const groups = {
+        "אחמ״ש": "*אחמשי״ם:*\n\n",
+        "קב״ט": "*קבטי״ם:*\n\n"
+      };
+      const days = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
+      const times = ["בוקר", "ערב", "לילה"];
+      // עבור כל אחד מהתפקידים
+      Object.keys(groups).forEach(roleKey => {
+        // סינון הרשומות לפי תפקיד
+        const submissions = window.allSubmissions.filter(s => s.role === roleKey);
+        submissions.forEach(entry => {
+          groups[roleKey] += `*${entry.name}:*\n`;
+          // בונים טקסט לסידור: עבור כל יום, בודקים אילו משמרות קיימות
+          days.forEach(day => {
+            let shifts = [];
+            times.forEach(time => {
+              const pattern = `${day}-${time}`;
+              if (entry.schedule && entry.schedule.includes(pattern)) {
+                shifts.push(time);
+              }
+            });
+            if (shifts.length > 0) {
+              groups[roleKey] += `${day} - ${shifts.join(" ,")}\n`;
+            }
+          });
+          groups[roleKey] += "\n";
+        });
+      });
+      // איחוד הטקסט עבור שתי הקבוצות
+      return groups["אחמ״ש"] + "\n" + groups["קב״ט"];
+    }
+
+    // פונקציה ליצירת טקסט הודעה עבור העתקה (כולל/בלי הקדמה לצאט גי פי טי)
+    function generateCopyMessage(mode) {
+      let message = "";
+      if (mode === "chatgpt") {
+        message += "יש לך פה סידור עבודה של עובדים המחולק לשתי קבוצות: אחמשי״ם וקבטי״ם.\n";
+        message += "אני אשאל אותך למשל: \"מי מהאחמשי״ם פתח לי ראשון לילה?\" – ואתה תסתכל בסידור ששלחתי ותענה בהתאם.\n";
+        message += "או למשל: \"מי מהקבטי״ם פתח לי שני בוקר?\" – ואתה תבדוק ותענה.\n";
+        message += "ואם אשאל: \"האם רועי חנוני פתח לי שני בוקר?\" – תענה באופן מדויק עם \"כן\" או \"לא\".\n\n";
+        message += "הנה הסידור:\n\n";
+      }
+      message += generateScheduleText();
+      return message;
+    }
+
+    // כדי שפונקציות generateCopyMessage ו-generateScheduleText יהיו נגישות באופן גלובלי
+    window.generateCopyMessage = generateCopyMessage;
+    window.generateScheduleText = generateScheduleText;
 
     // שמירת כל הסידורים במשתנה גלובלי
     window.allSubmissions = [];
@@ -473,6 +537,7 @@
     };
   </script>
   <script>
+    // Print modal functions
     function openPrintModal() {
       document.getElementById("printModal").style.display = "block";
     }
@@ -486,6 +551,28 @@
     }
     document.getElementById("printBtn").onclick = function() {
       openPrintModal();
+    };
+
+    // Copy modal functions
+    function openCopyModal() {
+      document.getElementById("copyModal").style.display = "block";
+    }
+    function closeCopyModal() {
+      document.getElementById("copyModal").style.display = "none";
+    }
+    function chooseCopyMode(mode) {
+      // mode: "normal" או "chatgpt"
+      const messageText = window.generateCopyMessage(mode);
+      // Copy to clipboard
+      navigator.clipboard.writeText(messageText).then(() => {
+        alert("הטקסט הועתק ללוח");
+      }).catch(err => {
+        alert("העתקה נכשלה");
+      });
+      closeCopyModal();
+    }
+    document.getElementById("copyBtn").onclick = function() {
+      openCopyModal();
     };
   </script>
 </body>
