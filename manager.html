@@ -2,13 +2,12 @@
 <html lang="he">
 <head>
   <meta charset="UTF-8">
-  <title>ניהול טופס</title>
+  <title>ניהול טופס - ערוך חוקיות</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     /* יבוא גופן Rubik מודרני */
     @import url('https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap');
-
-    /* עיצוב כללי */
+    
     html, body {
       margin: 0;
       padding: 0;
@@ -21,7 +20,6 @@
       padding: 0;
       text-align: center;
     }
-    /* Header מלא עם רקע ותפריט פנימי */
     header {
       width: 100%;
       background-color: #2c3e50;
@@ -40,7 +38,6 @@
       font-size: 1.2rem;
       color: #dfe6e9;
     }
-    /* תפריט בתוך ה-header */
     .menu {
       display: flex;
       justify-content: center;
@@ -48,7 +45,7 @@
       margin-top: 15px;
     }
     .menu button {
-      background-color: #00695c; /* ירוק כהה */
+      background-color: #00695c;
       color: #fff;
       border: none;
       padding: 10px 20px;
@@ -60,22 +57,22 @@
     .menu button:hover {
       background-color: #004d40;
     }
-    /* אזור ההגדרות – תצוגת הבית של "ניהול טופס" */
     .content {
       width: 100%;
       background-color: #fff;
       padding: 25px;
       box-sizing: border-box;
+      margin-bottom: 20px;
     }
-    /* הגדרות (Settings Section) – מוצגות כברירת מחדל */
+    /* Settings Section */
     #settingsSection {
       display: block;
     }
-    /* אזור ניהול העובדים – מוסתר כברירת מחדל */
+    /* Employee Management Section */
     #employeeManagement {
       display: none;
     }
-    /* עיצוב Toggle Buttons לשאלות ההגדרות */
+    /* Toggle Buttons */
     .settings-question {
       margin-bottom: 20px;
       text-align: right;
@@ -104,7 +101,7 @@
       background-color: #2c3e50;
       color: #fff;
     }
-    /* עוטף לטבלה עם קצוות מעוגלים */
+    /* Table styles for Employee Management */
     .table-container {
       overflow-x: auto;
       margin-top: 20px;
@@ -128,12 +125,10 @@
       padding: 12px;
       text-align: center;
     }
-    /* הזזת תא "פעולות" לימין – padding-left: 40px */
     table thead th:last-child,
     table tbody td:last-child {
       padding-left: 40px;
     }
-    /* כפתורי פעולות בטבלה */
     button.action-btn {
       padding: 6px 12px;
       font-size: 14px;
@@ -146,6 +141,9 @@
     button.edit-btn {
       background-color: #4CAF50;
       color: #fff;
+      border-radius: 20px;
+      padding: 6px 12px;
+      margin-right: 5px;
     }
     button.edit-btn:hover {
       background-color: #3e8e41;
@@ -153,11 +151,12 @@
     button.delete-btn {
       background-color: #f44336;
       color: #fff;
+      border-radius: 20px;
+      padding: 6px 12px;
     }
     button.delete-btn:hover {
       background-color: #d32f2f;
     }
-    /* כפתור הוספת עובד */
     button.add-btn {
       background-color: #2c3e50;
       color: #fff;
@@ -172,7 +171,7 @@
     button.add-btn:hover {
       background-color: #1a252f;
     }
-    /* מודלים – חלונות קופצים */
+    /* Modal Styles */
     .modal {
       display: none;
       position: fixed;
@@ -215,7 +214,6 @@
       font-size: 1rem;
       box-sizing: border-box;
     }
-    /* עיצוב Toggle Buttons במודלים (למקרה של הוספה/עריכה) */
     .modal-toggle-group {
       display: flex;
       justify-content: flex-end;
@@ -263,42 +261,166 @@
     .close:hover {
       color: #000;
     }
+    
+    /* New styles for the Rules Feature (General Rules) */
+    /* עיצוב תפריט נפתח לבחירת קטגוריה עם חץ בצד שמאל */
+    #ruleCategorySelect {
+      padding: 10px 10px 10px 35px;
+      border: 1px solid #2c3e50;
+      border-radius: 8px;
+      font-size: 1rem;
+      margin: 10px 0 15px 0;
+      background-color: #fff;
+      width: 100%;
+      max-width: 300px;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg width='12' height='12' viewBox='0 0 12 12' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M6 3l5 6H1z' fill='%232c3e50'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: left 10px center;
+      background-size: 12px;
+    }
+    /* ריווח בין אלמנטים בלוח החוקיות */
+    #addRuleButtonContainer {
+      margin-bottom: 20px;
+    }
+    /* עיצוב כפתורי המשמרות בטבלת הבחירה (לכללי) */
+    .shift-btn {
+      padding: 8px 12px;
+      border: 1px solid #2c3e50;
+      border-radius: 5px;
+      background-color: #f0f2f5;
+      color: #2c3e50;
+      cursor: pointer;
+      transition: background-color 0.3s, color 0.3s;
+      margin: 2px;
+    }
+    .shift-btn:hover {
+      background-color: #e0e0e0;
+    }
+    .shift-btn.active {
+      background-color: #8B0000; /* אדום כהה */
+      color: #fff;
+    }
+    .shift-btn.active::after {
+      content: " ✓";
+      font-weight: bold;
+    }
+    /* ריווח נוסף במודאל החוקיות (לכללי) */
+    #selectedShiftsInfo {
+      margin: 15px 0;
+      font-weight: 500;
+    }
+    #minShiftsContainer {
+      margin-top: 15px;
+    }
+    #minShiftsSelect {
+      padding: 10px;
+      border: 1px solid #2c3e50;
+      border-radius: 5px;
+      font-size: 1rem;
+      background-color: #fff;
+      width: 100%;
+      max-width: 150px;
+      margin-top: 5px;
+    }
+    
+    /* טבלת חוקיות */
+    #ruleList {
+      margin-top: 15px;
+      text-align: left;
+    }
+    #ruleList table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    #ruleList th, #ruleList td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: center;
+    }
+    
+    /* New: Employee-Specific Rules in Add Employee Modal */
+    .employee-specific-section {
+      margin-top: 20px;
+      text-align: right;
+      border: 1px solid #ccc;
+      padding: 15px;
+      border-radius: 10px;
+    }
+    /* עבור מודאל חוקיות ספציפיות – השתמש באלמנטים נפרדים */
+    #employeeRuleModal #employeeSelectedShiftsInfo {
+      margin: 15px 0;
+      font-weight: 500;
+    }
+    #employeeRuleModal #employeeMinShiftsContainer {
+      margin-top: 15px;
+    }
+    #employeeRuleModal #employeeMinShiftsSelect {
+      padding: 10px;
+      border: 1px solid #2c3e50;
+      border-radius: 5px;
+      font-size: 1rem;
+      background-color: #fff;
+      width: 100%;
+      max-width: 150px;
+      margin-top: 5px;
+    }
+    /* במודאל הספציפי – נשתמש בכפתורי משמרות עם אותו עיצוב */
   </style>
 </head>
 <body>
-  <!-- Header: לחיצה על הכותרת מחזירה לתצוגת ההגדרות -->
-  <header onclick="showSettingsSection()">
+  <header onclick="window.showSettingsSection()">
     <h1>ניהול טופס</h1>
     <p>סידור עבודה מחלקת ביטחון</p>
     <div class="menu">
-      <!-- כאן הכפתור "חזרה לטופס הראשי" מנווט לדף index -->
       <button onclick="window.location.href='index.html'; event.stopPropagation();">חזרה לטופס הראשי</button>
       <button onclick="window.location.href='סידורים.html'; event.stopPropagation();">מעבר לסידורים</button>
-      <button onclick="showEmployeeManagement(); event.stopPropagation();">ערוך עובדים</button>
+      <button onclick="window.showEmployeeManagement(); event.stopPropagation();">ערוך עובדים</button>
     </div>
   </header>
   
-  <!-- תצוגת הגדרות (Settings Section) – מוצגת כברירת מחדל -->
+  <!-- Settings Section -->
   <div class="content" id="settingsSection">
     <div class="settings-question">
       <label>האם לאפשר הגשת סידור עבודה:</label>
       <div class="toggle-group" id="scheduleSubmissionGroup">
-        <div class="toggle-btn" data-value="כן" onclick="selectToggle(this, 'scheduleSubmission'); updateSubmissionSetting('כן');">כן</div>
-        <div class="toggle-btn" data-value="לא" onclick="selectToggle(this, 'scheduleSubmission'); updateSubmissionSetting('לא');">לא</div>
+        <div class="toggle-btn" data-value="כן" onclick="window.selectToggle(this, 'scheduleSubmission'); window.updateSubmissionSetting('כן');">כן</div>
+        <div class="toggle-btn" data-value="לא" onclick="window.selectToggle(this, 'scheduleSubmission'); window.updateSubmissionSetting('לא');">לא</div>
       </div>
     </div>
     <div class="settings-question">
       <label>האם לבקש קוד עובד בעת בחירת שם:</label>
       <div class="toggle-group" id="requireEmployeeCodeGroup">
-        <div class="toggle-btn" data-value="כן" onclick="selectToggle(this, 'requireEmployeeCode'); updateRequireCodeSetting('כן');">כן</div>
-        <div class="toggle-btn" data-value="לא" onclick="selectToggle(this, 'requireEmployeeCode'); updateRequireCodeSetting('לא');">לא</div>
+        <div class="toggle-btn" data-value="כן" onclick="window.selectToggle(this, 'requireEmployeeCode'); window.updateRequireCodeSetting('כן');">כן</div>
+        <div class="toggle-btn" data-value="לא" onclick="window.selectToggle(this, 'requireEmployeeCode'); window.updateRequireCodeSetting('לא');">לא</div>
       </div>
+    </div>
+    
+    <!-- General Rules -->
+    <div class="settings-question">
+      <button class="add-btn" onclick="window.toggleRulesPanel()">ערוך חוקיות כלליות</button>
+    </div>
+    <!-- Rules Panel for General Rules (hidden by default) -->
+    <div id="rulesPanel" style="display: none; text-align: right; border: 1px solid #ccc; padding: 15px; border-radius: 10px;">
+      <label>בחר קטגוריה:</label>
+      <select id="ruleCategorySelect" onchange="window.onRuleCategoryChange()">
+        <option value="" disabled selected>בחר קטגוריה</option>
+        <option value="אחמ״ש">אחמ״ש</option>
+        <option value="קב״ט">קב״ט</option>
+        <option value="סטודנט">סטודנט</option>
+      </select>
+      <!-- Button to add new general rule -->
+      <div id="addRuleButtonContainer" style="display: none;">
+        <button class="add-btn" onclick="window.openAddRuleModal()">+ הוסף חוקיות כלליות</button>
+      </div>
+      <!-- List of existing general rules for the selected category -->
+      <div id="ruleList"></div>
     </div>
   </div>
   
-  <!-- אזור ניהול העובדים – מוסתר כברירת מחדל -->
+  <!-- Employee Management Section -->
   <div class="content" id="employeeManagement" style="display: none;">
-    <button class="add-btn" onclick="openAddEmployeeModal()">+ הוספת עובד</button>
+    <button class="add-btn" onclick="window.openAddEmployeeModal()">+ הוספת עובד</button>
     <div class="table-container">
       <table id="employeesTable">
         <thead>
@@ -317,10 +439,10 @@
     </div>
   </div>
   
-  <!-- מודל הוספת עובד -->
+  <!-- Modal: Add Employee -->
   <div id="addEmployeeModal" class="modal">
     <div class="modal-content">
-      <span class="close" onclick="closeAddEmployeeModal()">&times;</span>
+      <span class="close" onclick="window.closeAddEmployeeModal()">&times;</span>
       <h3>הוסף עובד</h3>
       <label for="addFirstName">שם פרטי:</label>
       <input type="text" id="addFirstName" placeholder="הזן שם פרטי">
@@ -328,24 +450,39 @@
       <input type="text" id="addLastName" placeholder="הזן שם משפחה">
       <label>סוג עובד:</label>
       <div class="toggle-group" id="addTypeGroup">
-        <div class="toggle-btn" data-value="אחמ״ש" onclick="selectToggle(this, 'addType')">אחמ״ש</div>
-        <div class="toggle-btn" data-value="קב״ט" onclick="selectToggle(this, 'addType')">קב״ט</div>
+        <div class="toggle-btn" data-value="אחמ״ש" onclick="window.selectToggle(this, 'addType')">אחמ״ש</div>
+        <div class="toggle-btn" data-value="קב״ט" onclick="window.selectToggle(this, 'addType')">קב״ט</div>
       </div>
       <label>סטודנט:</label>
       <div class="toggle-group" id="addStudentGroup">
-        <div class="toggle-btn" data-value="כן" onclick="selectToggle(this, 'addStudent')">כן</div>
-        <div class="toggle-btn" data-value="לא" onclick="selectToggle(this, 'addStudent')">לא</div>
+        <div class="toggle-btn" data-value="כן" onclick="window.selectToggle(this, 'addStudent')">כן</div>
+        <div class="toggle-btn" data-value="לא" onclick="window.selectToggle(this, 'addStudent')">לא</div>
       </div>
       <label for="addCode">מספר עובד (קוד):</label>
       <input type="text" id="addCode" placeholder="00000" maxlength="5">
-      <button onclick="saveNewEmployee()">שמור עובד</button>
+      
+      <!-- Employee-Specific Rules Toggle -->
+      <div class="settings-question">
+        <label>האם ליצור חוקיות ספציפית לעובד זה?</label>
+        <div class="toggle-group" id="employeeSpecificRulesToggleGroup">
+          <div class="toggle-btn" data-value="לא" onclick="window.selectToggle(this, 'employeeSpecificRulesToggle'); window.handleEmployeeSpecificToggle(this);">לא</div>
+          <div class="toggle-btn" data-value="כן" onclick="window.selectToggle(this, 'employeeSpecificRulesToggle'); window.handleEmployeeSpecificToggle(this);">כן</div>
+        </div>
+      </div>
+      <div id="employeeSpecificRulesSection" class="employee-specific-section" style="display: none;">
+        <p>חוקיות לסידור עבור: <span id="employeeSpecificName"></span></p>
+        <button class="add-btn" onclick="window.openEmployeeSpecificRuleModal()">+ הוסף חוקיות ספציפית</button>
+        <div id="employeeRuleList"></div>
+      </div>
+      
+      <button onclick="window.saveNewEmployee()">שמור עובד</button>
     </div>
   </div>
   
-  <!-- מודל עריכת עובד -->
+  <!-- Modal: Edit Employee -->
   <div id="editEmployeeModal" class="modal">
     <div class="modal-content">
-      <span class="close" onclick="closeEditEmployeeModal()">&times;</span>
+      <span class="close" onclick="window.closeEditEmployeeModal()">&times;</span>
       <h3>ערוך עובד</h3>
       <label for="editFirstName">שם פרטי:</label>
       <input type="text" id="editFirstName">
@@ -353,17 +490,173 @@
       <input type="text" id="editLastName">
       <label>סוג עובד:</label>
       <div class="toggle-group" id="editTypeGroup">
-        <div class="toggle-btn" data-value="אחמ״ש" onclick="selectToggle(this, 'editType')">אחמ״ש</div>
-        <div class="toggle-btn" data-value="קב״ט" onclick="selectToggle(this, 'editType')">קב״ט</div>
+        <div class="toggle-btn" data-value="אחמ״ש" onclick="window.selectToggle(this, 'editType')">אחמ״ש</div>
+        <div class="toggle-btn" data-value="קב״ט" onclick="window.selectToggle(this, 'editType')">קב״ט</div>
       </div>
       <label>סטודנט:</label>
       <div class="toggle-group" id="editStudentGroup">
-        <div class="toggle-btn" data-value="כן" onclick="selectToggle(this, 'editStudent')">כן</div>
-        <div class="toggle-btn" data-value="לא" onclick="selectToggle(this, 'editStudent')">לא</div>
+        <div class="toggle-btn" data-value="כן" onclick="window.selectToggle(this, 'editStudent')">כן</div>
+        <div class="toggle-btn" data-value="לא" onclick="window.selectToggle(this, 'editStudent')">לא</div>
       </div>
       <label for="editCode">מספר עובד (קוד):</label>
       <input type="text" id="editCode">
-      <button onclick="updateEmployee()">עדכן עובד</button>
+      <button onclick="window.updateEmployee()">עדכן עובד</button>
+    </div>
+  </div>
+  
+  <!-- Modal: Add General Rule -->
+  <div id="addRuleModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="window.closeAddRuleModal()">&times;</span>
+      <h3>הוסף חוקיות כלליות</h3>
+      <label for="ruleName">שם החוקיות:</label>
+      <input type="text" id="ruleName" placeholder="הזן שם חוקיות">
+      <!-- Table of shifts for selection (General Rule Modal) -->
+      <div id="shiftSelectionContainer">
+        <p>בחר קבוצה של משמרות:</p>
+        <table id="shiftTable">
+          <thead>
+            <tr>
+              <th>יום</th>
+              <th>בוקר</th>
+              <th>ערב</th>
+              <th>לילה</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>ראשון</td>
+              <td><button type="button" class="shift-btn" data-shift="ראשון-בוקר" onclick="window.toggleShiftSelection(this)">בוקר</button></td>
+              <td><button type="button" class="shift-btn" data-shift="ראשון-ערב" onclick="window.toggleShiftSelection(this)">ערב</button></td>
+              <td><button type="button" class="shift-btn" data-shift="ראשון-לילה" onclick="window.toggleShiftSelection(this)">לילה</button></td>
+            </tr>
+            <tr>
+              <td>שני</td>
+              <td><button type="button" class="shift-btn" data-shift="שני-בוקר" onclick="window.toggleShiftSelection(this)">בוקר</button></td>
+              <td><button type="button" class="shift-btn" data-shift="שני-ערב" onclick="window.toggleShiftSelection(this)">ערב</button></td>
+              <td><button type="button" class="shift-btn" data-shift="שני-לילה" onclick="window.toggleShiftSelection(this)">לילה</button></td>
+            </tr>
+            <tr>
+              <td>שלישי</td>
+              <td><button type="button" class="shift-btn" data-shift="שלישי-בוקר" onclick="window.toggleShiftSelection(this)">בוקר</button></td>
+              <td><button type="button" class="shift-btn" data-shift="שלישי-ערב" onclick="window.toggleShiftSelection(this)">ערב</button></td>
+              <td><button type="button" class="shift-btn" data-shift="שלישי-לילה" onclick="window.toggleShiftSelection(this)">לילה</button></td>
+            </tr>
+            <tr>
+              <td>רביעי</td>
+              <td><button type="button" class="shift-btn" data-shift="רביעי-בוקר" onclick="window.toggleShiftSelection(this)">בוקר</button></td>
+              <td><button type="button" class="shift-btn" data-shift="רביעי-ערב" onclick="window.toggleShiftSelection(this)">ערב</button></td>
+              <td><button type="button" class="shift-btn" data-shift="רביעי-לילה" onclick="window.toggleShiftSelection(this)">לילה</button></td>
+            </tr>
+            <tr>
+              <td>חמישי</td>
+              <td><button type="button" class="shift-btn" data-shift="חמישי-בוקר" onclick="window.toggleShiftSelection(this)">בוקר</button></td>
+              <td><button type="button" class="shift-btn" data-shift="חמישי-ערב" onclick="window.toggleShiftSelection(this)">ערב</button></td>
+              <td><button type="button" class="shift-btn" data-shift="חמישי-לילה" onclick="window.toggleShiftSelection(this)">לילה</button></td>
+            </tr>
+            <tr>
+              <td>שישי</td>
+              <td><button type="button" class="shift-btn" data-shift="שישי-בוקר" onclick="window.toggleShiftSelection(this)">בוקר</button></td>
+              <td><button type="button" class="shift-btn" data-shift="שישי-ערב" onclick="window.toggleShiftSelection(this)">ערב</button></td>
+              <td><button type="button" class="shift-btn" data-shift="שישי-לילה" onclick="window.toggleShiftSelection(this)">לילה</button></td>
+            </tr>
+            <tr>
+              <td>שבת</td>
+              <td><button type="button" class="shift-btn" data-shift="שבת-בוקר" onclick="window.toggleShiftSelection(this)">בוקר</button></td>
+              <td><button type="button" class="shift-btn" data-shift="שבת-ערב" onclick="window.toggleShiftSelection(this)">ערב</button></td>
+              <td><button type="button" class="shift-btn" data-shift="שבת-לילה" onclick="window.toggleShiftSelection(this)">לילה</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <!-- Display selected shifts info -->
+      <div id="selectedShiftsInfo"></div>
+      <!-- Dropdown for minimum shifts -->
+      <div id="minShiftsContainer" style="display: none;">
+        <label>בחר מינימום משמרות לקבוצה שבחרת:</label>
+        <select id="minShiftsSelect">
+          <!-- Options will be generated dynamically -->
+        </select>
+      </div>
+      <button onclick="window.saveNewRule()">הוסף חוקיות כלליות</button>
+    </div>
+  </div>
+  
+  <!-- Modal: Employee-Specific Rule Modal -->
+  <div id="employeeRuleModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="window.closeEmployeeSpecificRuleModal()">&times;</span>
+      <h3>הוסף חוקיות ספציפית</h3>
+      <label for="employeeRuleName">שם החוקיות:</label>
+      <input type="text" id="employeeRuleName" placeholder="הזן שם חוקיות">
+      <!-- Table of shifts for selection (Employee-Specific) -->
+      <div id="employeeShiftSelectionContainer">
+        <p>בחר קבוצה של משמרות:</p>
+        <table id="employeeShiftTable">
+          <thead>
+            <tr>
+              <th>יום</th>
+              <th>בוקר</th>
+              <th>ערב</th>
+              <th>לילה</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>ראשון</td>
+              <td><button type="button" class="shift-btn" data-shift="ראשון-בוקר" onclick="window.toggleEmployeeShiftSelection(this)">בוקר</button></td>
+              <td><button type="button" class="shift-btn" data-shift="ראשון-ערב" onclick="window.toggleEmployeeShiftSelection(this)">ערב</button></td>
+              <td><button type="button" class="shift-btn" data-shift="ראשון-לילה" onclick="window.toggleEmployeeShiftSelection(this)">לילה</button></td>
+            </tr>
+            <tr>
+              <td>שני</td>
+              <td><button type="button" class="shift-btn" data-shift="שני-בוקר" onclick="window.toggleEmployeeShiftSelection(this)">בוקר</button></td>
+              <td><button type="button" class="shift-btn" data-shift="שני-ערב" onclick="window.toggleEmployeeShiftSelection(this)">ערב</button></td>
+              <td><button type="button" class="shift-btn" data-shift="שני-לילה" onclick="window.toggleEmployeeShiftSelection(this)">לילה</button></td>
+            </tr>
+            <tr>
+              <td>שלישי</td>
+              <td><button type="button" class="shift-btn" data-shift="שלישי-בוקר" onclick="window.toggleEmployeeShiftSelection(this)">בוקר</button></td>
+              <td><button type="button" class="shift-btn" data-shift="שלישי-ערב" onclick="window.toggleEmployeeShiftSelection(this)">ערב</button></td>
+              <td><button type="button" class="shift-btn" data-shift="שלישי-לילה" onclick="window.toggleEmployeeShiftSelection(this)">לילה</button></td>
+            </tr>
+            <tr>
+              <td>רביעי</td>
+              <td><button type="button" class="shift-btn" data-shift="רביעי-בוקר" onclick="window.toggleEmployeeShiftSelection(this)">בוקר</button></td>
+              <td><button type="button" class="shift-btn" data-shift="רביעי-ערב" onclick="window.toggleEmployeeShiftSelection(this)">ערב</button></td>
+              <td><button type="button" class="shift-btn" data-shift="רביעי-לילה" onclick="window.toggleEmployeeShiftSelection(this)">לילה</button></td>
+            </tr>
+            <tr>
+              <td>חמישי</td>
+              <td><button type="button" class="shift-btn" data-shift="חמישי-בוקר" onclick="window.toggleEmployeeShiftSelection(this)">בוקר</button></td>
+              <td><button type="button" class="shift-btn" data-shift="חמישי-ערב" onclick="window.toggleEmployeeShiftSelection(this)">ערב</button></td>
+              <td><button type="button" class="shift-btn" data-shift="חמישי-לילה" onclick="window.toggleEmployeeShiftSelection(this)">לילה</button></td>
+            </tr>
+            <tr>
+              <td>שישי</td>
+              <td><button type="button" class="shift-btn" data-shift="שישי-בוקר" onclick="window.toggleEmployeeShiftSelection(this)">בוקר</button></td>
+              <td><button type="button" class="shift-btn" data-shift="שישי-ערב" onclick="window.toggleEmployeeShiftSelection(this)">ערב</button></td>
+              <td><button type="button" class="shift-btn" data-shift="שישי-לילה" onclick="window.toggleEmployeeShiftSelection(this)">לילה</button></td>
+            </tr>
+            <tr>
+              <td>שבת</td>
+              <td><button type="button" class="shift-btn" data-shift="שבת-בוקר" onclick="window.toggleEmployeeShiftSelection(this)">בוקר</button></td>
+              <td><button type="button" class="shift-btn" data-shift="שבת-ערב" onclick="window.toggleEmployeeShiftSelection(this)">ערב</button></td>
+              <td><button type="button" class="shift-btn" data-shift="שבת-לילה" onclick="window.toggleEmployeeShiftSelection(this)">לילה</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <!-- Display selected shifts info (Employee-Specific) -->
+      <div id="employeeSelectedShiftsInfo"></div>
+      <!-- Dropdown for minimum shifts (Employee-Specific) -->
+      <div id="employeeMinShiftsContainer" style="display: none;">
+        <label>בחר מינימום משמרות לקבוצה שבחרת:</label>
+        <select id="employeeMinShiftsSelect">
+          <!-- Options will be generated dynamically -->
+        </select>
+      </div>
+      <button onclick="window.saveEmployeeSpecificRule()">הוסף חוקיות ספציפית</button>
     </div>
   </div>
   
@@ -385,150 +678,33 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
     
-    let employees = {}; 
-    let currentEditKey = "";
+    // עדכון הגדרות
+    window.updateSubmissionSetting = function(value) {
+      set(ref(db, "settings/allowScheduleSubmission"), value)
+        .then(() => { alert("עודכן: הגשת סידור עבודה " + value); })
+        .catch(err => { alert("אירעה שגיאה בעדכון: " + err.message); });
+    };
+    window.updateRequireCodeSetting = function(value) {
+      set(ref(db, "settings/requireEmployeeCode"), value)
+        .then(() => { alert("עודכן: דרישת קוד עובד " + value); })
+        .catch(err => { alert("אירעה שגיאה בעדכון: " + err.message); });
+    };
     
-    // טעינת נתוני עובדים ועדכון הטבלה
-    onValue(ref(db, "employees"), (snapshot) => {
+    // מאזינים לשינויים מ-Firebase לעדכון מצב הלחצנים
+    onValue(ref(db, "settings/allowScheduleSubmission"), (snapshot) => {
       const val = snapshot.val();
-      employees = val ? val : {};
-      renderEmployeesTable();
+      if(val !== null && val !== undefined) {
+        window.setToggleGroupValue("scheduleSubmissionGroup", val);
+      }
+    });
+    onValue(ref(db, "settings/requireEmployeeCode"), (snapshot) => {
+      const val = snapshot.val();
+      if(val !== null && val !== undefined) {
+        window.setToggleGroupValue("requireEmployeeCodeGroup", val);
+      }
     });
     
-    // מציג את תצוגת ההגדרות ומסתיר את ניהול העובדים
-    window.showSettingsSection = function() {
-      document.getElementById("employeeManagement").style.display = "none";
-      document.getElementById("settingsSection").style.display = "block";
-    };
-    
-    // מציג את ניהול העובדים ומסתיר את תצוגת ההגדרות
-    window.showEmployeeManagement = function(){
-      document.getElementById("settingsSection").style.display = "none";
-      document.getElementById("employeeManagement").style.display = "block";
-    };
-    
-    window.openAddEmployeeModal = function(){
-      document.getElementById("addEmployeeModal").style.display = "block";
-    };
-    
-    window.closeAddEmployeeModal = function(){
-      document.getElementById("addEmployeeModal").style.display = "none";
-      document.getElementById("addFirstName").value = "";
-      document.getElementById("addLastName").value = "";
-      document.getElementById("addCode").value = "";
-      clearToggleGroup("addTypeGroup");
-      clearToggleGroup("addStudentGroup");
-    };
-    
-    window.saveNewEmployee = function(){
-      const firstName = document.getElementById("addFirstName").value.trim();
-      const lastName = document.getElementById("addLastName").value.trim();
-      const code = document.getElementById("addCode").value.trim();
-      const type = document.getElementById("addTypeGroup").getAttribute("data-selected") || "";
-      const student = document.getElementById("addStudentGroup").getAttribute("data-selected") || "";
-      
-      if(!firstName || !lastName || !code || !type || !student){
-        alert("נא למלא את כל השדות.");
-        return;
-      }
-      
-      const newEmployee = { firstName, lastName, code, type, student };
-      
-      push(ref(db, "employees"), newEmployee)
-        .then(() => {
-          alert("העובד נוסף בהצלחה!");
-          closeAddEmployeeModal();
-        })
-        .catch(err => {
-          alert("אירעה שגיאה: " + err.message);
-        });
-    };
-    
-    function renderEmployeesTable(){
-      const tbody = document.querySelector("#employeesTable tbody");
-      tbody.innerHTML = "";
-      const empArray = Object.entries(employees);
-      empArray.sort((a, b) => {
-        const empA = a[1], empB = b[1];
-        const getGroup = (emp) => {
-          if(emp.type === "אחמ״ש") return 1;
-          if(emp.type === "קב״ט" && emp.student === "כן") return 2;
-          return 3;
-        };
-        const groupA = getGroup(empA), groupB = getGroup(empB);
-        if(groupA !== groupB) return groupA - groupB;
-        return a[0].localeCompare(b[0]);
-      });
-      
-      empArray.forEach(([key, emp]) => {
-        const tr = document.createElement("tr");
-        const fullName = emp.firstName + " " + emp.lastName;
-        tr.innerHTML = `
-          <td>${fullName}</td>
-          <td>${emp.type}</td>
-          <td>${emp.student}</td>
-          <td>${emp.code}</td>
-          <td style="padding-left:40px;">
-            <button class="action-btn edit-btn" onclick="openEditEmployeeModal('${key}')">ערוך</button>
-            <button class="action-btn delete-btn" onclick="deleteEmployee('${key}')">מחק</button>
-          </td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
-    
-    window.openEditEmployeeModal = function(key){
-      currentEditKey = key;
-      const emp = employees[key];
-      document.getElementById("editFirstName").value = emp.firstName;
-      document.getElementById("editLastName").value = emp.lastName;
-      document.getElementById("editCode").value = emp.code;
-      setToggleGroupValue("editTypeGroup", emp.type);
-      setToggleGroupValue("editStudentGroup", emp.student);
-      document.getElementById("editEmployeeModal").style.display = "block";
-    };
-    
-    window.closeEditEmployeeModal = function(){
-      document.getElementById("editEmployeeModal").style.display = "none";
-    };
-    
-    window.updateEmployee = function(){
-      const firstName = document.getElementById("editFirstName").value.trim();
-      const lastName = document.getElementById("editLastName").value.trim();
-      const code = document.getElementById("editCode").value.trim();
-      const type = document.getElementById("editTypeGroup").getAttribute("data-selected") || "";
-      const student = document.getElementById("editStudentGroup").getAttribute("data-selected") || "";
-      
-      if(!firstName || !lastName || !code || !type || !student){
-        alert("נא למלא את כל השדות לעדכון.");
-        return;
-      }
-      
-      const updatedEmployee = { firstName, lastName, code, type, student };
-      
-      set(ref(db, "employees/" + currentEditKey), updatedEmployee)
-        .then(() => {
-          alert("העובד עודכן בהצלחה!");
-          closeEditEmployeeModal();
-        })
-        .catch(err => {
-          alert("אירעה שגיאה: " + err.message);
-        });
-    };
-    
-    window.deleteEmployee = function(key){
-      if(confirm("האם אתה בטוח שברצונך למחוק עובד זה?")){
-        remove(ref(db, "employees/" + key))
-          .then(() => {
-            alert("העובד נמחק.");
-          })
-          .catch(err => {
-            alert("אירעה שגיאה: " + err.message);
-          });
-      }
-    };
-
-    /* פונקציות לטיפול ב-Toggle Buttons */
+    // פונקציות לטיפול ב-Toggle Buttons
     window.selectToggle = function(el, groupId) {
       const group = document.getElementById(groupId + "Group");
       Array.from(group.children).forEach(btn => btn.classList.remove("active"));
@@ -553,41 +729,482 @@
         }
       });
     };
-
-    // עדכון הגדרות במסד הנתונים
-    window.updateSubmissionSetting = function(value) {
-      set(ref(db, "settings/allowScheduleSubmission"), value)
-        .then(() => {
-          alert("עודכן: הגשת סידור עבודה " + value);
-        })
-        .catch(err => {
-          alert("אירעה שגיאה בעדכון: " + err.message);
-        });
-    };
-
-    window.updateRequireCodeSetting = function(value) {
-      set(ref(db, "settings/requireEmployeeCode"), value)
-        .then(() => {
-          alert("עודכן: דרישת קוד עובד " + value);
-        })
-        .catch(err => {
-          alert("אירעה שגיאה בעדכון: " + err.message);
-        });
-    };
-
-    // בעת טעינת הדף – עדכון מצב הכפתורים לפי הערכים במסד הנתונים
-    onValue(ref(db, "settings/allowScheduleSubmission"), (snapshot) => {
+    
+    // ניהול עובדים
+    let employees = {}; 
+    let currentEditKey = "";
+    onValue(ref(db, "employees"), (snapshot) => {
       const val = snapshot.val();
-      if(val) {
-        setToggleGroupValue("scheduleSubmissionGroup", val);
+      employees = val ? val : {};
+      renderEmployeesTable();
+    });
+    function renderEmployeesTable() {
+      const tbody = document.querySelector("#employeesTable tbody");
+      tbody.innerHTML = "";
+      const empArray = Object.entries(employees);
+      empArray.sort((a, b) => {
+        const empA = a[1], empB = b[1];
+        const getGroup = (emp) => {
+          if(emp.type === "אחמ״ש") return 1;
+          if(emp.type === "קב״ט" && emp.student === "כן") return 2;
+          return 3;
+        };
+        const groupA = getGroup(empA), groupB = getGroup(empB);
+        if(groupA !== groupB) return groupA - groupB;
+        return a[0].localeCompare(b[0]);
+      });
+      empArray.forEach(([key, emp]) => {
+        const tr = document.createElement("tr");
+        const fullName = emp.firstName + " " + emp.lastName;
+        tr.innerHTML = `
+          <td>${fullName}</td>
+          <td>${emp.type}</td>
+          <td>${emp.student}</td>
+          <td>${emp.code}</td>
+          <td style="padding-left:40px;">
+            <button class="action-btn edit-btn" onclick="window.openEditEmployeeModal('${key}')">ערוך</button>
+            <button class="action-btn delete-btn" onclick="window.deleteEmployee('${key}')">מחק</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+    window.openAddEmployeeModal = function() {
+      document.getElementById("addEmployeeModal").style.display = "block";
+    };
+    window.closeAddEmployeeModal = function() {
+      document.getElementById("addEmployeeModal").style.display = "none";
+      document.getElementById("addFirstName").value = "";
+      document.getElementById("addLastName").value = "";
+      document.getElementById("addCode").value = "";
+      clearToggleGroup("addTypeGroup");
+      clearToggleGroup("addStudentGroup");
+      // Reset employee-specific toggle and section
+      clearToggleGroup("employeeSpecificRulesToggle");
+      document.getElementById("employeeSpecificRulesSection").style.display = "none";
+      document.getElementById("employeeSpecificName").innerText = "";
+      tempEmployeeRules = [];
+      document.getElementById("employeeRuleList").innerHTML = "";
+    };
+    
+    // משתנה לאגירת חוקיות ספציפית לעובד (זמנית)
+    let tempEmployeeRules = [];
+    
+    window.saveNewEmployee = function() {
+      const firstName = document.getElementById("addFirstName").value.trim();
+      const lastName = document.getElementById("addLastName").value.trim();
+      const code = document.getElementById("addCode").value.trim();
+      const type = document.getElementById("addTypeGroup").getAttribute("data-selected") || "";
+      const student = document.getElementById("addStudentGroup").getAttribute("data-selected") || "";
+      if(!firstName || !lastName || !code || !type || !student) {
+        alert("נא למלא את כל השדות.");
+        return;
+      }
+      const newEmployee = { firstName, lastName, code, type, student };
+      push(ref(db, "employees"), newEmployee)
+        .then((data) => {
+          alert("העובד נוסף בהצלחה!");
+          // אם העובד צריך חוקיות ספציפית, שמור את החוקיות תחת הנתיב employeeRules/{newEmployeeKey}
+          const newKey = data.key;
+          const specificToggle = document.getElementById("employeeSpecificRulesToggleGroup").getAttribute("data-selected");
+          if(specificToggle === "כן" && tempEmployeeRules.length > 0) {
+            tempEmployeeRules.forEach(rule => {
+              push(ref(db, "employeeRules/" + newKey), rule)
+                .catch(err => { alert("אירעה שגיאה בשמירת חוקיות ספציפית: " + err.message); });
+            });
+          }
+          closeAddEmployeeModal();
+        })
+        .catch(err => {
+          alert("אירעה שגיאה: " + err.message);
+        });
+    };
+    window.openEditEmployeeModal = function(key) {
+      currentEditKey = key;
+      const emp = employees[key];
+      document.getElementById("editFirstName").value = emp.firstName;
+      document.getElementById("editLastName").value = emp.lastName;
+      document.getElementById("editCode").value = emp.code;
+      setToggleGroupValue("editTypeGroup", emp.type);
+      setToggleGroupValue("editStudentGroup", emp.student);
+      document.getElementById("editEmployeeModal").style.display = "block";
+    };
+    window.closeEditEmployeeModal = function() {
+      document.getElementById("editEmployeeModal").style.display = "none";
+    };
+    window.updateEmployee = function() {
+      const firstName = document.getElementById("editFirstName").value.trim();
+      const lastName = document.getElementById("editLastName").value.trim();
+      const code = document.getElementById("editCode").value.trim();
+      const type = document.getElementById("editTypeGroup").getAttribute("data-selected") || "";
+      const student = document.getElementById("editStudentGroup").getAttribute("data-selected") || "";
+      if(!firstName || !lastName || !code || !type || !student) {
+        alert("נא למלא את כל השדות לעדכון.");
+        return;
+      }
+      const updatedEmployee = { firstName, lastName, code, type, student };
+      set(ref(db, "employees/" + currentEditKey), updatedEmployee)
+        .then(() => {
+          alert("העובד עודכן בהצלחה!");
+          closeEditEmployeeModal();
+        })
+        .catch(err => {
+          alert("אירעה שגיאה: " + err.message);
+        });
+    };
+    window.deleteEmployee = function(key) {
+      if(confirm("האם אתה בטוח שברצונך למחוק עובד זה?")) {
+        remove(ref(db, "employees/" + key))
+          .then(() => { alert("העובד נמחק."); })
+          .catch(err => { alert("אירעה שגיאה: " + err.message); });
+      }
+    };
+    
+    // פונקציות לתצוגת ההגדרות והעברת התצוגה
+    window.showSettingsSection = function() {
+      document.getElementById("employeeManagement").style.display = "none";
+      document.getElementById("settingsSection").style.display = "block";
+    };
+    window.showEmployeeManagement = function() {
+      document.getElementById("settingsSection").style.display = "none";
+      document.getElementById("employeeManagement").style.display = "block";
+    };
+    
+    // === Rules Feature Functions (General Rules) ===
+    let currentRuleCategory = "";
+    let currentRuleKey = "";
+    window.toggleRulesPanel = function() {
+      const panel = document.getElementById("rulesPanel");
+      panel.style.display = (panel.style.display === "none" || panel.style.display === "") ? "block" : "none";
+    };
+    window.onRuleCategoryChange = function() {
+      const category = document.getElementById("ruleCategorySelect").value;
+      currentRuleCategory = category;
+      currentRuleKey = ""; // reset editing state
+      const addButtonContainer = document.getElementById("addRuleButtonContainer");
+      if(category) {
+        addButtonContainer.style.display = "block";
+        window.loadRulesForCategory(category);
+      } else {
+        addButtonContainer.style.display = "none";
+        document.getElementById("ruleList").innerHTML = "";
+      }
+    };
+    window.loadRulesForCategory = function(category) {
+      const rulesRef = ref(db, "rules/" + category);
+      onValue(rulesRef, (snapshot) => {
+        const rules = snapshot.val() || {};
+        window.renderRulesList(rules);
+      });
+    };
+    window.renderRulesList = function(rules) {
+      const ruleListDiv = document.getElementById("ruleList");
+      ruleListDiv.innerHTML = "<h4>חוקיות קיימות:</h4>";
+      const table = document.createElement("table");
+      const thead = document.createElement("thead");
+      thead.innerHTML = `<tr><th>שם חוקיות</th><th>משמרות נבחרות</th><th>מינימום</th><th>פעולות</th></tr>`;
+      table.appendChild(thead);
+      const tbody = document.createElement("tbody");
+      for (const key in rules) {
+        const rule = rules[key];
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${rule.name}</td>
+                        <td>${rule.shifts.join(", ")}</td>
+                        <td>${rule.minRequired}</td>
+                        <td>
+                          <button class="action-btn edit-btn" onclick="window.editRule('${rule.category}', '${key}')">ערוך</button>
+                          <button class="action-btn delete-btn" onclick="window.deleteRule('${rule.category}', '${key}')">מחק</button>
+                        </td>`;
+        tbody.appendChild(tr);
+      }
+      table.appendChild(tbody);
+      ruleListDiv.appendChild(table);
+    };
+    window.deleteRule = function(category, ruleKey) {
+      if(confirm("האם אתה בטוח שברצונך למחוק חוקיות זו?")) {
+        remove(ref(db, "rules/" + category + "/" + ruleKey))
+          .then(() => { alert("חוקיות נמחקה."); })
+          .catch(err => { alert("אירעה שגיאה: " + err.message); });
+      }
+    };
+    window.editRule = function(category, ruleKey) {
+      currentRuleCategory = category;
+      currentRuleKey = ruleKey;
+      const ruleRef = ref(db, "rules/" + category + "/" + ruleKey);
+      onValue(ruleRef, (snapshot) => {
+        const ruleData = snapshot.val();
+        if(ruleData) {
+          document.getElementById("ruleName").value = ruleData.name;
+          const shiftButtons = document.querySelectorAll("#shiftTable .shift-btn");
+          shiftButtons.forEach(btn => {
+            const shift = btn.getAttribute("data-shift");
+            if(ruleData.shifts.includes(shift)) {
+              btn.classList.add("active");
+            } else {
+              btn.classList.remove("active");
+            }
+          });
+          selectedShifts = ruleData.shifts;
+          window.updateSelectedShiftsInfo();
+          const minSelect = document.getElementById("minShiftsSelect");
+          minSelect.innerHTML = "";
+          for(let i = 1; i <= selectedShifts.length; i++) {
+            const option = document.createElement("option");
+            option.value = i;
+            option.text = i;
+            if(i === ruleData.minRequired) {
+              option.selected = true;
+            }
+            minSelect.add(option);
+          }
+          document.getElementById("minShiftsContainer").style.display = "block";
+          // Change modal button text to "עדכן חוקיות"
+          document.querySelector("#addRuleModal button[onclick^='window.saveNewRule']").innerText = "עדכן חוקיות";
+        }
+      }, { onlyOnce: true });
+      document.getElementById("addRuleModal").style.display = "block";
+    };
+    window.openAddRuleModal = function() {
+      currentRuleKey = ""; // reset editing state if adding new
+      document.getElementById("ruleName").value = "";
+      const shiftButtons = document.querySelectorAll("#shiftTable .shift-btn");
+      shiftButtons.forEach(btn => btn.classList.remove("active"));
+      document.getElementById("selectedShiftsInfo").innerText = "";
+      document.getElementById("minShiftsContainer").style.display = "none";
+      document.getElementById("minShiftsSelect").innerHTML = "";
+      selectedShifts = [];
+      // Reset modal button text to "הוסף חוקיות"
+      document.querySelector("#addRuleModal button[onclick^='window.saveNewRule']").innerText = "הוסף חוקיות";
+      document.getElementById("addRuleModal").style.display = "block";
+    };
+    window.closeAddRuleModal = function() {
+      document.getElementById("addRuleModal").style.display = "none";
+    };
+    // Array to hold selected shifts in rule modal (for general rules)
+    let selectedShifts = [];
+    window.toggleShiftSelection = function(btn) {
+      const shift = btn.getAttribute("data-shift");
+      if(btn.classList.contains("active")) {
+        btn.classList.remove("active");
+        selectedShifts = selectedShifts.filter(s => s !== shift);
+      } else {
+        btn.classList.add("active");
+        selectedShifts.push(shift);
+      }
+      window.updateSelectedShiftsInfo();
+    };
+    window.updateSelectedShiftsInfo = function() {
+      const infoDiv = document.getElementById("selectedShiftsInfo");
+      infoDiv.innerText = "משמרות נבחרות: " + selectedShifts.join(", ");
+      const minContainer = document.getElementById("minShiftsContainer");
+      const minSelect = document.getElementById("minShiftsSelect");
+      if(selectedShifts.length > 0) {
+        minContainer.style.display = "block";
+        minSelect.innerHTML = "";
+        for(let i = 1; i <= selectedShifts.length; i++) {
+          const option = document.createElement("option");
+          option.value = i;
+          option.text = i;
+          minSelect.add(option);
+        }
+      } else {
+        minContainer.style.display = "none";
+      }
+    };
+    window.saveNewRule = function() {
+      const ruleName = document.getElementById("ruleName").value.trim();
+      if(!ruleName) {
+        alert("נא להזין שם חוקיות.");
+        return;
+      }
+      if(selectedShifts.length === 0) {
+        alert("נא לבחור קבוצת משמרות.");
+        return;
+      }
+      const minRequired = document.getElementById("minShiftsSelect").value;
+      if(!minRequired) {
+        alert("נא לבחור מינימום משמרות.");
+        return;
+      }
+      const category = document.getElementById("ruleCategorySelect").value;
+      if(!category) {
+        alert("נא לבחור קטגוריה.");
+        return;
+      }
+      const ruleData = {
+        name: ruleName,
+        shifts: selectedShifts,
+        minRequired: Number(minRequired),
+        category: category
+      };
+      if(currentRuleKey) {
+        // Update existing rule
+        set(ref(db, "rules/" + category + "/" + currentRuleKey), ruleData)
+          .then(() => {
+            alert("חוקיות עודכנה בהצלחה!");
+            window.closeAddRuleModal();
+            selectedShifts = [];
+            window.updateSelectedShiftsInfo();
+            currentRuleKey = "";
+            currentRuleCategory = "";
+            document.querySelector("#addRuleModal button[onclick^='window.saveNewRule']").innerText = "הוסף חוקיות";
+          })
+          .catch(err => {
+            alert("אירעה שגיאה: " + err.message);
+          });
+      } else {
+        // Add new rule
+        push(ref(db, "rules/" + category), ruleData)
+          .then(() => {
+            alert("חוקיות נוספה בהצלחה!");
+            window.closeAddRuleModal();
+            selectedShifts = [];
+            window.updateSelectedShiftsInfo();
+          })
+          .catch(err => {
+            alert("אירעה שגיאה: " + err.message);
+          });
+      }
+    };
+    
+    // === Employee-Specific Rules Functions ===
+    window.handleEmployeeSpecificToggle = function(btn) {
+      const value = btn.getAttribute("data-value");
+      if(value === "כן") {
+        document.getElementById("employeeSpecificRulesSection").style.display = "block";
+        const firstName = document.getElementById("addFirstName").value.trim();
+        const lastName = document.getElementById("addLastName").value.trim();
+        document.getElementById("employeeSpecificName").innerText = firstName && lastName ? (firstName + " " + lastName) : "";
+      } else {
+        document.getElementById("employeeSpecificRulesSection").style.display = "none";
+      }
+    };
+    
+    window.openEmployeeSpecificRuleModal = function() {
+      // Open modal for employee-specific rule using separate element IDs
+      document.getElementById("employeeRuleName").value = "";
+      const shiftButtons = document.querySelectorAll("#employeeShiftTable .shift-btn");
+      shiftButtons.forEach(btn => btn.classList.remove("active"));
+      document.getElementById("employeeSelectedShiftsInfo").innerText = "";
+      document.getElementById("employeeMinShiftsContainer").style.display = "none";
+      document.getElementById("employeeMinShiftsSelect").innerHTML = "";
+      // Use separate variable for employee-specific modal; here we reuse selectedShiftsEmployee
+      selectedShiftsEmployee = [];
+      document.getElementById("employeeRuleModal").style.display = "block";
+    };
+    window.closeEmployeeSpecificRuleModal = function() {
+      document.getElementById("employeeRuleModal").style.display = "none";
+    };
+    // Variable for employee-specific rule shifts
+    let selectedShiftsEmployee = [];
+    window.toggleEmployeeShiftSelection = function(btn) {
+      const shift = btn.getAttribute("data-shift");
+      if(btn.classList.contains("active")) {
+        btn.classList.remove("active");
+        selectedShiftsEmployee = selectedShiftsEmployee.filter(s => s !== shift);
+      } else {
+        btn.classList.add("active");
+        selectedShiftsEmployee.push(shift);
+      }
+      window.updateEmployeeSelectedShiftsInfo();
+    };
+    window.updateEmployeeSelectedShiftsInfo = function() {
+      const infoDiv = document.getElementById("employeeSelectedShiftsInfo");
+      infoDiv.innerText = "משמרות נבחרות: " + selectedShiftsEmployee.join(", ");
+      const minContainer = document.getElementById("employeeMinShiftsContainer");
+      const minSelect = document.getElementById("employeeMinShiftsSelect");
+      if(selectedShiftsEmployee.length > 0) {
+        minContainer.style.display = "block";
+        minSelect.innerHTML = "";
+        for(let i = 1; i <= selectedShiftsEmployee.length; i++) {
+          const option = document.createElement("option");
+          option.value = i;
+          option.text = i;
+          minSelect.add(option);
+        }
+      } else {
+        minContainer.style.display = "none";
+      }
+    };
+    window.saveEmployeeSpecificRule = function() {
+      const ruleName = document.getElementById("employeeRuleName").value.trim();
+      if(!ruleName) {
+        alert("נא להזין שם חוקיות.");
+        return;
+      }
+      if(selectedShiftsEmployee.length === 0) {
+        alert("נא לבחור קבוצת משמרות.");
+        return;
+      }
+      const minRequired = document.getElementById("employeeMinShiftsSelect").value;
+      if(!minRequired) {
+        alert("נא לבחור מינימום משמרות.");
+        return;
+      }
+      const empName = document.getElementById("employeeSpecificName").innerText;
+      const ruleData = {
+        name: ruleName,
+        shifts: selectedShiftsEmployee,
+        minRequired: Number(minRequired),
+        employeeName: empName
+      };
+      tempEmployeeRules.push(ruleData);
+      alert("חוקיות ספציפית נוספה בהצלחה!");
+      window.closeEmployeeSpecificRuleModal();
+      window.renderEmployeeRuleList();
+      selectedShiftsEmployee = [];
+      window.updateEmployeeSelectedShiftsInfo();
+    };
+    window.renderEmployeeRuleList = function() {
+      const listDiv = document.getElementById("employeeRuleList");
+      listDiv.innerHTML = "<h4>חוקיות ספציפיות לעובד:</h4>";
+      if(tempEmployeeRules.length === 0) return;
+      const table = document.createElement("table");
+      const thead = document.createElement("thead");
+      thead.innerHTML = `<tr><th>שם חוקיות</th><th>משמרות נבחרות</th><th>מינימום</th><th>פעולות</th></tr>`;
+      table.appendChild(thead);
+      const tbody = document.createElement("tbody");
+      tempEmployeeRules.forEach((rule, index) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${rule.name}</td>
+                        <td>${rule.shifts.join(", ")}</td>
+                        <td>${rule.minRequired}</td>
+                        <td>
+                          <button class="action-btn delete-btn" onclick="window.deleteEmployeeRule(${index})">מחק</button>
+                        </td>`;
+        tbody.appendChild(tr);
+      });
+      table.appendChild(tbody);
+      listDiv.innerHTML = "";
+      listDiv.appendChild(table);
+    };
+    window.deleteEmployeeRule = function(index) {
+      if(confirm("האם אתה בטוח שברצונך למחוק חוקיות זו?")) {
+        tempEmployeeRules.splice(index, 1);
+        window.renderEmployeeRuleList();
+      }
+    };
+    
+    // מאזינים לעדכון ערך בשדות הוספת עובד כדי לעדכן את שם העובד בחוקיות ספציפית (אם מופעל)
+    document.getElementById("addFirstName").addEventListener("input", function() {
+      const firstName = this.value.trim();
+      const lastName = document.getElementById("addLastName").value.trim();
+      if(document.getElementById("employeeSpecificRulesToggleGroup").getAttribute("data-selected") === "כן") {
+        document.getElementById("employeeSpecificName").innerText = firstName && lastName ? (firstName + " " + lastName) : "";
       }
     });
-    onValue(ref(db, "settings/requireEmployeeCode"), (snapshot) => {
-      const val = snapshot.val();
-      if(val) {
-        setToggleGroupValue("requireEmployeeCodeGroup", val);
+    document.getElementById("addLastName").addEventListener("input", function() {
+      const lastName = this.value.trim();
+      const firstName = document.getElementById("addFirstName").value.trim();
+      if(document.getElementById("employeeSpecificRulesToggleGroup").getAttribute("data-selected") === "כן") {
+        document.getElementById("employeeSpecificName").innerText = firstName && lastName ? (firstName + " " + lastName) : "";
       }
     });
   </script>
 </body>
-</html>
+</html> 
+
+
+
+
+
