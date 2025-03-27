@@ -656,7 +656,6 @@
       <input type="text" id="employeeCodeInput" placeholder="00000" maxlength="5">
       <div class="error-msg" id="employeeCodeError">הקוד שהוזן שגוי.</div>
       <div class="code-btns">
-        <!-- שינוי: לחיצה על ביטול במקרה זה תסגור את המודל ולא תאפשר המשך תהליך -->
         <button id="cancelCodeBtn">ביטול</button>
         <button id="confirmCodeBtn">אישור</button>
       </div>
@@ -731,6 +730,12 @@
     let submittedSchedules = {};
     onValue(ref(db, "schedules"), (snapshot) => {
       submittedSchedules = snapshot.val() || {};
+    });
+
+    // נתוני חוקיות מהפיירבייס (מבנה: rules/{category})
+    let rulesData = {};
+    onValue(ref(db, "rules"), (snapshot) => {
+      rulesData = snapshot.val() || {};
     });
 
     // משתנים לעובד נוכחי וסידור
@@ -813,11 +818,9 @@
     const cancelCodeBtn = document.getElementById("cancelCodeBtn");
     const confirmCodeBtn = document.getElementById("confirmCodeBtn");
     cancelCodeBtn.addEventListener("click", () => {
-      // שינוי: במקרה של ביטול, אם יש סידור קיים – לא נמשיך, נחסום את התהליך
       employeeCodeModal.style.display = "none";
       employeeCodeInput.value = "";
       employeeCodeError.style.display = "none";
-      // במקרה כזה, נעצור את התהליך – ניתן להודיע למשתמש או לרענן את הדף
       alert("אין אפשרות להמשיך ללא אימות קוד.");
     });
     confirmCodeBtn.addEventListener("click", () => {
@@ -837,7 +840,7 @@
       }
     });
 
-    // פונקציה ליצירת טבלת משמרות (עיצוב זהה לעמוד הסידורים)
+    // פונקציה ליצירת טבלת משמרות
     function createScheduleTable(scheduleString) {
       const days = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
       const times = [
@@ -888,6 +891,7 @@
       validateForm();
     });
 
+    // validateForm משתמש כעת בחוקיות מ-Firebase (אם קיימת) עבור הקטגוריה המתאימה
     function validateForm() {
       const roleInput = document.querySelector('input[name="role"]:checked');
       if (!roleInput) {
@@ -902,72 +906,79 @@
       const shifts = document.querySelectorAll('input[name="shift"]:checked');
       const totalSelected = shifts.length;
       
-      // בדיקות ולידציה – בהתאם ללוגיקה עבור סטודנטים או עובדים רגילים
-      if (currentEmployeeData.student === "כן") {
-        let countNight = 0;
-        let countSaturday = 0;
-        const daysForNight = new Set(["ראשון", "שני", "שלישי", "רביעי", "חמישי"]);
-        const saturdayGroup = new Set(["שישי-ערב", "שישי-לילה", "שבת-בוקר", "שבת-ערב"]);
-        shifts.forEach(shift => {
-          const value = shift.value;
-          if(value.includes("לילה")){
-            const parts = value.split("-");
-            if(parts.length === 2 && daysForNight.has(parts[0])){
-              countNight++;
-            }
-          }
-          if(saturdayGroup.has(value)){
-            countSaturday++;
+      // קביעת קטגוריה – אם העובד סטודנט, נשתמש ב"סטודנט", אחרת לפי התפקיד
+      let category = (currentEmployeeData.student === "כן") ? "סטודנט" : role;
+      
+      let messages = [];
+      if(rulesData && rulesData[category]) {
+        Object.values(rulesData[category]).forEach(rule => {
+          const count = Array.from(shifts).filter(shift => rule.shifts.includes(shift.value)).length;
+          if(count < rule.minRequired) {
+            messages.push(`לפי החוק "${rule.name}" יש לבחור לפחות ${rule.minRequired} משמרות מהקבוצה (${rule.shifts.join(", ")}). נבחרו ${count} משמרות.`);
           }
         });
-        let messages = [];
-        if(totalSelected < 8) {
-          messages.push("יש לבחור מינימום 8 משמרות. נבחרו " + totalSelected + " משמרות.");
-        }
-        if(countNight < 1) {
-          messages.push("יש לבחור לפחות משמרת לילה אחת מיום ראשון עד חמישי. נבחרו " + countNight + " משמרות לילה.");
-        }
-        if(countSaturday < 1) {
-          messages.push("יש לבחור לפחות משמרת אחת מתוך הקבוצה (שישי ערב, שישי לילה, שבת בוקר, שבת-ערב). נבחרו " + countSaturday + " משמרות.");
-        }
-        if(messages.length > 0) {
-          alert(messages.join("\n"));
-          return;
-        }
       } else {
-        const minTotal = 14, minBoker = 2, minErev = 2, minLaila = 2, minSpecial = 2;
-        let countBoker = 0, countErev = 0, countLaila = 0, countSpecial = 0;
-        const specialShifts = new Set(["שישי-ערב", "שישי-לילה", "שבת-בוקר", "שבת-ערב"]);
-        shifts.forEach(shift => {
-          const value = shift.value;
-          if (value.includes("בוקר")) countBoker++;
-          if (value.includes("ערב")) countErev++;
-          if (value.includes("לילה")) countLaila++;
-          if (specialShifts.has(value)) countSpecial++;
-        });
-        let messages = [];
-        if(totalSelected < minTotal) {
-          messages.push("יש לבחור מינימום 14 משמרות. נבחרו " + totalSelected + " משמרות.");
-        }
-        if(countBoker < minBoker) {
-          messages.push("יש לבחור מינימום 2 משמרות בוקר. נבחרו " + countBoker + " משמרות בוקר.");
-        }
-        if(countErev < minErev) {
-          messages.push("יש לבחור מינימום 2 משמרות ערב. נבחרו " + countErev + " משמרות ערב.");
-        }
-        if(countLaila < minLaila) {
-          messages.push("יש לבחור מינימום 2 משמרות לילה. נבחרו " + countLaila + " משמרות לילה.");
-        }
-        if(countSpecial < minSpecial) {
-          messages.push("יש לבחור מינימום 2 משמרות מהקבוצה (שישי ערב, שישי לילה, שבת בוקר, שבת ערב). נבחרו " + countSpecial + " משמרות.");
-        }
-        if(messages.length > 0) {
-          alert(messages.join("\n"));
-          return;
+        // לוגיקה ברירת מחדל במידה ואין חוקיות מוגדרת
+        if (currentEmployeeData.student === "כן") {
+          let countNight = 0;
+          let countSaturday = 0;
+          const daysForNight = new Set(["ראשון", "שני", "שלישי", "רביעי", "חמישי"]);
+          const saturdayGroup = new Set(["שישי-ערב", "שישי-לילה", "שבת-בוקר", "שבת-ערב"]);
+          shifts.forEach(shift => {
+            const value = shift.value;
+            if(value.includes("לילה")){
+              const parts = value.split("-");
+              if(parts.length === 2 && daysForNight.has(parts[0])){
+                countNight++;
+              }
+            }
+            if(saturdayGroup.has(value)){
+              countSaturday++;
+            }
+          });
+          if(totalSelected < 8) {
+            messages.push("יש לבחור מינימום 8 משמרות. נבחרו " + totalSelected + " משמרות.");
+          }
+          if(countNight < 1) {
+            messages.push("יש לבחור לפחות משמרת לילה אחת מיום ראשון עד חמישי. נבחרו " + countNight + " משמרות לילה.");
+          }
+          if(countSaturday < 1) {
+            messages.push("יש לבחור לפחות משמרת אחת מתוך הקבוצה (שישי ערב, שישי לילה, שבת בוקר, שבת-ערב). נבחרו " + countSaturday + " משמרות.");
+          }
+        } else {
+          const minTotal = 14, minBoker = 2, minErev = 2, minLaila = 2, minSpecial = 2;
+          let countBoker = 0, countErev = 0, countLaila = 0, countSpecial = 0;
+          const specialShifts = new Set(["שישי-ערב", "שישי-לילה", "שבת-בוקר", "שבת-ערב"]);
+          shifts.forEach(shift => {
+            const value = shift.value;
+            if (value.includes("בוקר")) countBoker++;
+            if (value.includes("ערב")) countErev++;
+            if (value.includes("לילה")) countLaila++;
+            if (specialShifts.has(value)) countSpecial++;
+          });
+          if(totalSelected < minTotal) {
+            messages.push("יש לבחור מינימום 14 משמרות. נבחרו " + totalSelected + " משמרות.");
+          }
+          if(countBoker < minBoker) {
+            messages.push("יש לבחור מינימום 2 משמרות בוקר. נבחרו " + countBoker + " משמרות בוקר.");
+          }
+          if(countErev < minErev) {
+            messages.push("יש לבחור מינימום 2 משמרות ערב. נבחרו " + countErev + " משמרות ערב.");
+          }
+          if(countLaila < minLaila) {
+            messages.push("יש לבחור מינימום 2 משמרות לילה. נבחרו " + countLaila + " משמרות לילה.");
+          }
+          if(countSpecial < minSpecial) {
+            messages.push("יש לבחור מינימום 2 משמרות מהקבוצה (שישי ערב, שישי לילה, שבת בוקר, שבת ערב). נבחרו " + countSpecial + " משמרות.");
+          }
         }
       }
       
-      // יצירת מחרוזת סידור
+      if(messages.length > 0) {
+        alert(messages.join("\n"));
+        return;
+      }
+      
       const scheduleString = Array.from(shifts).map(s => s.value).join(", ");
       pendingSubmission = {
         role: role,
@@ -993,12 +1004,9 @@
       }
       document.getElementById("previewModal").style.display = "block";
     }
-    // סגירת מודל התצוגה המקדימה (לחצן "חזור")
     function closePreviewModal() {
       document.getElementById("previewModal").style.display = "none";
     }
-
-    // לחצן "שלח" בתוך מודל התצוגה – הגשה סופית
     document.getElementById("finalSubmitBtn").addEventListener("click", () => {
       if (!pendingSubmission) return;
       if (currentScheduleKey) {
@@ -1021,13 +1029,10 @@
           });
       }
     });
-
-    // לחצן "חזור" במודל – סוגר את המודל ומאפשר חזרה לעריכה
     document.getElementById("editBtn").addEventListener("click", () => {
       closePreviewModal();
     });
 
-    /* מודל סידור קיים */
     window.openExistingScheduleModal = function() {
       document.getElementById("existingScheduleModal").style.display = "block";
     };
@@ -1049,7 +1054,6 @@
       window.location.reload();
     };
 
-    // צפייה בסידור קיים – שימוש במודל צפייה
     window.viewExistingSchedule = function() {
       if (!existingSchedule) return;
       const viewContent = document.getElementById("viewScheduleContent");
@@ -1066,7 +1070,6 @@
       window.openViewScheduleModal();
     };
 
-    // הגדרת פונקציות צפייה וסגירת מודל צפייה – מוצהרות ב-window כדי להיות נגישות גם מה-HTML
     window.openViewScheduleModal = function() {
       document.getElementById("viewScheduleModal").style.display = "block";
     };
@@ -1074,7 +1077,6 @@
       document.getElementById("viewScheduleModal").style.display = "none";
     };
 
-    /* מודל בחירת עובד לצפייה בסידור */
     window.openViewScheduleSelectionModal = function() {
       const select = document.getElementById("viewEmployeeSelect");
       select.innerHTML = "<option value='' disabled selected>בחר שם</option>";
@@ -1144,7 +1146,6 @@
       window.openViewScheduleModal();
     }
 
-    // התחברות מנהל
     window.openAdminModal = function() {
       document.getElementById("adminModal").style.display = "block";
     };
@@ -1165,7 +1166,6 @@
         });
     });
 
-    // בדיקת הגשת סידור עבודה – אם אסור, טופס מוסתר ולחצן צפייה מוצג
     onValue(ref(db, "settings/allowScheduleSubmission"), (snapshot) => {
       const allowSubmission = snapshot.val();
       if (allowSubmission === "לא" || allowSubmission === false) {
