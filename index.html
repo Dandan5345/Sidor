@@ -700,7 +700,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-analytics.js";
-    import { getDatabase, ref, push, onValue, set, remove } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-database.js";
+    import { getDatabase, ref, push, onValue, set, remove, get, child } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-database.js";
     import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-auth.js";
 
     const firebaseConfig = {
@@ -732,11 +732,14 @@
       submittedSchedules = snapshot.val() || {};
     });
 
-    // נתוני חוקיות מהפיירבייס (מבנה: rules/{category})
+    // נתוני חוקיות כלליות מהפיירבייס (מבנה: rules/{category})
     let rulesData = {};
     onValue(ref(db, "rules"), (snapshot) => {
       rulesData = snapshot.val() || {};
     });
+
+    // משתנה לאחסון חוקיות ספציפיות לעובד (אם קיימת)
+    let employeeRulesData = null;
 
     // משתנים לעובד נוכחי וסידור
     let currentEmployeeId = "";
@@ -775,7 +778,7 @@
       document.getElementById("nameDiv").style.display = "block";
     };
 
-    // בעת בחירת שם – שמירה ובדיקה אם כבר נשלח סידור
+    // בעת בחירת שם – שמירה, טעינת חוקיות ספציפיות ובדיקה אם כבר נשלח סידור
     const nameSelect = document.getElementById("nameSelect");
     nameSelect.addEventListener("change", () => {
       currentEmployeeId = nameSelect.value;
@@ -789,7 +792,16 @@
           break;
         }
       }
-      // תמיד אם יש דרישת קוד – מבקשים אותו, גם אם יש סידור קיים
+      // טוענים חוקיות ספציפיות לעובד (אם קיימת)
+      get(child(ref(db), "employeeRules/" + currentEmployeeId))
+        .then((snapshot) => {
+          employeeRulesData = snapshot.val() || null;
+        })
+        .catch(err => {
+          console.error("Error loading employee-specific rules:", err);
+          employeeRulesData = null;
+        });
+      // טיפול בדרישת קוד
       if(currentEmployeeData.code && requireEmployeeCodeSetting === "כן") {
         document.getElementById("shiftsDiv").style.display = "none";
         document.getElementById("employeeCodeInput").value = "";
@@ -891,7 +903,7 @@
       validateForm();
     });
 
-    // validateForm משתמש כעת בחוקיות מ-Firebase (אם קיימת) עבור הקטגוריה המתאימה
+    // validateForm – בודק קודם חוקיות ספציפיות (אם קיימת) ולאחר מכן חוקיות כלליות לפי קטגוריה
     function validateForm() {
       const roleInput = document.querySelector('input[name="role"]:checked');
       if (!roleInput) {
@@ -906,70 +918,79 @@
       const shifts = document.querySelectorAll('input[name="shift"]:checked');
       const totalSelected = shifts.length;
       
-      // קביעת קטגוריה – אם העובד סטודנט, נשתמש ב"סטודנט", אחרת לפי התפקיד
-      let category = (currentEmployeeData.student === "כן") ? "סטודנט" : role;
-      
       let messages = [];
-      if(rulesData && rulesData[category]) {
-        Object.values(rulesData[category]).forEach(rule => {
+      // במידה וקיימת חוקיות ספציפיות לעובד – נשתמש בהן
+      if(employeeRulesData) {
+        Object.values(employeeRulesData).forEach(rule => {
           const count = Array.from(shifts).filter(shift => rule.shifts.includes(shift.value)).length;
           if(count < rule.minRequired) {
-            messages.push(`לפי החוק "${rule.name}" יש לבחור לפחות ${rule.minRequired} משמרות מהקבוצה (${rule.shifts.join(", ")}). נבחרו ${count} משמרות.`);
+            messages.push(`לפי החוק "${rule.name}" (ספציפי) יש לבחור לפחות ${rule.minRequired} משמרות מהקבוצה (${rule.shifts.join(", ")}). נבחרו ${count} משמרות.`);
           }
         });
       } else {
-        // לוגיקה ברירת מחדל במידה ואין חוקיות מוגדרת
-        if (currentEmployeeData.student === "כן") {
-          let countNight = 0;
-          let countSaturday = 0;
-          const daysForNight = new Set(["ראשון", "שני", "שלישי", "רביעי", "חמישי"]);
-          const saturdayGroup = new Set(["שישי-ערב", "שישי-לילה", "שבת-בוקר", "שבת-ערב"]);
-          shifts.forEach(shift => {
-            const value = shift.value;
-            if(value.includes("לילה")){
-              const parts = value.split("-");
-              if(parts.length === 2 && daysForNight.has(parts[0])){
-                countNight++;
-              }
-            }
-            if(saturdayGroup.has(value)){
-              countSaturday++;
+        // אם אין חוקיות ספציפיות – נשתמש בחוקיות הכלליות לפי קטגוריה
+        let category = (currentEmployeeData.student === "כן") ? "סטודנט" : role;
+        if(rulesData && rulesData[category]) {
+          Object.values(rulesData[category]).forEach(rule => {
+            const count = Array.from(shifts).filter(shift => rule.shifts.includes(shift.value)).length;
+            if(count < rule.minRequired) {
+              messages.push(`לפי החוק "${rule.name}" יש לבחור לפחות ${rule.minRequired} משמרות מהקבוצה (${rule.shifts.join(", ")}). נבחרו ${count} משמרות.`);
             }
           });
-          if(totalSelected < 8) {
-            messages.push("יש לבחור מינימום 8 משמרות. נבחרו " + totalSelected + " משמרות.");
-          }
-          if(countNight < 1) {
-            messages.push("יש לבחור לפחות משמרת לילה אחת מיום ראשון עד חמישי. נבחרו " + countNight + " משמרות לילה.");
-          }
-          if(countSaturday < 1) {
-            messages.push("יש לבחור לפחות משמרת אחת מתוך הקבוצה (שישי ערב, שישי לילה, שבת בוקר, שבת-ערב). נבחרו " + countSaturday + " משמרות.");
-          }
         } else {
-          const minTotal = 14, minBoker = 2, minErev = 2, minLaila = 2, minSpecial = 2;
-          let countBoker = 0, countErev = 0, countLaila = 0, countSpecial = 0;
-          const specialShifts = new Set(["שישי-ערב", "שישי-לילה", "שבת-בוקר", "שבת-ערב"]);
-          shifts.forEach(shift => {
-            const value = shift.value;
-            if (value.includes("בוקר")) countBoker++;
-            if (value.includes("ערב")) countErev++;
-            if (value.includes("לילה")) countLaila++;
-            if (specialShifts.has(value)) countSpecial++;
-          });
-          if(totalSelected < minTotal) {
-            messages.push("יש לבחור מינימום 14 משמרות. נבחרו " + totalSelected + " משמרות.");
-          }
-          if(countBoker < minBoker) {
-            messages.push("יש לבחור מינימום 2 משמרות בוקר. נבחרו " + countBoker + " משמרות בוקר.");
-          }
-          if(countErev < minErev) {
-            messages.push("יש לבחור מינימום 2 משמרות ערב. נבחרו " + countErev + " משמרות ערב.");
-          }
-          if(countLaila < minLaila) {
-            messages.push("יש לבחור מינימום 2 משמרות לילה. נבחרו " + countLaila + " משמרות לילה.");
-          }
-          if(countSpecial < minSpecial) {
-            messages.push("יש לבחור מינימום 2 משמרות מהקבוצה (שישי ערב, שישי לילה, שבת בוקר, שבת ערב). נבחרו " + countSpecial + " משמרות.");
+          // לוגיקה ברירת מחדל במידה ואין חוקיות כלליות מוגדרת
+          if (currentEmployeeData.student === "כן") {
+            let countNight = 0;
+            let countSaturday = 0;
+            const daysForNight = new Set(["ראשון", "שני", "שלישי", "רביעי", "חמישי"]);
+            const saturdayGroup = new Set(["שישי-ערב", "שישי-לילה", "שבת-בוקר", "שבת-ערב"]);
+            shifts.forEach(shift => {
+              const value = shift.value;
+              if(value.includes("לילה")){
+                const parts = value.split("-");
+                if(parts.length === 2 && daysForNight.has(parts[0])){
+                  countNight++;
+                }
+              }
+              if(saturdayGroup.has(value)){
+                countSaturday++;
+              }
+            });
+            if(totalSelected < 8) {
+              messages.push("יש לבחור מינימום 8 משמרות. נבחרו " + totalSelected + " משמרות.");
+            }
+            if(countNight < 1) {
+              messages.push("יש לבחור לפחות משמרת לילה אחת מיום ראשון עד חמישי. נבחרו " + countNight + " משמרות לילה.");
+            }
+            if(countSaturday < 1) {
+              messages.push("יש לבחור לפחות משמרת אחת מתוך הקבוצה (שישי ערב, שישי לילה, שבת בוקר, שבת-ערב). נבחרו " + countSaturday + " משמרות.");
+            }
+          } else {
+            const minTotal = 14, minBoker = 2, minErev = 2, minLaila = 2, minSpecial = 2;
+            let countBoker = 0, countErev = 0, countLaila = 0, countSpecial = 0;
+            const specialShifts = new Set(["שישי-ערב", "שישי-לילה", "שבת-בוקר", "שבת-ערב"]);
+            shifts.forEach(shift => {
+              const value = shift.value;
+              if (value.includes("בוקר")) countBoker++;
+              if (value.includes("ערב")) countErev++;
+              if (value.includes("לילה")) countLaila++;
+              if (specialShifts.has(value)) countSpecial++;
+            });
+            if(totalSelected < minTotal) {
+              messages.push("יש לבחור מינימום 14 משמרות. נבחרו " + totalSelected + " משמרות.");
+            }
+            if(countBoker < minBoker) {
+              messages.push("יש לבחור מינימום 2 משמרות בוקר. נבחרו " + countBoker + " משמרות בוקר.");
+            }
+            if(countErev < minErev) {
+              messages.push("יש לבחור מינימום 2 משמרות ערב. נבחרו " + countErev + " משמרות ערב.");
+            }
+            if(countLaila < minLaila) {
+              messages.push("יש לבחור מינימום 2 משמרות לילה. נבחרו " + countLaila + " משמרות לילה.");
+            }
+            if(countSpecial < minSpecial) {
+              messages.push("יש לבחור מינימום 2 משמרות מהקבוצה (שישי ערב, שישי לילה, שבת בוקר, שבת ערב). נבחרו " + countSpecial + " משמרות.");
+            }
           }
         }
       }
