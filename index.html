@@ -907,7 +907,7 @@
         let countNight = 0;
         let countSaturday = 0;
         const daysForNight = new Set(["ראשון", "שני", "שלישי", "רביעי", "חמישי"]);
-        const saturdayGroup = new Set(["שישי-ערב", "שישי-לילה", "שבת-בוקר", "שבת-לילה"]);
+        const saturdayGroup = new Set(["שישי-ערב", "שישי-לילה", "שבת-בוקר", "שבת-ערב"]);
         shifts.forEach(shift => {
           const value = shift.value;
           if(value.includes("לילה")){
@@ -928,7 +928,7 @@
           messages.push("יש לבחור לפחות משמרת לילה אחת מיום ראשון עד חמישי. נבחרו " + countNight + " משמרות לילה.");
         }
         if(countSaturday < 1) {
-          messages.push("יש לבחור לפחות משמרת אחת מתוך הקבוצה (שישי ערב, שישי לילה, שבת בוקר, שבת-לילה). נבחרו " + countSaturday + " משמרות.");
+          messages.push("יש לבחור לפחות משמרת אחת מתוך הקבוצה (שישי ערב, שישי לילה, שבת בוקר, שבת-ערב). נבחרו " + countSaturday + " משמרות.");
         }
         if(messages.length > 0) {
           alert(messages.join("\n"));
