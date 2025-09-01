@@ -260,7 +260,7 @@
             box-shadow: 0 0 0 3px rgba(197, 179, 88, 0.25);
         }
 
-        /* --- כפתורי הערות מוכנות --- */
+        /* --- כפתורי הערות מוכנות (עודכן) --- */
         .preset-comments {
             display: flex;
             flex-wrap: wrap;
@@ -268,19 +268,41 @@
             margin-top: 10px;
         }
         .preset-comment-btn {
-            background-color: #f1f1f1;
-            border: 1px solid var(--border-color);
             color: var(--dark-text);
             border-radius: 20px;
-            padding: 6px 14px;
+            padding: 8px 10px;
             font-size: 0.9rem;
             cursor: pointer;
             transition: all 0.2s ease;
+            flex-grow: 1;
+            flex-basis: calc(50% - 4px);
+            text-align: center;
+            box-sizing: border-box;
+            border: 1px solid transparent;
         }
-        .preset-comment-btn:hover {
-            background-color: #e0e0e0;
-            border-color: #ccc;
-        }
+
+        /* צבעים אלגנטיים לכפתורים המוכנים */
+        .preset-comment-btn:nth-child(7n + 1) { background-color: #f6f3ed; border-color: #e9e4d9; }
+        .preset-comment-btn:nth-child(7n + 1):hover { background-color: #e9e4d9; }
+
+        .preset-comment-btn:nth-child(7n + 2) { background-color: #eff2f5; border-color: #dfe4e8; }
+        .preset-comment-btn:nth-child(7n + 2):hover { background-color: #dfe4e8; }
+
+        .preset-comment-btn:nth-child(7n + 3) { background-color: #f5f2f0; border-color: #e8e3df; }
+        .preset-comment-btn:nth-child(7n + 3):hover { background-color: #e8e3df; }
+
+        .preset-comment-btn:nth-child(7n + 4) { background-color: #f7eef0; border-color: #ebdce0; }
+        .preset-comment-btn:nth-child(7n + 4):hover { background-color: #ebdce0; }
+
+        .preset-comment-btn:nth-child(7n + 5) { background-color: #eef3eb; border-color: #dce6d6; }
+        .preset-comment-btn:nth-child(7n + 5):hover { background-color: #dce6d6; }
+
+        .preset-comment-btn:nth-child(7n + 6) { background-color: #fcf8e8; border-color: #f7efc9; }
+        .preset-comment-btn:nth-child(7n + 6):hover { background-color: #f7efc9; }
+
+        .preset-comment-btn:nth-child(7n + 7) { background-color: #f0f0f0; border-color: #e0e0e0; }
+        .preset-comment-btn:nth-child(7n + 7):hover { background-color: #e0e0e0; }
+
 
         /* --- כפתור הגשה --- */
         .submit-container {
@@ -433,7 +455,7 @@
             flex-direction: column;
         }
         
-        /* --- מודל שגיאות חדש --- */
+        /* --- מודל שגיאות (עודכן) --- */
         #validationErrorModal .modal-content {
             border-top: 5px solid var(--error-color);
         }
@@ -448,11 +470,55 @@
         }
         #validationErrorContent li {
             font-size: 1.1rem;
-            padding: 8px 0;
+            padding: 12px 0;
             border-bottom: 1px solid #eee;
         }
         #validationErrorContent li:last-child {
             border-bottom: none;
+        }
+
+        /* --- [חדש] עיצוב כפתור ופירוט שגיאה --- */
+        .error-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .details-btn {
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            margin-right: 10px; /* ריווח מהטקסט */
+            transition: background-color 0.2s;
+        }
+        .details-btn:hover {
+            background-color: #e0e0e0;
+        }
+        .details-content {
+            display: none;
+            width: 100%;
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            text-align: right;
+            font-size: 0.95rem;
+        }
+        .details-content p {
+            margin: 5px 0;
+        }
+        .details-content ul {
+            padding-right: 20px;
+            margin-top: 5px;
+        }
+        .details-content li {
+            font-size: 0.9rem;
+            padding: 2px 0;
+            border: none;
         }
 
         /* --- התאמות למסכים קטנים --- */
@@ -588,7 +654,7 @@
 <!-- מודל סידור קיים -->
 <div id="existingScheduleModal" class="modal">
     <div class="modal-content">
-        <span class="close" onclick="closeExistingScheduleModal()">&times;</span>
+        <span class="close" onclick="finishExistingSchedule()">&times;</span>
         <h3 id="existingScheduleTitle">כבר שלחת סידור השבוע</h3>
         <p>מה תרצה לעשות?</p>
         <div class="modal-buttons column-layout">
@@ -604,6 +670,10 @@
     <div class="modal-content">
         <span class="close" onclick="closeViewScheduleModal()">&times;</span>
         <h3>הסידור שלך</h3>
+        <div style="margin-bottom: 20px; text-align: right;">
+            <label for="viewModalHistorySelect" style="margin-bottom: 5px;">צפייה בסידור אחר:</label>
+            <select id="viewModalHistorySelect" class="form-select" style="margin-bottom: 0;"></select>
+        </div>
         <div id="viewScheduleContent" style="text-align: right;"></div>
         <div class="modal-buttons" style="justify-content: center;">
             <button onclick="closeViewScheduleModal()" class="confirm-btn">סגור</button>
@@ -715,7 +785,6 @@
             msgDiv.textContent = "לא ניתן להגיש סידור עבודה (זמן ההגשה חלף).";
             msgDiv.style.display = "block";
             viewBtn.style.display = "block";
-            // Also hide admin button when submissions are disabled to prevent confusion
             if (adminBtn) adminBtn.style.display = 'none';
         } else {
             form.style.display = "block";
@@ -881,6 +950,7 @@
 
     document.getElementById("cancelCodeBtn").addEventListener("click", () => {
         document.getElementById("employeeCodeModal").style.display = "none";
+        resetForm();
     });
 
     document.getElementById("shiftForm").addEventListener("submit", (event) => {
@@ -894,36 +964,53 @@
         if(!currentEmployeeId){ alert("אנא בחר שם."); return; }
         
         const shifts = Array.from(document.querySelectorAll('input[name="shift"]:checked'));
-        const totalSelected = shifts.length;
-        let messages = [];
+        let errors = [];
 
-        if (employeeRulesData) {
-            Object.values(employeeRulesData).forEach(rule => {
-                const count = shifts.filter(shift => rule.shifts.includes(shift.value)).length;
-                if (count < rule.minRequired) {
-                    messages.push(`לפי החוק "${rule.name}" יש לבחור לפחות ${rule.minRequired} משמרות מהקבוצה. (נבחרו ${count})`);
+        // Check rules
+        const checkRules = (rules) => {
+            Object.values(rules).forEach(rule => {
+                const selectedInRule = shifts.filter(shift => rule.shifts.includes(shift.value));
+                if (selectedInRule.length < rule.minRequired) {
+                    errors.push({
+                        message: `לפי החוק "${rule.name}" יש לבחור לפחות ${rule.minRequired} משמרות מהקבוצה. (נבחרו ${selectedInRule.length})`,
+                        allShifts: rule.shifts,
+                        selectedShifts: selectedInRule.map(s => s.value),
+                        minRequired: rule.minRequired
+                    });
                 }
             });
-        } else {
+        };
+
+        if (employeeRulesData) {
+            checkRules(employeeRulesData);
+        } else if (rulesData) {
             const category = (currentEmployeeData.student === "כן") ? "סטודנט" : roleInput.value;
-            if (rulesData && rulesData[category]) {
-                Object.values(rulesData[category]).forEach(rule => {
-                    const count = shifts.filter(shift => rule.shifts.includes(shift.value)).length;
-                    if (count < rule.minRequired) {
-                        messages.push(`לפי החוק "${rule.name}" יש לבחור לפחות ${rule.minRequired} משמרות מהקבוצה. (נבחרו ${count})`);
-                    }
-                });
+            if (rulesData[category]) {
+                checkRules(rulesData[category]);
             } else {
+                // Fallback hardcoded rules if category not found in DB
+                const totalSelected = shifts.length;
+                const allShiftValues = Array.from(document.querySelectorAll('input[name="shift"]')).map(s => s.value);
                 if (currentEmployeeData.student === "כן") {
-                    if(totalSelected < 3) messages.push(`סטודנט חייב לבחור לפחות 3 משמרות. (נבחרו ${totalSelected})`);
+                    if (totalSelected < 3) errors.push({
+                        message: `סטודנט חייב לבחור לפחות 3 משמרות. (נבחרו ${totalSelected})`,
+                        allShifts: allShiftValues,
+                        selectedShifts: shifts.map(s => s.value),
+                        minRequired: 3
+                    });
                 } else {
-                    if(totalSelected < 4) messages.push(`עובד שאינו סטודנט חייב לבחור לפחות 4 משמרות. (נבחרו ${totalSelected})`);
+                    if (totalSelected < 4) errors.push({
+                        message: `עובד שאינו סטודנט חייב לבחור לפחות 4 משמרות. (נבחרו ${totalSelected})`,
+                        allShifts: allShiftValues,
+                        selectedShifts: shifts.map(s => s.value),
+                        minRequired: 4
+                    });
                 }
             }
         }
         
-        if (messages.length > 0) {
-            openValidationErrorModal(messages);
+        if (errors.length > 0) {
+            openValidationErrorModal(errors);
             return;
         }
         
@@ -983,6 +1070,49 @@
             btn.textContent = 'שלח סידור';
         }
     });
+    
+    // --- [חדש] פונקציית פירוט ---
+    window.toggleDetails = function(button) {
+        const detailsDiv = button.nextElementSibling;
+        const isVisible = detailsDiv.style.display === 'block';
+        detailsDiv.style.display = isVisible ? 'none' : 'block';
+        button.textContent = isVisible ? 'פירוט' : 'סגור פירוט';
+    };
+
+    // --- [מעודכן] מודל שגיאות עם פירוט ---
+    function openValidationErrorModal(errors) {
+        const contentDiv = document.getElementById('validationErrorContent');
+        let html = '<ul>';
+        errors.forEach(error => {
+            const selectedCount = error.selectedShifts.length;
+            const neededCount = error.minRequired - selectedCount;
+            const missingText = neededCount === 1 ? 'חסרה עוד משמרת אחת' : `חסרות עוד ${neededCount} משמרות`;
+
+            html += `<li>
+                <div class="error-item">
+                    <span>${error.message}</span>
+                    <button class="details-btn" onclick="toggleDetails(this)">פירוט</button>
+                    <div class="details-content">
+                        <p><strong>פירוט החוק:</strong></p>
+                        <p>יש לבחור לפחות ${error.minRequired} משמרות מהרשימה הבאה:</p>
+                        <ul>${error.allShifts.map(s => `<li>- ${s}</li>`).join('')}</ul>
+                        <p><strong>מה נבחר:</strong></p>
+                        ${selectedCount > 0 ? 
+                            `<ul>${error.selectedShifts.map(s => `<li>- ${s}</li>`).join('')}</ul>` : 
+                            '<p>לא נבחרו משמרות רלוונטיות מקבוצה זו.</p>'
+                        }
+                        <p><strong>סיכום:</strong> ${missingText} כדי לעמוד בחוק זה.</p>
+                    </div>
+                </div>
+            </li>`;
+        });
+        html += '</ul>';
+        contentDiv.innerHTML = html;
+        document.getElementById('validationErrorModal').style.display = 'block';
+    }
+
+
+    window.closeValidationErrorModal = () => document.getElementById('validationErrorModal').style.display = 'none';
 
     function openPreviewModal(data) {
         const previewContent = document.getElementById("previewContent");
@@ -995,13 +1125,6 @@
     }
     window.closePreviewModal = () => document.getElementById("previewModal").style.display = "none";
     document.getElementById('editBtn').onclick = closePreviewModal;
-
-    function openValidationErrorModal(messages) {
-        const contentDiv = document.getElementById('validationErrorContent');
-        contentDiv.innerHTML = '<ul>' + messages.map(msg => `<li>${msg}</li>`).join('') + '</ul>';
-        document.getElementById('validationErrorModal').style.display = 'block';
-    }
-    window.closeValidationErrorModal = () => document.getElementById('validationErrorModal').style.display = 'none';
 
     function openHistoricalScheduleModal(data, timestamp) {
         document.getElementById('historicalDate').textContent = new Date(parseInt(timestamp)).toLocaleDateString('he-IL');
@@ -1053,18 +1176,63 @@
 
     window.viewExistingSchedule = function() {
         if (!existingSchedule) return;
-        const viewContent = document.getElementById("viewScheduleContent");
-        viewContent.innerHTML = "";
-        viewContent.appendChild(createScheduleTable(existingSchedule.schedule || ""));
-        if (existingSchedule.preferences) {
-            viewContent.innerHTML += `<p><strong>העדפות:</strong> ${existingSchedule.preferences.replace(/\n/g, '<br>')}</p>`;
+        
+        const updateViewContent = (scheduleData) => {
+            const viewContent = document.getElementById("viewScheduleContent");
+            viewContent.innerHTML = "";
+            viewContent.appendChild(createScheduleTable(scheduleData.schedule || ""));
+            if (scheduleData.preferences) {
+                viewContent.innerHTML += `<p><strong>העדפות:</strong> ${scheduleData.preferences.replace(/\n/g, '<br>')}</p>`;
+            }
+        };
+
+        updateViewContent(existingSchedule);
+        
+        const historySelect = document.getElementById('viewModalHistorySelect');
+        historySelect.innerHTML = '<option value="current" selected>הסידור הנוכחי</option>';
+        if (historicalSchedules) {
+            const sortedKeys = Object.keys(historicalSchedules).sort((a, b) => b - a);
+            sortedKeys.forEach(timestampKey => {
+                const date = new Date(parseInt(timestampKey));
+                const option = document.createElement('option');
+                option.value = timestampKey;
+                option.textContent = `סידור מתאריך: ${date.toLocaleDateString('he-IL')}`;
+                historySelect.add(option);
+            });
         }
+
         closeExistingScheduleModal();
         openViewScheduleModal();
     };
 
+    document.getElementById('viewModalHistorySelect').addEventListener('change', (event) => {
+        const selectedValue = event.target.value;
+        let scheduleToShow;
+
+        if (selectedValue === 'current') {
+            scheduleToShow = existingSchedule;
+        } else {
+            scheduleToShow = historicalSchedules[selectedValue];
+        }
+
+        if (scheduleToShow) {
+            const viewContent = document.getElementById("viewScheduleContent");
+            viewContent.innerHTML = "";
+            viewContent.appendChild(createScheduleTable(scheduleToShow.schedule || ""));
+            if (scheduleToShow.preferences) {
+                viewContent.innerHTML += `<p><strong>העדפות:</strong> ${scheduleToShow.preferences.replace(/\n/g, '<br>')}</p>`;
+            }
+        }
+    });
+
+
     window.openViewScheduleModal = () => document.getElementById("viewScheduleModal").style.display = "block";
-    window.closeViewScheduleModal = () => document.getElementById("viewScheduleModal").style.display = "none";
+    
+    // --- שינוי: סגירת חלון הצפייה מאפסת את הטופס ---
+    window.closeViewScheduleModal = () => {
+        document.getElementById("viewScheduleModal").style.display = "none";
+        resetForm();
+    };
     
     window.openAdminModal = () => document.getElementById("adminModal").style.display = "block";
     window.closeAdminModal = () => document.getElementById("adminModal").style.display = "none";
@@ -1102,6 +1270,7 @@
             if (schedule.preferences) {
                 viewContent.innerHTML += `<p><strong>העדפות:</strong> ${schedule.preferences.replace(/\n/g, '<br>')}</p>`;
             }
+            document.getElementById('viewModalHistorySelect').style.display = 'none'; 
             closeViewScheduleSelectionModal();
             openViewScheduleModal();
         } else {
