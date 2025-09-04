@@ -406,6 +406,12 @@
             text-align: right;
         }
         
+        /* תיקון כיווניות לשדה אימייל */
+        #adminEmail {
+            direction: ltr;
+            text-align: left;
+        }
+        
         .close {
             color: #aaa;
             position: absolute;
@@ -790,12 +796,10 @@
             msgDiv.textContent = "לא ניתן להגיש סידור עבודה (זמן ההגשה חלף).";
             msgDiv.style.display = "block";
             viewBtn.style.display = "block";
-            if (adminBtn) adminBtn.style.display = 'none';
         } else {
             form.style.display = "block";
             msgDiv.style.display = "none";
             viewBtn.style.display = "none";
-            if (adminBtn) adminBtn.style.display = 'block';
         }
     });
 
