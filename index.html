@@ -643,7 +643,7 @@
     <div class="modal-content">
         <h3>מספר עובד</h3>
         <input type="text" id="employeeCodeInput" placeholder="00000" maxlength="5" style="text-align: center; font-size: 1.2rem;">
-        <div class="error-msg" id="employeeCodeError">הקוד שהוזן שגוי.</div>
+        <div id="employeeCodeError" style="color: red; display: none; margin-top: 10px;">הקוד שהוזן שגוי.</div>
         <div class="modal-buttons">
             <button id="cancelCodeBtn" class="cancel-btn">ביטול</button>
             <button id="confirmCodeBtn" class="confirm-btn">אישור</button>
@@ -700,7 +700,8 @@
         <span class="close" onclick="closeViewScheduleSelectionModal()">&times;</span>
         <h3>בחר שם לצפייה בסידור</h3>
         <select id="viewEmployeeSelect" class="form-select"><option value="" disabled selected>בחר שם</option></select>
-        <button onclick="submitViewScheduleSelection()" class="confirm-btn" style="width: 100%; border-radius: 8px;">צפייה בסידור</button>
+        <!-- שינוי עיצובי ופונקציונלי בכפתור הבא -->
+        <button onclick="submitViewScheduleSelection()" class="confirm-btn" style="width: 100%; border-radius: 8px; padding: 12px; font-size: 1.1rem; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">צפייה בסידור</button>
     </div>
 </div>
 
@@ -740,7 +741,7 @@
       apiKey: "AIzaSyCeYVNOdp8N9BJdsO9eLeATX1_PX5LRG_A",
       authDomain: "sidoravoda111.firebaseapp.com",
       projectId: "sidoravoda111",
-      storageBucket: "sidoravoda111.firebasestorage.app",
+      storageBucket: "sidoravoda111.appspot.com",
       messagingSenderId: "862141234850",
       appId: "1:862141234850:web:12a616ff91e9a61002a1fb",
       measurementId: "G-SFFCVQGW37",
@@ -762,6 +763,10 @@
     let existingSchedule = null;
     let currentScheduleKey = null;
     let pendingSubmission = null;
+
+    // --- [חדש] משתנים לניהול מצב צפייה בסידור חסום ---
+    let codeModalContext = 'submit'; // 'submit' or 'view'
+    let pendingViewData = null; // Will hold { employee, schedule }
 
     // --- טעינת נתונים ראשונית מ-Firebase ---
     onValue(ref(db, "employees"), (snapshot) => { employeesData = snapshot.val() || {}; });
@@ -872,6 +877,7 @@
         employeeRulesData = rulesSnapshot.val() || null;
 
         if (currentEmployeeData.code && requireEmployeeCodeSetting === "כן") {
+            codeModalContext = 'submit'; // Set context for regular submission flow
             document.getElementById("shiftsDiv").style.display = "none";
             document.getElementById("employeeCodeInput").value = "";
             document.getElementById("employeeCodeError").style.display = "none";
@@ -940,17 +946,39 @@
     
     document.getElementById("confirmCodeBtn").addEventListener("click", () => {
         const codeTyped = document.getElementById("employeeCodeInput").value.trim();
-        if (!currentEmployeeData.code || codeTyped !== currentEmployeeData.code) {
-            document.getElementById("employeeCodeError").style.display = "block";
-            return;
+
+        if (codeModalContext === 'view') {
+            if (pendingViewData && codeTyped === pendingViewData.employee.code) {
+                document.getElementById("employeeCodeModal").style.display = "none";
+                const schedule = pendingViewData.schedule;
+                const viewContent = document.getElementById("viewScheduleContent");
+                viewContent.innerHTML = "";
+                viewContent.appendChild(createScheduleTable(schedule.schedule || ""));
+                if (schedule.preferences) {
+                    viewContent.innerHTML += `<p><strong>העדפות:</strong> ${schedule.preferences.replace(/\n/g, '<br>')}</p>`;
+                }
+                document.getElementById('viewModalHistorySelect').style.display = 'none';
+                openViewScheduleModal();
+                pendingViewData = null; // Reset
+            } else {
+                document.getElementById("employeeCodeError").style.display = "block";
+            }
+        } else { // 'submit' context (original logic)
+            if (!currentEmployeeData.code || codeTyped !== currentEmployeeData.code) {
+                document.getElementById("employeeCodeError").style.display = "block";
+                return;
+            }
+            document.getElementById("employeeCodeModal").style.display = "none";
+            handlePostAuthentication();
         }
-        document.getElementById("employeeCodeModal").style.display = "none";
-        handlePostAuthentication();
     });
 
     document.getElementById("cancelCodeBtn").addEventListener("click", () => {
         document.getElementById("employeeCodeModal").style.display = "none";
-        resetForm();
+        if (codeModalContext === 'submit') {
+            resetForm();
+        }
+        pendingViewData = null; // Reset
     });
 
     document.getElementById("shiftForm").addEventListener("submit", (event) => {
@@ -1071,7 +1099,6 @@
         }
     });
     
-    // --- [חדש] פונקציית פירוט ---
     window.toggleDetails = function(button) {
         const detailsDiv = button.nextElementSibling;
         const isVisible = detailsDiv.style.display === 'block';
@@ -1079,7 +1106,6 @@
         button.textContent = isVisible ? 'פירוט' : 'סגור פירוט';
     };
 
-    // --- [מעודכן] מודל שגיאות עם פירוט ---
     function openValidationErrorModal(errors) {
         const contentDiv = document.getElementById('validationErrorContent');
         let html = '<ul>';
@@ -1099,7 +1125,7 @@
                         <p><strong>מה נבחר:</strong></p>
                         ${selectedCount > 0 ? 
                             `<ul>${error.selectedShifts.map(s => `<li>- ${s}</li>`).join('')}</ul>` : 
-                            '<p>לא נבחרו משמרות רלוונטיות מקבוצה זו.</p>'
+                            '<p>לא נבחרה משמרת רלוונטית מקבוצה זו.</p>'
                         }
                         <p><strong>סיכום:</strong> ${missingText} כדי לעמוד בחוק זה.</p>
                     </div>
@@ -1228,7 +1254,6 @@
 
     window.openViewScheduleModal = () => document.getElementById("viewScheduleModal").style.display = "block";
     
-    // --- שינוי: סגירת חלון הצפייה מאפסת את הטופס ---
     window.closeViewScheduleModal = () => {
         document.getElementById("viewScheduleModal").style.display = "none";
         resetForm();
@@ -1249,9 +1274,16 @@
         document.getElementById("viewScheduleSelectionModal").style.display = "block";
         const select = document.getElementById("viewEmployeeSelect");
         select.innerHTML = "<option value='' disabled selected>בחר שם</option>";
-        Object.values(employeesData).forEach(emp => {
+        
+        const sortedEmployees = Object.entries(employeesData).sort((a, b) => {
+            const nameA = `${a[1].firstName} ${a[1].lastName}`;
+            const nameB = `${b[1].firstName} ${b[1].lastName}`;
+            return nameA.localeCompare(nameB, 'he');
+        });
+
+        sortedEmployees.forEach(([key, emp]) => {
             const option = document.createElement("option");
-            option.value = `${emp.firstName} ${emp.lastName}`;
+            option.value = key; // Use employee key as value
             option.textContent = `${emp.firstName} ${emp.lastName}`;
             select.add(option);
         });
@@ -1259,11 +1291,25 @@
     window.closeViewScheduleSelectionModal = () => document.getElementById("viewScheduleSelectionModal").style.display = "none";
     
     window.submitViewScheduleSelection = function() {
-        const selectedName = document.getElementById('viewEmployeeSelect').value;
-        if (!selectedName) return alert('בחר שם');
+        const selectedEmployeeId = document.getElementById('viewEmployeeSelect').value;
+        if (!selectedEmployeeId) return alert('בחר שם');
         
-        const schedule = Object.values(submittedSchedules).find(s => s.name === selectedName);
-        if (schedule) {
+        const employee = employeesData[selectedEmployeeId];
+        const fullName = `${employee.firstName} ${employee.lastName}`;
+        const schedule = Object.values(submittedSchedules).find(s => s.name === fullName);
+
+        if (!schedule) {
+            return alert('לא נמצא סידור עבור העובד שנבחר');
+        }
+
+        if (!submissionsAllowed && employee.code) {
+            codeModalContext = 'view';
+            pendingViewData = { employee, schedule };
+            document.getElementById("employeeCodeInput").value = "";
+            document.getElementById("employeeCodeError").style.display = "none";
+            closeViewScheduleSelectionModal(); // <-- התיקון כאן
+            document.getElementById("employeeCodeModal").style.display = "block";
+        } else {
             const viewContent = document.getElementById("viewScheduleContent");
             viewContent.innerHTML = "";
             viewContent.appendChild(createScheduleTable(schedule.schedule || ""));
@@ -1273,11 +1319,10 @@
             document.getElementById('viewModalHistorySelect').style.display = 'none'; 
             closeViewScheduleSelectionModal();
             openViewScheduleModal();
-        } else {
-            alert('לא נמצא סידור עבור העובד שנבחר');
         }
     };
 </script>
 
 </body>
 </html>
+
