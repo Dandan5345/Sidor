@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="he">
+
 <head>
     <meta charset="UTF-8">
     <title>סידור עבודה - מלון ממילא</title>
@@ -15,21 +16,24 @@
             --gold-hover: #a99a4a;
             --dark-text: #212529;
             --light-text: #ffffff;
-            --background-card: rgba(255, 255, 255, 0.97);
-            --border-color: #dee2e6;
+            --background-card: rgba(255, 255, 255, 0.85);
+            /* צבע שקוף למחצה למראה מודרני */
+            --border-color: rgba(222, 226, 230, 0.6);
             --error-color: #d9534f;
         }
 
         /* --- עיצוב בסיסי --- */
-        html, body {
+        html,
+        body {
             margin: 0;
             padding: 0;
             direction: rtl;
             font-family: 'Assistant', sans-serif;
             color: var(--dark-text);
-            overflow-x: hidden; /* מניעת גלילה אופקית */
+            overflow-x: hidden;
+            /* מניעת גלילה אופקית */
         }
-        
+
         body {
             background-image: url('https://www.mamillahotel.com/content/uploads/2022/09/MAMILLA_Lobby_1_1200.jpg');
             background-size: cover;
@@ -48,24 +52,26 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.6);
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.4) 100%);
             z-index: -1;
         }
 
         /* --- כותרות --- */
         .page-title {
-            font-size: 2.8rem;
+            font-size: 3rem;
             font-weight: 700;
-            margin-bottom: 0;
+            margin-bottom: 5px;
             color: var(--gold-color);
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+            letter-spacing: 1px;
         }
 
         .page-subtitle {
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             font-weight: 400;
-            margin-bottom: 25px;
+            margin-bottom: 30px;
             color: var(--light-text);
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
         }
 
         /* --- קונטיינר ראשי --- */
@@ -79,25 +85,31 @@
         /* --- עיצוב טופס --- */
         form {
             background-color: var(--background-card);
-            padding: 25px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            backdrop-filter: blur(12px);
+            /* מראה זכוכית (Glassmorphism) */
+            -webkit-backdrop-filter: blur(12px);
+            padding: 35px 30px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.1);
             text-align: right;
             position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.4);
         }
 
         label {
             display: block;
-            margin-bottom: 10px;
-            font-weight: 600;
-            font-size: 1.1rem;
+            margin-bottom: 12px;
+            font-weight: 700;
+            font-size: 1.15rem;
+            color: #1f2937;
         }
 
         /* --- כפתור התחברות מנהל (עודכן) --- */
         .admin-login {
             /* שינוי: הוזז אל מחוץ לטופס */
             display: block;
-            margin: 0 auto 20px auto; /* ממורכז ועם ריווח תחתון */
+            margin: 0 auto 20px auto;
+            /* ממורכז ועם ריווח תחתון */
             width: fit-content;
             background-color: transparent;
             color: var(--gold-color);
@@ -138,12 +150,13 @@
             user-select: none;
         }
 
-        .role-button.active, .role-button:hover {
+        .role-button.active,
+        .role-button:hover {
             background-color: var(--gold-color);
             border-color: var(--gold-color);
             color: var(--light-text);
             transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
         .role-button input {
@@ -169,8 +182,10 @@
             box-sizing: border-box;
             text-align: right;
             transition: box-shadow 0.3s, border-color 0.3s;
-            color: var(--dark-text); /* וידוא צבע טקסט */
-            font-family: 'Assistant', sans-serif; /* וידוא גופן */
+            color: var(--dark-text);
+            /* וידוא צבע טקסט */
+            font-family: 'Assistant', sans-serif;
+            /* וידוא גופן */
         }
 
         .form-select:focus {
@@ -178,7 +193,7 @@
             border-color: var(--gold-color);
             box-shadow: 0 0 0 3px rgba(197, 179, 88, 0.25);
         }
-        
+
         /* --- טקסט תחתון (חדש) --- */
         .footer-text {
             color: var(--light-text);
@@ -186,7 +201,7 @@
             margin-top: 25px;
             font-weight: 600;
             font-size: 1.1rem;
-            text-shadow: 1px 1px 4px rgba(0,0,0,0.7);
+            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7);
         }
 
         /* --- אזור משמרות והעדפות --- */
@@ -201,7 +216,8 @@
             margin-bottom: 25px;
         }
 
-        th, td {
+        th,
+        td {
             border: 1px solid var(--border-color);
             padding: 8px;
             text-align: center;
@@ -212,7 +228,7 @@
             color: #fff;
             font-weight: 600;
         }
-        
+
         td:first-child {
             font-weight: 600;
         }
@@ -232,7 +248,7 @@
         .shift-cell:hover {
             transform: scale(1.05);
         }
-        
+
         .shift-cell:has(input[type="checkbox"]:checked) {
             background-color: var(--gold-color);
             color: #fff;
@@ -254,6 +270,7 @@
             min-height: 80px;
             transition: box-shadow 0.3s, border-color 0.3s;
         }
+
         #preferences:focus {
             outline: none;
             border-color: var(--gold-color);
@@ -267,6 +284,7 @@
             gap: 8px;
             margin-top: 10px;
         }
+
         .preset-comment-btn {
             color: var(--dark-text);
             border-radius: 20px;
@@ -282,57 +300,109 @@
         }
 
         /* צבעים אלגנטיים לכפתורים המוכנים */
-        .preset-comment-btn:nth-child(7n + 1) { background-color: #f6f3ed; border-color: #e9e4d9; }
-        .preset-comment-btn:nth-child(7n + 1):hover { background-color: #e9e4d9; }
+        .preset-comment-btn:nth-child(7n + 1) {
+            background-color: #f6f3ed;
+            border-color: #e9e4d9;
+        }
 
-        .preset-comment-btn:nth-child(7n + 2) { background-color: #eff2f5; border-color: #dfe4e8; }
-        .preset-comment-btn:nth-child(7n + 2):hover { background-color: #dfe4e8; }
+        .preset-comment-btn:nth-child(7n + 1):hover {
+            background-color: #e9e4d9;
+        }
 
-        .preset-comment-btn:nth-child(7n + 3) { background-color: #f5f2f0; border-color: #e8e3df; }
-        .preset-comment-btn:nth-child(7n + 3):hover { background-color: #e8e3df; }
+        .preset-comment-btn:nth-child(7n + 2) {
+            background-color: #eff2f5;
+            border-color: #dfe4e8;
+        }
 
-        .preset-comment-btn:nth-child(7n + 4) { background-color: #f7eef0; border-color: #ebdce0; }
-        .preset-comment-btn:nth-child(7n + 4):hover { background-color: #ebdce0; }
+        .preset-comment-btn:nth-child(7n + 2):hover {
+            background-color: #dfe4e8;
+        }
 
-        .preset-comment-btn:nth-child(7n + 5) { background-color: #eef3eb; border-color: #dce6d6; }
-        .preset-comment-btn:nth-child(7n + 5):hover { background-color: #dce6d6; }
+        .preset-comment-btn:nth-child(7n + 3) {
+            background-color: #f5f2f0;
+            border-color: #e8e3df;
+        }
 
-        .preset-comment-btn:nth-child(7n + 6) { background-color: #fcf8e8; border-color: #f7efc9; }
-        .preset-comment-btn:nth-child(7n + 6):hover { background-color: #f7efc9; }
+        .preset-comment-btn:nth-child(7n + 3):hover {
+            background-color: #e8e3df;
+        }
 
-        .preset-comment-btn:nth-child(7n + 7) { background-color: #f0f0f0; border-color: #e0e0e0; }
-        .preset-comment-btn:nth-child(7n + 7):hover { background-color: #e0e0e0; }
+        .preset-comment-btn:nth-child(7n + 4) {
+            background-color: #f7eef0;
+            border-color: #ebdce0;
+        }
+
+        .preset-comment-btn:nth-child(7n + 4):hover {
+            background-color: #ebdce0;
+        }
+
+        .preset-comment-btn:nth-child(7n + 5) {
+            background-color: #eef3eb;
+            border-color: #dce6d6;
+        }
+
+        .preset-comment-btn:nth-child(7n + 5):hover {
+            background-color: #dce6d6;
+        }
+
+        .preset-comment-btn:nth-child(7n + 6) {
+            background-color: #fcf8e8;
+            border-color: #f7efc9;
+        }
+
+        .preset-comment-btn:nth-child(7n + 6):hover {
+            background-color: #f7efc9;
+        }
+
+        .preset-comment-btn:nth-child(7n + 7) {
+            background-color: #f0f0f0;
+            border-color: #e0e0e0;
+        }
+
+        .preset-comment-btn:nth-child(7n + 7):hover {
+            background-color: #e0e0e0;
+        }
 
 
         /* --- כפתור הגשה --- */
         .submit-container {
             text-align: center;
-            margin-top: 30px;
+            margin-top: 35px;
         }
+
         .submit-btn {
-            background-color: var(--gold-color);
+            background: linear-gradient(135deg, var(--gold-color), #d4c270);
             color: var(--light-text);
             border: none;
-            padding: 14px 30px;
-            font-size: 1.2rem;
+            padding: 16px 40px;
+            font-size: 1.3rem;
             font-weight: 700;
-            border-radius: 30px;
+            border-radius: 9999px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             display: inline-flex;
             align-items: center;
-            gap: 10px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            gap: 12px;
+            box-shadow: 0 4px 15px rgba(197, 179, 88, 0.4);
+            letter-spacing: 0.5px;
         }
+
         .submit-btn:hover {
-            background-color: var(--gold-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+            background: linear-gradient(135deg, var(--gold-hover), var(--gold-color));
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(197, 179, 88, 0.5);
         }
+
         .submit-btn svg {
-            width: 20px;
-            height: 20px;
+            width: 22px;
+            height: 22px;
             fill: #fff;
+            transition: transform 0.3s ease;
+        }
+
+        .submit-btn:hover svg {
+            transform: translateX(-4px);
+            /* אנימציית חץ קטנה */
         }
 
         /* --- הודעת חסימת הגשה --- */
@@ -372,10 +442,11 @@
             width: 100%;
             height: 100%;
             overflow: auto;
-            background: rgba(0,0,0,0.6);
+            background: rgba(0, 0, 0, 0.6);
             backdrop-filter: blur(5px);
             -webkit-backdrop-filter: blur(5px);
         }
+
         .modal-content {
             background: #fff;
             margin: 15% auto;
@@ -383,19 +454,21 @@
             border-radius: 15px;
             width: 90%;
             max-width: 500px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
             position: relative;
             text-align: center;
         }
 
-        .modal-content h2, .modal-content h3 {
+        .modal-content h2,
+        .modal-content h3 {
             margin-top: 0;
             margin-bottom: 20px;
             color: var(--dark-text);
             font-weight: 700;
         }
-        
-        .modal-content input, .modal-content select {
+
+        .modal-content input,
+        .modal-content select {
             width: 100%;
             padding: 12px;
             margin-bottom: 15px;
@@ -405,23 +478,25 @@
             box-sizing: border-box;
             text-align: right;
         }
-        
+
         /* תיקון כיווניות לשדה אימייל */
         #adminEmail {
             direction: ltr;
             text-align: left;
         }
-        
+
         .close {
             color: #aaa;
             position: absolute;
             top: 10px;
-            left: 15px; /* Changed to left for RTL */
+            left: 15px;
+            /* Changed to left for RTL */
             font-size: 32px;
             font-weight: bold;
             cursor: pointer;
             transition: color 0.3s;
         }
+
         .close:hover {
             color: #000;
         }
@@ -432,6 +507,7 @@
             gap: 15px;
             margin-top: 20px;
         }
+
         .modal-buttons button {
             flex-grow: 1;
             padding: 12px 20px;
@@ -442,43 +518,56 @@
             cursor: pointer;
             transition: all 0.3s ease;
         }
+
         .modal-buttons .confirm-btn {
             background-color: var(--gold-color);
             color: var(--light-text);
         }
+
         .modal-buttons .confirm-btn:hover {
             background-color: var(--gold-hover);
         }
+
         .modal-buttons .cancel-btn {
             background-color: #f1f1f1;
             border: 1px solid var(--border-color);
             color: var(--dark-text);
         }
+
         .modal-buttons .cancel-btn:hover {
             background-color: #e0e0e0;
         }
+
         .modal-buttons.column-layout {
             flex-direction: column;
         }
-        
+
         /* --- מודל שגיאות (עודכן) --- */
         #validationErrorModal .modal-content {
             border-top: 5px solid var(--error-color);
+            background: #ffffff;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            border-radius: 16px;
         }
+
         #validationErrorModal h3 {
             color: var(--error-color);
+            font-size: 1.5rem;
         }
+
         #validationErrorContent ul {
             list-style-type: none;
             padding: 0;
             margin: 0;
             text-align: right;
         }
+
         #validationErrorContent li {
             font-size: 1.1rem;
             padding: 12px 0;
             border-bottom: 1px solid #eee;
         }
+
         #validationErrorContent li:last-child {
             border-bottom: none;
         }
@@ -490,6 +579,7 @@
             align-items: center;
             flex-wrap: wrap;
         }
+
         .details-btn {
             background-color: #f0f0f0;
             border: 1px solid #ccc;
@@ -497,12 +587,15 @@
             padding: 4px 12px;
             font-size: 0.9rem;
             cursor: pointer;
-            margin-right: 10px; /* ריווח מהטקסט */
+            margin-right: 10px;
+            /* ריווח מהטקסט */
             transition: background-color 0.2s;
         }
+
         .details-btn:hover {
             background-color: #e0e0e0;
         }
+
         .details-content {
             display: none;
             width: 100%;
@@ -514,13 +607,16 @@
             text-align: right;
             font-size: 0.95rem;
         }
+
         .details-content p {
             margin: 5px 0;
         }
+
         .details-content ul {
             padding-right: 20px;
             margin-top: 5px;
         }
+
         .details-content li {
             font-size: 0.9rem;
             padding: 2px 0;
@@ -529,596 +625,687 @@
 
         /* --- התאמות למסכים קטנים --- */
         @media (max-width: 600px) {
-            body { padding: 5vh 5px; }
-            .page-title { font-size: 2rem; }
-            .page-subtitle { font-size: 1rem; }
-            form { padding: 20px; }
-            .modal-content { padding: 20px; margin: 10% auto;}
-            .shift-cell span { font-size: 0.9rem; }
-            th, td { padding: 6px; }
-            .admin-login { padding: 6px 16px; font-size: 0.9rem; }
-        }
+            body {
+                padding: 5vh 5px;
+            }
 
+            .page-title {
+                font-size: 2rem;
+            }
+
+            .page-subtitle {
+                font-size: 1rem;
+            }
+
+            form {
+                padding: 20px;
+            }
+
+            .modal-content {
+                padding: 20px;
+                margin: 10% auto;
+            }
+
+            .shift-cell span {
+                font-size: 0.9rem;
+            }
+
+            th,
+            td {
+                padding: 6px;
+            }
+
+            .admin-login {
+                padding: 6px 16px;
+                font-size: 0.9rem;
+            }
+        }
     </style>
 </head>
+
 <body>
 
-<div class="main-container">
+    <div class="main-container">
 
-    <h1 class="page-title">סידור עבודה</h1>
-    <div class="page-subtitle">מחלקת ביטחון מלון ממילא</div>
-    
-    <div id="submissionDisabledMessage"></div>
-    <button id="viewSubmittedScheduleBtn">צפייה בסידור שנשלח</button>
-    
-    <!-- שינוי: כפתור המנהל הוזז לכאן -->
-    <button type="button" class="admin-login" onclick="openAdminModal()">מנהל</button>
+        <h1 class="page-title">סידור עבודה</h1>
+        <div class="page-subtitle">מחלקת ביטחון מלון ממילא</div>
 
-    <form id="shiftForm">
-        
-        <div id="roleDiv" class="role-buttons">
-            <label class="role-button" id="roleA">
-                <input type="radio" name="role" value="אחמ״ש" required onchange="handleRoleChange(this);">
-                אחמ״ש
-            </label>
-            <label class="role-button" id="roleB">
-                <input type="radio" name="role" value="קב״ט" required onchange="handleRoleChange(this);">
-                קב״ט
-            </label>
-        </div>
+        <div id="submissionDisabledMessage"></div>
+        <button id="viewSubmittedScheduleBtn">צפייה בסידור שנשלח</button>
 
-        <div id="nameDiv" style="display: none;">
-            <label for="nameSelect">בחר שם:</label>
-            <select id="nameSelect" name="name" required class="form-select">
-                <option value="" disabled selected>יש לבחור שם</option>
-            </select>
-        </div>
-        
-        <div id="previousSchedulesDiv" style="display: none;">
-            <label for="previousSchedulesSelect">טעינת סידור קודם:</label>
-            <select id="previousSchedulesSelect" class="form-select">
-                <option value="" disabled selected>בחר תאריך לצפייה</option>
-            </select>
-        </div>
-        
-        <div id="shiftsDiv" style="display: none;">
-            <h3>בחר משמרות:</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>יום</th>
-                        <th>בוקר</th>
-                        <th>ערב</th>
-                        <th>לילה</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr><td>ראשון</td><td><label class="shift-cell"><input type="checkbox" name="shift" value="ראשון-בוקר"><span>בוקר</span></label></td><td><label class="shift-cell"><input type="checkbox" name="shift" value="ראשון-ערב"><span>ערב</span></label></td><td><label class="shift-cell"><input type="checkbox" name="shift" value="ראשון-לילה"><span>לילה</span></label></td></tr>
-                    <tr><td>שני</td><td><label class="shift-cell"><input type="checkbox" name="shift" value="שני-בוקר"><span>בוקר</span></label></td><td><label class="shift-cell"><input type="checkbox" name="shift" value="שני-ערב"><span>ערב</span></label></td><td><label class="shift-cell"><input type="checkbox" name="shift" value="שני-לילה"><span>לילה</span></label></td></tr>
-                    <tr><td>שלישי</td><td><label class="shift-cell"><input type="checkbox" name="shift" value="שלישי-בוקר"><span>בוקר</span></label></td><td><label class="shift-cell"><input type="checkbox" name="shift" value="שלישי-ערב"><span>ערב</span></label></td><td><label class="shift-cell"><input type="checkbox" name="shift" value="שלישי-לילה"><span>לילה</span></label></td></tr>
-                    <tr><td>רביעי</td><td><label class="shift-cell"><input type="checkbox" name="shift" value="רביעי-בוקר"><span>בוקר</span></label></td><td><label class="shift-cell"><input type="checkbox" name="shift" value="רביעי-ערב"><span>ערב</span></label></td><td><label class="shift-cell"><input type="checkbox" name="shift" value="רביעי-לילה"><span>לילה</span></label></td></tr>
-                    <tr><td>חמישי</td><td><label class="shift-cell"><input type="checkbox" name="shift" value="חמישי-בוקר"><span>בוקר</span></label></td><td><label class="shift-cell"><input type="checkbox" name="shift" value="חמישי-ערב"><span>ערב</span></label></td><td><label class="shift-cell"><input type="checkbox" name="shift" value="חמישי-לילה"><span>לילה</span></label></td></tr>
-                    <tr><td>שישי</td><td><label class="shift-cell"><input type="checkbox" name="shift" value="שישי-בוקר"><span>בוקר</span></label></td><td><label class="shift-cell"><input type="checkbox" name="shift" value="שישי-ערב"><span>ערב</span></label></td><td><label class="shift-cell"><input type="checkbox" name="shift" value="שישי-לילה"><span>לילה</span></label></td></tr>
-                    <tr><td>שבת</td><td><label class="shift-cell"><input type="checkbox" name="shift" value="שבת-בוקר"><span>בוקר</span></label></td><td><label class="shift-cell"><input type="checkbox" name="shift" value="שבת-ערב"><span>ערב</span></label></td><td><label class="shift-cell"><input type="checkbox" name="shift" value="שבת-לילה"><span>לילה</span></label></td></tr>
-                </tbody>
-            </table>
-            
-            <label for="preferences">העדפות ובקשות מיוחדות:</label>
-            <textarea id="preferences" name="preferences" rows="3" placeholder="הזן כאן בקשות (לא חובה)"></textarea>
-            
-            <div id="presetCommentsDiv" class="preset-comments">
-                <button type="button" class="preset-comment-btn">אשמח כמה שפחות 8-8</button>
-                <button type="button" class="preset-comment-btn">אשמח למשמרות בוקר</button>
-                <button type="button" class="preset-comment-btn">אשמח למשמרות ערב</button>
-                <button type="button" class="preset-comment-btn">אשמח בלי לילות אם אפשרי</button>
-                <button type="button" class="preset-comment-btn">אשמח בלי משמרות שבת אם אפשרי</button>
-                <button type="button" class="preset-comment-btn">אשמח ל-4 משמרות</button>
-                <button type="button" class="preset-comment-btn">אשמח ל-6 משמרות</button>
+        <!-- שינוי: כפתור המנהל הוזז לכאן -->
+        <button type="button" class="admin-login" onclick="openAdminModal()">מנהל</button>
+
+        <form id="shiftForm">
+
+            <div id="roleDiv" class="role-buttons">
+                <label class="role-button" id="roleA">
+                    <input type="radio" name="role" value="אחמ״ש" required onchange="handleRoleChange(this);">
+                    אחמ״ש
+                </label>
+                <label class="role-button" id="roleB">
+                    <input type="radio" name="role" value="קב״ט" required onchange="handleRoleChange(this);">
+                    קב״ט
+                </label>
             </div>
 
-            <div class="submit-container">
-                <button type="submit" class="submit-btn">
-                    <span>תצוגה מקדימה</span>
-                    <svg viewBox="0 0 512 512"><path d="M476.5 3.5c-11.1-4.7-23.8-1.1-31.4 8.6L31.4 239.9c-9.8 7.3-12.2 20.5-5.2 30.1s20.5 12.2 30.1 5.2l102.2-76.4 172 172c4.5 4.5 10.6 6.7 16.8 6.7 4.3 0 8.7-1.2 12.5-3.6 9.3-5.6 13.3-17 10.4-26.3L201.3 256l255.2-185.8c9.2-6.7 11.8-19.8 5.8-29.7z"/></svg>
-                </button>
+            <div id="nameDiv" style="display: none;">
+                <label for="nameSelect">בחר שם:</label>
+                <select id="nameSelect" name="name" required class="form-select">
+                    <option value="" disabled selected>יש לבחור שם</option>
+                </select>
+            </div>
+
+            <div id="previousSchedulesDiv" style="display: none;">
+                <label for="previousSchedulesSelect">טעינת סידור קודם:</label>
+                <select id="previousSchedulesSelect" class="form-select">
+                    <option value="" disabled selected>בחר תאריך לצפייה</option>
+                </select>
+            </div>
+
+            <div id="shiftsDiv" style="display: none;">
+                <h3>בחר משמרות:</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>יום</th>
+                            <th>בוקר</th>
+                            <th>ערב</th>
+                            <th>לילה</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>ראשון</td>
+                            <td><label class="shift-cell"><input type="checkbox" name="shift"
+                                        value="ראשון-בוקר"><span>בוקר</span></label></td>
+                            <td><label class="shift-cell"><input type="checkbox" name="shift"
+                                        value="ראשון-ערב"><span>ערב</span></label></td>
+                            <td><label class="shift-cell"><input type="checkbox" name="shift"
+                                        value="ראשון-לילה"><span>לילה</span></label></td>
+                        </tr>
+                        <tr>
+                            <td>שני</td>
+                            <td><label class="shift-cell"><input type="checkbox" name="shift"
+                                        value="שני-בוקר"><span>בוקר</span></label></td>
+                            <td><label class="shift-cell"><input type="checkbox" name="shift"
+                                        value="שני-ערב"><span>ערב</span></label></td>
+                            <td><label class="shift-cell"><input type="checkbox" name="shift"
+                                        value="שני-לילה"><span>לילה</span></label></td>
+                        </tr>
+                        <tr>
+                            <td>שלישי</td>
+                            <td><label class="shift-cell"><input type="checkbox" name="shift"
+                                        value="שלישי-בוקר"><span>בוקר</span></label></td>
+                            <td><label class="shift-cell"><input type="checkbox" name="shift"
+                                        value="שלישי-ערב"><span>ערב</span></label></td>
+                            <td><label class="shift-cell"><input type="checkbox" name="shift"
+                                        value="שלישי-לילה"><span>לילה</span></label></td>
+                        </tr>
+                        <tr>
+                            <td>רביעי</td>
+                            <td><label class="shift-cell"><input type="checkbox" name="shift"
+                                        value="רביעי-בוקר"><span>בוקר</span></label></td>
+                            <td><label class="shift-cell"><input type="checkbox" name="shift"
+                                        value="רביעי-ערב"><span>ערב</span></label></td>
+                            <td><label class="shift-cell"><input type="checkbox" name="shift"
+                                        value="רביעי-לילה"><span>לילה</span></label></td>
+                        </tr>
+                        <tr>
+                            <td>חמישי</td>
+                            <td><label class="shift-cell"><input type="checkbox" name="shift"
+                                        value="חמישי-בוקר"><span>בוקר</span></label></td>
+                            <td><label class="shift-cell"><input type="checkbox" name="shift"
+                                        value="חמישי-ערב"><span>ערב</span></label></td>
+                            <td><label class="shift-cell"><input type="checkbox" name="shift"
+                                        value="חמישי-לילה"><span>לילה</span></label></td>
+                        </tr>
+                        <tr>
+                            <td>שישי</td>
+                            <td><label class="shift-cell"><input type="checkbox" name="shift"
+                                        value="שישי-בוקר"><span>בוקר</span></label></td>
+                            <td><label class="shift-cell"><input type="checkbox" name="shift"
+                                        value="שישי-ערב"><span>ערב</span></label></td>
+                            <td><label class="shift-cell"><input type="checkbox" name="shift"
+                                        value="שישי-לילה"><span>לילה</span></label></td>
+                        </tr>
+                        <tr>
+                            <td>שבת</td>
+                            <td><label class="shift-cell"><input type="checkbox" name="shift"
+                                        value="שבת-בוקר"><span>בוקר</span></label></td>
+                            <td><label class="shift-cell"><input type="checkbox" name="shift"
+                                        value="שבת-ערב"><span>ערב</span></label></td>
+                            <td><label class="shift-cell"><input type="checkbox" name="shift"
+                                        value="שבת-לילה"><span>לילה</span></label></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <label for="preferences">העדפות ובקשות מיוחדות:</label>
+                <textarea id="preferences" name="preferences" rows="3" placeholder="הזן כאן בקשות (לא חובה)"></textarea>
+
+                <div id="presetCommentsDiv" class="preset-comments">
+                    <button type="button" class="preset-comment-btn">אשמח כמה שפחות 8-8</button>
+                    <button type="button" class="preset-comment-btn">אשמח למשמרות בוקר</button>
+                    <button type="button" class="preset-comment-btn">אשמח למשמרות ערב</button>
+                    <button type="button" class="preset-comment-btn">אשמח בלי לילות אם אפשרי</button>
+                    <button type="button" class="preset-comment-btn">אשמח בלי משמרות שבת אם אפשרי</button>
+                    <button type="button" class="preset-comment-btn">אשמח ל-4 משמרות</button>
+                    <button type="button" class="preset-comment-btn">אשמח ל-6 משמרות</button>
+                </div>
+
+                <div class="submit-container">
+                    <button type="submit" class="submit-btn">
+                        <span>תצוגה מקדימה</span>
+                        <svg viewBox="0 0 512 512">
+                            <path
+                                d="M476.5 3.5c-11.1-4.7-23.8-1.1-31.4 8.6L31.4 239.9c-9.8 7.3-12.2 20.5-5.2 30.1s20.5 12.2 30.1 5.2l102.2-76.4 172 172c4.5 4.5 10.6 6.7 16.8 6.7 4.3 0 8.7-1.2 12.5-3.6 9.3-5.6 13.3-17 10.4-26.3L201.3 256l255.2-185.8c9.2-6.7 11.8-19.8 5.8-29.7z" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </form>
+
+        <!-- חדש: טקסט תחתון שנוסף -->
+        <div class="footer-text">ביטחון מלון ממילא</div>
+    </div>
+
+    <!-- === מודלים === -->
+
+    <!-- מודל התחברות מנהל -->
+    <div id="adminModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeAdminModal()">&times;</span>
+            <h2>התחברות מנהל</h2>
+            <input type="email" id="adminEmail" placeholder="אימייל">
+            <input type="password" id="adminPassword" placeholder="סיסמה">
+            <div class="modal-buttons">
+                <button id="adminLoginBtn" class="confirm-btn">התחבר</button>
             </div>
         </div>
-    </form>
-    
-    <!-- חדש: טקסט תחתון שנוסף -->
-    <div class="footer-text">ביטחון מלון ממילא</div>
-</div>
+    </div>
 
-<!-- === מודלים === -->
-
-<!-- מודל התחברות מנהל -->
-<div id="adminModal" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="closeAdminModal()">&times;</span>
-        <h2>התחברות מנהל</h2>
-        <input type="email" id="adminEmail" placeholder="אימייל">
-        <input type="password" id="adminPassword" placeholder="סיסמה">
-        <div class="modal-buttons">
-            <button id="adminLoginBtn" class="confirm-btn">התחבר</button>
+    <!-- מודל קוד עובד -->
+    <div id="employeeCodeModal" class="modal">
+        <div class="modal-content">
+            <h3>מספר עובד</h3>
+            <input type="text" id="employeeCodeInput" placeholder="00000" maxlength="5"
+                style="text-align: center; font-size: 1.2rem;">
+            <div id="employeeCodeError" style="color: red; display: none; margin-top: 10px;">הקוד שהוזן שגוי.</div>
+            <div class="modal-buttons">
+                <button id="cancelCodeBtn" class="cancel-btn">ביטול</button>
+                <button id="confirmCodeBtn" class="confirm-btn">אישור</button>
+            </div>
         </div>
     </div>
-</div>
 
-<!-- מודל קוד עובד -->
-<div id="employeeCodeModal" class="modal">
-    <div class="modal-content">
-        <h3>מספר עובד</h3>
-        <input type="text" id="employeeCodeInput" placeholder="00000" maxlength="5" style="text-align: center; font-size: 1.2rem;">
-        <div id="employeeCodeError" style="color: red; display: none; margin-top: 10px;">הקוד שהוזן שגוי.</div>
-        <div class="modal-buttons">
-            <button id="cancelCodeBtn" class="cancel-btn">ביטול</button>
-            <button id="confirmCodeBtn" class="confirm-btn">אישור</button>
+    <!-- מודל סידור קיים -->
+    <div id="existingScheduleModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="finishExistingSchedule()">&times;</span>
+            <h3 id="existingScheduleTitle">כבר שלחת סידור השבוע</h3>
+            <p>מה תרצה לעשות?</p>
+            <div class="modal-buttons column-layout">
+                <button id="editScheduleBtn" class="confirm-btn" onclick="editExistingSchedule()">עריכת הסידור
+                    הקיים</button>
+                <button id="viewScheduleBtn" class="cancel-btn" onclick="viewExistingSchedule()">צפייה בסידור</button>
+                <button id="finishScheduleBtn" class="cancel-btn" onclick="finishExistingSchedule()">סיום</button>
+            </div>
         </div>
     </div>
-</div>
 
-<!-- מודל סידור קיים -->
-<div id="existingScheduleModal" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="finishExistingSchedule()">&times;</span>
-        <h3 id="existingScheduleTitle">כבר שלחת סידור השבוע</h3>
-        <p>מה תרצה לעשות?</p>
-        <div class="modal-buttons column-layout">
-            <button id="editScheduleBtn" class="confirm-btn" onclick="editExistingSchedule()">עריכת הסידור הקיים</button>
-            <button id="viewScheduleBtn" class="cancel-btn" onclick="viewExistingSchedule()">צפייה בסידור</button>
-            <button id="finishScheduleBtn" class="cancel-btn" onclick="finishExistingSchedule()">סיום</button>
+    <!-- מודל תצוגה כללי -->
+    <div id="viewScheduleModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeViewScheduleModal()">&times;</span>
+            <h3>הסידור שלך</h3>
+            <div style="margin-bottom: 20px; text-align: right;">
+                <label for="viewModalHistorySelect" style="margin-bottom: 5px;">צפייה בסידור אחר:</label>
+                <select id="viewModalHistorySelect" class="form-select" style="margin-bottom: 0;"></select>
+            </div>
+            <div id="viewScheduleContent" style="text-align: right;"></div>
+            <div class="modal-buttons" style="justify-content: center;">
+                <button onclick="closeViewScheduleModal()" class="confirm-btn">סגור</button>
+            </div>
         </div>
     </div>
-</div>
 
-<!-- מודל תצוגה כללי -->
-<div id="viewScheduleModal" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="closeViewScheduleModal()">&times;</span>
-        <h3>הסידור שלך</h3>
-        <div style="margin-bottom: 20px; text-align: right;">
-            <label for="viewModalHistorySelect" style="margin-bottom: 5px;">צפייה בסידור אחר:</label>
-            <select id="viewModalHistorySelect" class="form-select" style="margin-bottom: 0;"></select>
-        </div>
-        <div id="viewScheduleContent" style="text-align: right;"></div>
-        <div class="modal-buttons" style="justify-content: center;">
-            <button onclick="closeViewScheduleModal()" class="confirm-btn">סגור</button>
+    <!-- מודל תצוגה מקדימה -->
+    <div id="previewModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closePreviewModal()">&times;</span>
+            <h3>תצוגה מקדימה של הסידור</h3>
+            <div id="previewContent" style="text-align: right;"></div>
+            <div class="modal-buttons">
+                <button id="editBtn" class="cancel-btn">חזור לעריכה</button>
+                <button id="finalSubmitBtn" class="confirm-btn">שלח סידור</button>
+            </div>
         </div>
     </div>
-</div>
 
-<!-- מודל תצוגה מקדימה -->
-<div id="previewModal" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="closePreviewModal()">&times;</span>
-        <h3>תצוגה מקדימה של הסידור</h3>
-        <div id="previewContent" style="text-align: right;"></div>
-        <div class="modal-buttons">
-            <button id="editBtn" class="cancel-btn">חזור לעריכה</button>
-            <button id="finalSubmitBtn" class="confirm-btn">שלח סידור</button>
+    <!-- מודל צפייה בסידור של עובד אחר -->
+    <div id="viewScheduleSelectionModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeViewScheduleSelectionModal()">&times;</span>
+            <h3>בחר שם לצפייה בסידור</h3>
+            <select id="viewEmployeeSelect" class="form-select">
+                <option value="" disabled selected>בחר שם</option>
+            </select>
+            <!-- שינוי עיצובי ופונקציונלי בכפתור הבא -->
+            <button onclick="submitViewScheduleSelection()" class="confirm-btn"
+                style="width: 100%; border-radius: 8px; padding: 12px; font-size: 1.1rem; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">צפייה
+                בסידור</button>
         </div>
     </div>
-</div>
 
-<!-- מודל צפייה בסידור של עובד אחר -->
-<div id="viewScheduleSelectionModal" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="closeViewScheduleSelectionModal()">&times;</span>
-        <h3>בחר שם לצפייה בסידור</h3>
-        <select id="viewEmployeeSelect" class="form-select"><option value="" disabled selected>בחר שם</option></select>
-        <!-- שינוי עיצובי ופונקציונלי בכפתור הבא -->
-        <button onclick="submitViewScheduleSelection()" class="confirm-btn" style="width: 100%; border-radius: 8px; padding: 12px; font-size: 1.1rem; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">צפייה בסידור</button>
-    </div>
-</div>
-
-<!-- מודל צפייה בסידור היסטורי -->
-<div id="historicalScheduleModal" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="closeHistoricalScheduleModal()">&times;</span>
-        <h3>סידור מתאריך <span id="historicalDate"></span></h3>
-        <div id="historicalScheduleContent" style="text-align: right;"></div>
-        <div class="modal-buttons">
-            <button class="cancel-btn" onclick="closeHistoricalScheduleModal()">סגור</button>
-            <button id="copyScheduleBtn" class="confirm-btn">העתק לסידור הנוכחי</button>
+    <!-- מודל צפייה בסידור היסטורי -->
+    <div id="historicalScheduleModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeHistoricalScheduleModal()">&times;</span>
+            <h3>סידור מתאריך <span id="historicalDate"></span></h3>
+            <div id="historicalScheduleContent" style="text-align: right;"></div>
+            <div class="modal-buttons">
+                <button class="cancel-btn" onclick="closeHistoricalScheduleModal()">סגור</button>
+                <button id="copyScheduleBtn" class="confirm-btn">העתק לסידור הנוכחי</button>
+            </div>
         </div>
     </div>
-</div>
 
-<!-- מודל שגיאות ולידציה -->
-<div id="validationErrorModal" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="closeValidationErrorModal()">&times;</span>
-        <h3>שגיאה בהגשה</h3>
-        <p>נמצאו בעיות בסידור שבחרת. אנא תקן אותן לפני ההגשה:</p>
-        <div id="validationErrorContent"></div>
-        <div class="modal-buttons">
-            <button class="confirm-btn" onclick="closeValidationErrorModal()">הבנתי, אחזור לתקן</button>
+    <!-- מודל שגיאות ולידציה -->
+    <div id="validationErrorModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeValidationErrorModal()">&times;</span>
+            <h3>שגיאה בהגשה</h3>
+            <p>נמצאו בעיות בסידור שבחרת. אנא תקן אותן לפני ההגשה:</p>
+            <div id="validationErrorContent"></div>
+            <div class="modal-buttons">
+                <button class="confirm-btn" onclick="closeValidationErrorModal()">הבנתי, אחזור לתקן</button>
+            </div>
         </div>
     </div>
-</div>
 
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
-    import { getDatabase, ref, push, onValue, set, get, child } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-database.js";
-    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-auth.js";
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
+        import { getDatabase, ref, push, onValue, set, get, child } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-database.js";
+        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-auth.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyCeYVNOdp8N9BJdsO9eLeATX1_PX5LRG_A",
-      authDomain: "sidoravoda111.firebaseapp.com",
-      projectId: "sidoravoda111",
-      storageBucket: "sidoravoda111.appspot.com",
-      messagingSenderId: "862141234850",
-      appId: "1:862141234850:web:12a616ff91e9a61002a1fb",
-      measurementId: "G-SFFCVQGW37",
-      databaseURL: "https://sidoravoda111-default-rtdb.europe-west1.firebasedatabase.app/"
-    };
+        const firebaseConfig = {
+            apiKey: "AIzaSyCeYVNOdp8N9BJdsO9eLeATX1_PX5LRG_A",
+            authDomain: "sidoravoda111.firebaseapp.com",
+            projectId: "sidoravoda111",
+            storageBucket: "sidoravoda111.appspot.com",
+            messagingSenderId: "862141234850",
+            appId: "1:862141234850:web:12a616ff91e9a61002a1fb",
+            measurementId: "G-SFFCVQGW37",
+            databaseURL: "https://sidoravoda111-default-rtdb.europe-west1.firebasedatabase.app/"
+        };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-    const auth = getAuth(app);
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const auth = getAuth(app);
 
-    // --- משתנים גלובליים ---
-    let employeesData = {};
-    let submittedSchedules = {};
-    let rulesData = {};
-    let employeeRulesData = null;
-    let historicalSchedules = {};
-    let currentEmployeeId = "";
-    let currentEmployeeData = {};
-    let existingSchedule = null;
-    let currentScheduleKey = null;
-    let pendingSubmission = null;
+        // --- משתנים גלובליים ---
+        let employeesData = {};
+        let submittedSchedules = {};
+        let rulesData = {};
+        let employeeRulesData = null;
+        let historicalSchedules = {};
+        let currentEmployeeId = "";
+        let currentEmployeeData = {};
+        let existingSchedule = null;
+        let currentScheduleKey = null;
+        let pendingSubmission = null;
 
-    // --- [חדש] משתנים לניהול מצב צפייה בסידור חסום ---
-    let codeModalContext = 'submit'; // 'submit' or 'view'
-    let pendingViewData = null; // Will hold { employee, schedule }
+        // --- [חדש] משתנים לניהול מצב צפייה בסידור חסום ---
+        let codeModalContext = 'submit'; // 'submit' or 'view'
+        let pendingViewData = null; // Will hold { employee, schedule }
 
-    // --- טעינת נתונים ראשונית מ-Firebase ---
-    onValue(ref(db, "employees"), (snapshot) => { employeesData = snapshot.val() || {}; });
-    onValue(ref(db, "schedules"), (snapshot) => { submittedSchedules = snapshot.val() || {}; });
-    onValue(ref(db, "rules"), (snapshot) => { rulesData = snapshot.val() || {}; });
+        // --- טעינת נתונים ראשונית מ-Firebase ---
+        onValue(ref(db, "employees"), (snapshot) => { employeesData = snapshot.val() || {}; });
+        onValue(ref(db, "schedules"), (snapshot) => { submittedSchedules = snapshot.val() || {}; });
+        onValue(ref(db, "rules"), (snapshot) => { rulesData = snapshot.val() || {}; });
 
-    let requireEmployeeCodeSetting = "לא";
-    onValue(ref(db, "settings/requireEmployeeCode"), (snapshot) => { requireEmployeeCodeSetting = snapshot.val() || "לא"; });
+        let requireEmployeeCodeSetting = "לא";
+        onValue(ref(db, "settings/requireEmployeeCode"), (snapshot) => { requireEmployeeCodeSetting = snapshot.val() || "לא"; });
 
-    let submissionsAllowed = true;
-    onValue(ref(db, "settings/allowScheduleSubmission"), (snapshot) => {
-        const allow = snapshot.val();
-        submissionsAllowed = !(allow === "לא" || allow === false);
-        const msgDiv = document.getElementById("submissionDisabledMessage");
-        const viewBtn = document.getElementById("viewSubmittedScheduleBtn");
-        const form = document.getElementById("shiftForm");
-        const adminBtn = document.querySelector('.admin-login'); // Get admin button
+        let submissionsAllowed = true;
+        onValue(ref(db, "settings/allowScheduleSubmission"), (snapshot) => {
+            const allow = snapshot.val();
+            submissionsAllowed = !(allow === "לא" || allow === false);
+            const msgDiv = document.getElementById("submissionDisabledMessage");
+            const viewBtn = document.getElementById("viewSubmittedScheduleBtn");
+            const form = document.getElementById("shiftForm");
+            const adminBtn = document.querySelector('.admin-login'); // Get admin button
 
-        if (!submissionsAllowed) {
-            form.style.display = "none";
-            msgDiv.textContent = "לא ניתן להגיש סידור עבודה (זמן ההגשה חלף).";
-            msgDiv.style.display = "block";
-            viewBtn.style.display = "block";
-        } else {
-            form.style.display = "block";
-            msgDiv.style.display = "none";
-            viewBtn.style.display = "none";
-        }
-    });
+            if (!submissionsAllowed) {
+                form.style.display = "none";
+                msgDiv.textContent = "לא ניתן להגיש סידור עבודה (זמן ההגשה חלף).";
+                msgDiv.style.display = "block";
+                viewBtn.style.display = "block";
+            } else {
+                form.style.display = "block";
+                msgDiv.style.display = "none";
+                viewBtn.style.display = "none";
+            }
+        });
 
-    // --- פונקציות עזר ---
-    function createScheduleTable(scheduleString) {
-        const days = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
-        const times = ["בוקר", "ערב", "לילה"];
-        let html = '<table style="width:100%; text-align:center;"><thead><tr><th>יום</th><th>בוקר</th><th>ערב</th><th>לילה</th></tr></thead><tbody>';
-        days.forEach(day => {
-            html += `<tr><td style="font-weight:600;">${day}</td>`;
-            times.forEach(time => {
-                const pattern = `${day}-${time}`;
-                const cellContent = scheduleString.includes(pattern) ? '<span style="color: green; font-weight: bold; font-size: 1.2rem;">✓</span>' : '–';
-                html += `<td>${cellContent}</td>`;
+        // --- פונקציות עזר ---
+        function createScheduleTable(scheduleString) {
+            const days = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
+            const times = ["בוקר", "ערב", "לילה"];
+            let html = '<table style="width:100%; text-align:center;"><thead><tr><th>יום</th><th>בוקר</th><th>ערב</th><th>לילה</th></tr></thead><tbody>';
+            days.forEach(day => {
+                html += `<tr><td style="font-weight:600;">${day}</td>`;
+                times.forEach(time => {
+                    const pattern = `${day}-${time}`;
+                    const cellContent = scheduleString.includes(pattern) ? '<span style="color: green; font-weight: bold; font-size: 1.2rem;">✓</span>' : '–';
+                    html += `<td>${cellContent}</td>`;
+                });
+                html += '</tr>';
             });
-            html += '</tr>';
-        });
-        html += '</tbody></table>';
-        const container = document.createElement('div');
-        container.innerHTML = html;
-        return container.firstChild;
-    }
-    
-    function resetForm() {
-        document.getElementById("nameDiv").style.display = "none";
-        document.getElementById("shiftsDiv").style.display = "none";
-        document.getElementById("previousSchedulesDiv").style.display = "none";
-        
-        document.querySelectorAll('.role-button').forEach(btn => btn.classList.remove('active'));
-        document.querySelectorAll('input[name="role"]').forEach(radio => radio.checked = false);
-        document.getElementById("nameSelect").value = "";
-        
-        document.querySelectorAll('input[name="shift"]').forEach(checkbox => checkbox.checked = false);
-        document.getElementById("preferences").value = "";
-        
-        currentEmployeeId = "";
-        currentEmployeeData = {};
-        existingSchedule = null;
-        currentScheduleKey = null;
-        pendingSubmission = null;
-    }
-
-    // --- טיפול בטופס ---
-    window.handleRoleChange = function(el) {
-        document.querySelectorAll('.role-button').forEach(btn => btn.classList.remove('active'));
-        el.parentElement.classList.add('active');
-        const role = el.value;
-        const nameSelect = document.getElementById("nameSelect");
-        nameSelect.innerHTML = '<option value="" disabled selected>בחר שם</option>';
-        const filtered = Object.entries(employeesData).filter(([key, emp]) => emp.type === role);
-        filtered.sort((a, b) => `${a[1].firstName} ${a[1].lastName}`.localeCompare(`${b[1].firstName} ${b[1].lastName}`));
-        filtered.forEach(([key, emp]) => {
-            const option = document.createElement("option");
-            option.value = key;
-            option.text = `${emp.firstName} ${emp.lastName}`;
-            nameSelect.add(option);
-        });
-        document.getElementById("nameDiv").style.display = "block";
-        document.getElementById("shiftsDiv").style.display = "none";
-        document.getElementById("previousSchedulesDiv").style.display = "none";
-    };
-    
-    document.getElementById("nameSelect").addEventListener("change", async () => {
-        currentEmployeeId = document.getElementById("nameSelect").value;
-        if (!currentEmployeeId) return;
-
-        currentEmployeeData = employeesData[currentEmployeeId];
-        const fullName = `${currentEmployeeData.firstName} ${currentEmployeeData.lastName}`;
-        
-        existingSchedule = Object.entries(submittedSchedules).find(([key, val]) => val.name === fullName) || null;
-        if (existingSchedule) {
-            existingSchedule = { key: existingSchedule[0], ...existingSchedule[1] };
+            html += '</tbody></table>';
+            const container = document.createElement('div');
+            container.innerHTML = html;
+            return container.firstChild;
         }
-        currentScheduleKey = existingSchedule ? existingSchedule.key : null;
-        
-        await loadScheduleHistory();
 
-        const rulesSnapshot = await get(child(ref(db), `employeeRules/${currentEmployeeId}`));
-        employeeRulesData = rulesSnapshot.val() || null;
-
-        if (currentEmployeeData.code && requireEmployeeCodeSetting === "כן") {
-            codeModalContext = 'submit'; // Set context for regular submission flow
+        function resetForm() {
+            document.getElementById("nameDiv").style.display = "none";
             document.getElementById("shiftsDiv").style.display = "none";
-            document.getElementById("employeeCodeInput").value = "";
-            document.getElementById("employeeCodeError").style.display = "none";
-            document.getElementById("employeeCodeModal").style.display = "block";
-        } else {
-            handlePostAuthentication();
+            document.getElementById("previousSchedulesDiv").style.display = "none";
+
+            document.querySelectorAll('.role-button').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('input[name="role"]').forEach(radio => radio.checked = false);
+            document.getElementById("nameSelect").value = "";
+
+            document.querySelectorAll('input[name="shift"]').forEach(checkbox => checkbox.checked = false);
+            document.getElementById("preferences").value = "";
+
+            currentEmployeeId = "";
+            currentEmployeeData = {};
+            existingSchedule = null;
+            currentScheduleKey = null;
+            pendingSubmission = null;
         }
-    });
 
-    function handlePostAuthentication() {
-        document.getElementById("previousSchedulesDiv").style.display = "block";
-        if (submissionsAllowed) {
-            if (existingSchedule) {
-                document.getElementById("existingScheduleTitle").textContent = "כבר שלחת סידור השבוע";
-                document.getElementById("existingScheduleModal").style.display = "block";
-            } else {
-                document.getElementById("shiftsDiv").style.display = "block";
-            }
-        }
-    }
-    
-    async function loadScheduleHistory() {
-        const historySelect = document.getElementById('previousSchedulesSelect');
-        historySelect.innerHTML = '<option value="" disabled selected>בחר תאריך לצפייה</option>';
-        historicalSchedules = {};
-
-        if (!currentEmployeeId) return;
-
-        const snapshot = await get(child(ref(db), `scheduleHistory/${currentEmployeeId}`));
-        if (snapshot.exists()) {
-            historicalSchedules = snapshot.val();
-            const sortedKeys = Object.keys(historicalSchedules).sort((a, b) => b - a);
-            
-            sortedKeys.forEach(timestampKey => {
-                const date = new Date(parseInt(timestampKey));
-                const option = document.createElement('option');
-                option.value = timestampKey;
-                option.textContent = date.toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: 'numeric' });
-                historySelect.add(option);
+        // --- טיפול בטופס ---
+        window.handleRoleChange = function (el) {
+            document.querySelectorAll('.role-button').forEach(btn => btn.classList.remove('active'));
+            el.parentElement.classList.add('active');
+            const role = el.value;
+            const nameSelect = document.getElementById("nameSelect");
+            nameSelect.innerHTML = '<option value="" disabled selected>בחר שם</option>';
+            const filtered = Object.entries(employeesData).filter(([key, emp]) => emp.type === role);
+            filtered.sort((a, b) => `${a[1].firstName} ${a[1].lastName}`.localeCompare(`${b[1].firstName} ${b[1].lastName}`));
+            filtered.forEach(([key, emp]) => {
+                const option = document.createElement("option");
+                option.value = key;
+                option.text = `${emp.firstName} ${emp.lastName}`;
+                nameSelect.add(option);
             });
-        }
-    }
-    
-    document.getElementById('previousSchedulesSelect').addEventListener('change', (event) => {
-        const selectedTimestamp = event.target.value;
-        if (!selectedTimestamp || !historicalSchedules[selectedTimestamp]) return;
+            document.getElementById("nameDiv").style.display = "block";
+            document.getElementById("shiftsDiv").style.display = "none";
+            document.getElementById("previousSchedulesDiv").style.display = "none";
+        };
 
-        const scheduleData = historicalSchedules[selectedTimestamp];
-        openHistoricalScheduleModal(scheduleData, selectedTimestamp);
-    });
-    
-    document.getElementById('presetCommentsDiv').addEventListener('click', function(event) {
-        if (event.target.classList.contains('preset-comment-btn')) {
-            const preferencesTextarea = document.getElementById('preferences');
-            const commentText = event.target.textContent;
-            
-            if (preferencesTextarea.value.trim() === '') {
-                preferencesTextarea.value = commentText;
-            } else {
-                preferencesTextarea.value += ',\n' + commentText;
+        document.getElementById("nameSelect").addEventListener("change", async () => {
+            currentEmployeeId = document.getElementById("nameSelect").value;
+            if (!currentEmployeeId) return;
+
+            currentEmployeeData = employeesData[currentEmployeeId];
+            const fullName = `${currentEmployeeData.firstName} ${currentEmployeeData.lastName}`;
+
+            existingSchedule = Object.entries(submittedSchedules).find(([key, val]) => val.name === fullName) || null;
+            if (existingSchedule) {
+                existingSchedule = { key: existingSchedule[0], ...existingSchedule[1] };
             }
-        }
-    });
+            currentScheduleKey = existingSchedule ? existingSchedule.key : null;
 
-    // --- מודלים ואירועים ---
-    
-    document.getElementById("confirmCodeBtn").addEventListener("click", () => {
-        const codeTyped = document.getElementById("employeeCodeInput").value.trim();
+            await loadScheduleHistory();
 
-        if (codeModalContext === 'view') {
-            if (pendingViewData && codeTyped === pendingViewData.employee.code) {
-                document.getElementById("employeeCodeModal").style.display = "none";
-                const schedule = pendingViewData.schedule;
-                const viewContent = document.getElementById("viewScheduleContent");
-                viewContent.innerHTML = "";
-                viewContent.appendChild(createScheduleTable(schedule.schedule || ""));
-                if (schedule.preferences) {
-                    viewContent.innerHTML += `<p><strong>העדפות:</strong> ${schedule.preferences.replace(/\n/g, '<br>')}</p>`;
+            const rulesSnapshot = await get(child(ref(db), `employeeRules/${currentEmployeeId}`));
+            employeeRulesData = rulesSnapshot.val() || null;
+
+            if (currentEmployeeData.code && requireEmployeeCodeSetting === "כן") {
+                codeModalContext = 'submit'; // Set context for regular submission flow
+                document.getElementById("shiftsDiv").style.display = "none";
+                document.getElementById("employeeCodeInput").value = "";
+                document.getElementById("employeeCodeError").style.display = "none";
+                document.getElementById("employeeCodeModal").style.display = "block";
+            } else {
+                handlePostAuthentication();
+            }
+        });
+
+        function handlePostAuthentication() {
+            document.getElementById("previousSchedulesDiv").style.display = "block";
+            if (submissionsAllowed) {
+                if (existingSchedule) {
+                    document.getElementById("existingScheduleTitle").textContent = "כבר שלחת סידור השבוע";
+                    document.getElementById("existingScheduleModal").style.display = "block";
+                } else {
+                    document.getElementById("shiftsDiv").style.display = "block";
                 }
-                document.getElementById('viewModalHistorySelect').style.display = 'none';
-                openViewScheduleModal();
-                pendingViewData = null; // Reset
-            } else {
-                document.getElementById("employeeCodeError").style.display = "block";
             }
-        } else { // 'submit' context (original logic)
-            if (!currentEmployeeData.code || codeTyped !== currentEmployeeData.code) {
-                document.getElementById("employeeCodeError").style.display = "block";
+        }
+
+        async function loadScheduleHistory() {
+            const historySelect = document.getElementById('previousSchedulesSelect');
+            historySelect.innerHTML = '<option value="" disabled selected>בחר תאריך לצפייה</option>';
+            historicalSchedules = {};
+
+            if (!currentEmployeeId) return;
+
+            const snapshot = await get(child(ref(db), `scheduleHistory/${currentEmployeeId}`));
+            if (snapshot.exists()) {
+                historicalSchedules = snapshot.val();
+                const sortedKeys = Object.keys(historicalSchedules).sort((a, b) => b - a);
+
+                sortedKeys.forEach(timestampKey => {
+                    const date = new Date(parseInt(timestampKey));
+                    const option = document.createElement('option');
+                    option.value = timestampKey;
+                    option.textContent = date.toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                    historySelect.add(option);
+                });
+            }
+        }
+
+        document.getElementById('previousSchedulesSelect').addEventListener('change', (event) => {
+            const selectedTimestamp = event.target.value;
+            if (!selectedTimestamp || !historicalSchedules[selectedTimestamp]) return;
+
+            const scheduleData = historicalSchedules[selectedTimestamp];
+            openHistoricalScheduleModal(scheduleData, selectedTimestamp);
+        });
+
+        document.getElementById('presetCommentsDiv').addEventListener('click', function (event) {
+            if (event.target.classList.contains('preset-comment-btn')) {
+                const preferencesTextarea = document.getElementById('preferences');
+                const commentText = event.target.textContent;
+
+                if (preferencesTextarea.value.trim() === '') {
+                    preferencesTextarea.value = commentText;
+                } else {
+                    preferencesTextarea.value += ',\n' + commentText;
+                }
+            }
+        });
+
+        // --- מודלים ואירועים ---
+
+        document.getElementById("confirmCodeBtn").addEventListener("click", () => {
+            const codeTyped = document.getElementById("employeeCodeInput").value.trim();
+
+            if (codeModalContext === 'view') {
+                if (pendingViewData && codeTyped === pendingViewData.employee.code) {
+                    document.getElementById("employeeCodeModal").style.display = "none";
+                    const schedule = pendingViewData.schedule;
+                    const viewContent = document.getElementById("viewScheduleContent");
+                    viewContent.innerHTML = "";
+                    viewContent.appendChild(createScheduleTable(schedule.schedule || ""));
+                    if (schedule.preferences) {
+                        viewContent.innerHTML += `<p><strong>העדפות:</strong> ${schedule.preferences.replace(/\n/g, '<br>')}</p>`;
+                    }
+                    document.getElementById('viewModalHistorySelect').style.display = 'none';
+                    openViewScheduleModal();
+                    pendingViewData = null; // Reset
+                } else {
+                    document.getElementById("employeeCodeError").style.display = "block";
+                }
+            } else { // 'submit' context (original logic)
+                if (!currentEmployeeData.code || codeTyped !== currentEmployeeData.code) {
+                    document.getElementById("employeeCodeError").style.display = "block";
+                    return;
+                }
+                document.getElementById("employeeCodeModal").style.display = "none";
+                handlePostAuthentication();
+            }
+        });
+
+        document.getElementById("cancelCodeBtn").addEventListener("click", () => {
+            document.getElementById("employeeCodeModal").style.display = "none";
+            if (codeModalContext === 'submit') {
+                resetForm();
+            }
+            pendingViewData = null; // Reset
+        });
+
+        document.getElementById("shiftForm").addEventListener("submit", (event) => {
+            event.preventDefault();
+            validateAndPreview();
+        });
+
+        function validateAndPreview() {
+            const roleInput = document.querySelector('input[name="role"]:checked');
+            if (!roleInput) { alert("אנא בחר תפקיד."); return; }
+            if (!currentEmployeeId) { alert("אנא בחר שם."); return; }
+
+            const shifts = Array.from(document.querySelectorAll('input[name="shift"]:checked'));
+            let errors = [];
+
+            // Check rules
+            const checkRules = (rules) => {
+                Object.values(rules).forEach(rule => {
+                    const selectedInRule = shifts.filter(shift => rule.shifts.includes(shift.value));
+                    if (selectedInRule.length < rule.minRequired) {
+                        errors.push({
+                            message: `לפי החוק "${rule.name}" יש לבחור לפחות ${rule.minRequired} משמרות מהקבוצה. (נבחרו ${selectedInRule.length})`,
+                            allShifts: rule.shifts,
+                            selectedShifts: selectedInRule.map(s => s.value),
+                            minRequired: rule.minRequired
+                        });
+                    }
+                });
+            };
+
+            if (employeeRulesData) {
+                checkRules(employeeRulesData);
+            } else if (rulesData) {
+                const category = (currentEmployeeData.student === "כן") ? "סטודנט" : roleInput.value;
+                if (rulesData[category]) {
+                    checkRules(rulesData[category]);
+                } else {
+                    // Fallback hardcoded rules if category not found in DB
+                    const totalSelected = shifts.length;
+                    const allShiftValues = Array.from(document.querySelectorAll('input[name="shift"]')).map(s => s.value);
+                    if (currentEmployeeData.student === "כן") {
+                        if (totalSelected < 3) errors.push({
+                            message: `סטודנט חייב לבחור לפחות 3 משמרות. (נבחרו ${totalSelected})`,
+                            allShifts: allShiftValues,
+                            selectedShifts: shifts.map(s => s.value),
+                            minRequired: 3
+                        });
+                    } else {
+                        if (totalSelected < 4) errors.push({
+                            message: `עובד שאינו סטודנט חייב לבחור לפחות 4 משמרות. (נבחרו ${totalSelected})`,
+                            allShifts: allShiftValues,
+                            selectedShifts: shifts.map(s => s.value),
+                            minRequired: 4
+                        });
+                    }
+                }
+            }
+
+            if (errors.length > 0) {
+                openValidationErrorModal(errors);
                 return;
             }
-            document.getElementById("employeeCodeModal").style.display = "none";
-            handlePostAuthentication();
+
+            const scheduleString = shifts.map(s => s.value).join(", ");
+            pendingSubmission = {
+                role: roleInput.value,
+                name: `${currentEmployeeData.firstName} ${currentEmployeeData.lastName}`,
+                schedule: scheduleString,
+                preferences: document.getElementById("preferences").value,
+                submissionTime: Date.now()
+            };
+            openPreviewModal(pendingSubmission);
         }
-    });
 
-    document.getElementById("cancelCodeBtn").addEventListener("click", () => {
-        document.getElementById("employeeCodeModal").style.display = "none";
-        if (codeModalContext === 'submit') {
-            resetForm();
-        }
-        pendingViewData = null; // Reset
-    });
+        document.getElementById("finalSubmitBtn").addEventListener("click", async () => {
+            const btn = document.getElementById("finalSubmitBtn");
+            if (!pendingSubmission || btn.disabled) return;
 
-    document.getElementById("shiftForm").addEventListener("submit", (event) => {
-        event.preventDefault();
-        validateAndPreview();
-    });
-    
-    function validateAndPreview() {
-        const roleInput = document.querySelector('input[name="role"]:checked');
-        if (!roleInput) { alert("אנא בחר תפקיד."); return; }
-        if(!currentEmployeeId){ alert("אנא בחר שם."); return; }
-        
-        const shifts = Array.from(document.querySelectorAll('input[name="shift"]:checked'));
-        let errors = [];
+            btn.disabled = true;
+            btn.textContent = 'שולח...';
 
-        // Check rules
-        const checkRules = (rules) => {
-            Object.values(rules).forEach(rule => {
-                const selectedInRule = shifts.filter(shift => rule.shifts.includes(shift.value));
-                if (selectedInRule.length < rule.minRequired) {
-                    errors.push({
-                        message: `לפי החוק "${rule.name}" יש לבחור לפחות ${rule.minRequired} משמרות מהקבוצה. (נבחרו ${selectedInRule.length})`,
-                        allShifts: rule.shifts,
-                        selectedShifts: selectedInRule.map(s => s.value),
-                        minRequired: rule.minRequired
-                    });
+            try {
+                const isUpdate = !!currentScheduleKey;
+                let scheduleKey = currentScheduleKey;
+
+                if (!isUpdate) {
+                    scheduleKey = push(child(ref(db), 'schedules')).key;
                 }
-            });
+
+                const scheduleRef = ref(db, `schedules/${scheduleKey}`);
+                await set(scheduleRef, pendingSubmission);
+
+                const historyRef = ref(db, `scheduleHistory/${currentEmployeeId}`);
+                const historySnapshot = await get(historyRef);
+                let currentHistory = historySnapshot.val() || {};
+                currentHistory[Date.now()] = pendingSubmission;
+
+                const historyKeys = Object.keys(currentHistory).sort((a, b) => a - b);
+                if (historyKeys.length > 3) {
+                    delete currentHistory[historyKeys[0]];
+                }
+                await set(historyRef, currentHistory);
+
+                currentScheduleKey = scheduleKey;
+                existingSchedule = { key: scheduleKey, ...pendingSubmission };
+
+                closePreviewModal();
+
+                const successMessage = isUpdate ? "הסידור עודכן בהצלחה!" : "הסידור נשלח ונשמר בהצלחה!";
+                document.getElementById('existingScheduleTitle').textContent = successMessage;
+                document.getElementById('existingScheduleModal').style.display = 'block';
+
+            } catch (err) {
+                alert("אירעה שגיאה בשמירה: " + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'שלח סידור';
+            }
+        });
+
+        window.toggleDetails = function (button) {
+            const detailsDiv = button.nextElementSibling;
+            const isVisible = detailsDiv.style.display === 'block';
+            detailsDiv.style.display = isVisible ? 'none' : 'block';
+            button.textContent = isVisible ? 'פירוט' : 'סגור פירוט';
         };
 
-        if (employeeRulesData) {
-            checkRules(employeeRulesData);
-        } else if (rulesData) {
-            const category = (currentEmployeeData.student === "כן") ? "סטודנט" : roleInput.value;
-            if (rulesData[category]) {
-                checkRules(rulesData[category]);
-            } else {
-                // Fallback hardcoded rules if category not found in DB
-                const totalSelected = shifts.length;
-                const allShiftValues = Array.from(document.querySelectorAll('input[name="shift"]')).map(s => s.value);
-                if (currentEmployeeData.student === "כן") {
-                    if (totalSelected < 3) errors.push({
-                        message: `סטודנט חייב לבחור לפחות 3 משמרות. (נבחרו ${totalSelected})`,
-                        allShifts: allShiftValues,
-                        selectedShifts: shifts.map(s => s.value),
-                        minRequired: 3
-                    });
-                } else {
-                    if (totalSelected < 4) errors.push({
-                        message: `עובד שאינו סטודנט חייב לבחור לפחות 4 משמרות. (נבחרו ${totalSelected})`,
-                        allShifts: allShiftValues,
-                        selectedShifts: shifts.map(s => s.value),
-                        minRequired: 4
-                    });
-                }
-            }
-        }
-        
-        if (errors.length > 0) {
-            openValidationErrorModal(errors);
-            return;
-        }
-        
-        const scheduleString = shifts.map(s => s.value).join(", ");
-        pendingSubmission = {
-            role: roleInput.value,
-            name: `${currentEmployeeData.firstName} ${currentEmployeeData.lastName}`,
-            schedule: scheduleString,
-            preferences: document.getElementById("preferences").value,
-            submissionTime: Date.now()
-        };
-        openPreviewModal(pendingSubmission);
-    }
-    
-    document.getElementById("finalSubmitBtn").addEventListener("click", async () => {
-        const btn = document.getElementById("finalSubmitBtn");
-        if (!pendingSubmission || btn.disabled) return;
-    
-        btn.disabled = true;
-        btn.textContent = 'שולח...';
-    
-        try {
-            const isUpdate = !!currentScheduleKey;
-            let scheduleKey = currentScheduleKey;
+        function openValidationErrorModal(errors) {
+            const contentDiv = document.getElementById('validationErrorContent');
+            let html = '<ul>';
+            errors.forEach(error => {
+                const selectedCount = error.selectedShifts.length;
+                const neededCount = error.minRequired - selectedCount;
+                const missingText = neededCount === 1 ? 'חסרה עוד משמרת אחת' : `חסרות עוד ${neededCount} משמרות`;
 
-            if (!isUpdate) {
-                scheduleKey = push(child(ref(db), 'schedules')).key;
-            }
-            
-            const scheduleRef = ref(db, `schedules/${scheduleKey}`);
-            await set(scheduleRef, pendingSubmission);
-    
-            const historyRef = ref(db, `scheduleHistory/${currentEmployeeId}`);
-            const historySnapshot = await get(historyRef);
-            let currentHistory = historySnapshot.val() || {};
-            currentHistory[Date.now()] = pendingSubmission;
-    
-            const historyKeys = Object.keys(currentHistory).sort((a, b) => a - b);
-            if (historyKeys.length > 3) {
-                delete currentHistory[historyKeys[0]];
-            }
-            await set(historyRef, currentHistory);
-    
-            currentScheduleKey = scheduleKey;
-            existingSchedule = { key: scheduleKey, ...pendingSubmission };
-
-            closePreviewModal();
-
-            const successMessage = isUpdate ? "הסידור עודכן בהצלחה!" : "הסידור נשלח ונשמר בהצלחה!";
-            document.getElementById('existingScheduleTitle').textContent = successMessage;
-            document.getElementById('existingScheduleModal').style.display = 'block';
-    
-        } catch (err) {
-            alert("אירעה שגיאה בשמירה: " + err.message);
-        } finally {
-            btn.disabled = false;
-            btn.textContent = 'שלח סידור';
-        }
-    });
-    
-    window.toggleDetails = function(button) {
-        const detailsDiv = button.nextElementSibling;
-        const isVisible = detailsDiv.style.display === 'block';
-        detailsDiv.style.display = isVisible ? 'none' : 'block';
-        button.textContent = isVisible ? 'פירוט' : 'סגור פירוט';
-    };
-
-    function openValidationErrorModal(errors) {
-        const contentDiv = document.getElementById('validationErrorContent');
-        let html = '<ul>';
-        errors.forEach(error => {
-            const selectedCount = error.selectedShifts.length;
-            const neededCount = error.minRequired - selectedCount;
-            const missingText = neededCount === 1 ? 'חסרה עוד משמרת אחת' : `חסרות עוד ${neededCount} משמרות`;
-
-            html += `<li>
+                html += `<li>
                 <div class="error-item">
                     <span>${error.message}</span>
                     <button class="details-btn" onclick="toggleDetails(this)">פירוט</button>
@@ -1127,206 +1314,206 @@
                         <p>יש לבחור לפחות ${error.minRequired} משמרות מהרשימה הבאה:</p>
                         <ul>${error.allShifts.map(s => `<li>- ${s}</li>`).join('')}</ul>
                         <p><strong>מה נבחר:</strong></p>
-                        ${selectedCount > 0 ? 
-                            `<ul>${error.selectedShifts.map(s => `<li>- ${s}</li>`).join('')}</ul>` : 
-                            '<p>לא נבחרה משמרת רלוונטית מקבוצה זו.</p>'
-                        }
+                        ${selectedCount > 0 ?
+                        `<ul>${error.selectedShifts.map(s => `<li>- ${s}</li>`).join('')}</ul>` :
+                        '<p>לא נבחרה משמרת רלוונטית מקבוצה זו.</p>'
+                    }
                         <p><strong>סיכום:</strong> ${missingText} כדי לעמוד בחוק זה.</p>
                     </div>
                 </div>
             </li>`;
-        });
-        html += '</ul>';
-        contentDiv.innerHTML = html;
-        document.getElementById('validationErrorModal').style.display = 'block';
-    }
-
-
-    window.closeValidationErrorModal = () => document.getElementById('validationErrorModal').style.display = 'none';
-
-    function openPreviewModal(data) {
-        const previewContent = document.getElementById("previewContent");
-        previewContent.innerHTML = "";
-        previewContent.appendChild(createScheduleTable(data.schedule));
-        if (data.preferences) {
-            previewContent.innerHTML += `<p><strong>העדפות:</strong> ${data.preferences.replace(/\n/g, '<br>')}</p>`;
+            });
+            html += '</ul>';
+            contentDiv.innerHTML = html;
+            document.getElementById('validationErrorModal').style.display = 'block';
         }
-        document.getElementById("previewModal").style.display = "block";
-    }
-    window.closePreviewModal = () => document.getElementById("previewModal").style.display = "none";
-    document.getElementById('editBtn').onclick = closePreviewModal;
 
-    function openHistoricalScheduleModal(data, timestamp) {
-        document.getElementById('historicalDate').textContent = new Date(parseInt(timestamp)).toLocaleDateString('he-IL');
-        const contentDiv = document.getElementById('historicalScheduleContent');
-        contentDiv.innerHTML = '';
-        contentDiv.appendChild(createScheduleTable(data.schedule));
-        if (data.preferences) {
-            contentDiv.innerHTML += `<p><strong>העדפות:</strong> ${data.preferences.replace(/\n/g, '<br>')}</p>`;
-        }
-        
-        const copyBtn = document.getElementById('copyScheduleBtn');
-        copyBtn.style.display = submissionsAllowed ? 'inline-flex' : 'none';
-        copyBtn.onclick = () => copyScheduleToCurrent(data);
 
-        document.getElementById('historicalScheduleModal').style.display = 'block';
-    }
-    window.closeHistoricalScheduleModal = () => {
-        document.getElementById('historicalScheduleModal').style.display = 'none';
-        document.getElementById('previousSchedulesSelect').value = '';
-    };
-    
-    function copyScheduleToCurrent(scheduleData) {
-        if (!submissionsAllowed) return;
-        const shiftsToCopy = scheduleData.schedule ? scheduleData.schedule.split(', ') : [];
-        document.querySelectorAll('input[name="shift"]').forEach(checkbox => {
-            checkbox.checked = shiftsToCopy.includes(checkbox.value);
-        });
-        document.getElementById('preferences').value = scheduleData.preferences || '';
-        
-        alert('הסידור הועתק. ניתן לערוך אותו ולשלוח.');
-        closeHistoricalScheduleModal();
-    }
-    
-    window.closeExistingScheduleModal = () => document.getElementById("existingScheduleModal").style.display = "none";
-    
-    window.editExistingSchedule = function() {
-        if (!existingSchedule) return;
-        const shifts = existingSchedule.schedule ? existingSchedule.schedule.split(", ") : [];
-        document.querySelectorAll('input[name="shift"]').forEach(cb => { cb.checked = shifts.includes(cb.value); });
-        document.getElementById("preferences").value = existingSchedule.preferences || "";
-        closeExistingScheduleModal();
-        document.getElementById("shiftsDiv").style.display = "block";
-    };
+        window.closeValidationErrorModal = () => document.getElementById('validationErrorModal').style.display = 'none';
 
-    window.finishExistingSchedule = function() {
-        closeExistingScheduleModal();
-        resetForm();
-    };
-
-    window.viewExistingSchedule = function() {
-        if (!existingSchedule) return;
-        
-        const updateViewContent = (scheduleData) => {
-            const viewContent = document.getElementById("viewScheduleContent");
-            viewContent.innerHTML = "";
-            viewContent.appendChild(createScheduleTable(scheduleData.schedule || ""));
-            if (scheduleData.preferences) {
-                viewContent.innerHTML += `<p><strong>העדפות:</strong> ${scheduleData.preferences.replace(/\n/g, '<br>')}</p>`;
+        function openPreviewModal(data) {
+            const previewContent = document.getElementById("previewContent");
+            previewContent.innerHTML = "";
+            previewContent.appendChild(createScheduleTable(data.schedule));
+            if (data.preferences) {
+                previewContent.innerHTML += `<p><strong>העדפות:</strong> ${data.preferences.replace(/\n/g, '<br>')}</p>`;
             }
+            document.getElementById("previewModal").style.display = "block";
+        }
+        window.closePreviewModal = () => document.getElementById("previewModal").style.display = "none";
+        document.getElementById('editBtn').onclick = closePreviewModal;
+
+        function openHistoricalScheduleModal(data, timestamp) {
+            document.getElementById('historicalDate').textContent = new Date(parseInt(timestamp)).toLocaleDateString('he-IL');
+            const contentDiv = document.getElementById('historicalScheduleContent');
+            contentDiv.innerHTML = '';
+            contentDiv.appendChild(createScheduleTable(data.schedule));
+            if (data.preferences) {
+                contentDiv.innerHTML += `<p><strong>העדפות:</strong> ${data.preferences.replace(/\n/g, '<br>')}</p>`;
+            }
+
+            const copyBtn = document.getElementById('copyScheduleBtn');
+            copyBtn.style.display = submissionsAllowed ? 'inline-flex' : 'none';
+            copyBtn.onclick = () => copyScheduleToCurrent(data);
+
+            document.getElementById('historicalScheduleModal').style.display = 'block';
+        }
+        window.closeHistoricalScheduleModal = () => {
+            document.getElementById('historicalScheduleModal').style.display = 'none';
+            document.getElementById('previousSchedulesSelect').value = '';
         };
 
-        updateViewContent(existingSchedule);
-        
-        const historySelect = document.getElementById('viewModalHistorySelect');
-        historySelect.innerHTML = '<option value="current" selected>הסידור הנוכחי</option>';
-        if (historicalSchedules) {
-            const sortedKeys = Object.keys(historicalSchedules).sort((a, b) => b - a);
-            sortedKeys.forEach(timestampKey => {
-                const date = new Date(parseInt(timestampKey));
-                const option = document.createElement('option');
-                option.value = timestampKey;
-                option.textContent = `סידור מתאריך: ${date.toLocaleDateString('he-IL')}`;
-                historySelect.add(option);
+        function copyScheduleToCurrent(scheduleData) {
+            if (!submissionsAllowed) return;
+            const shiftsToCopy = scheduleData.schedule ? scheduleData.schedule.split(', ') : [];
+            document.querySelectorAll('input[name="shift"]').forEach(checkbox => {
+                checkbox.checked = shiftsToCopy.includes(checkbox.value);
             });
+            document.getElementById('preferences').value = scheduleData.preferences || '';
+
+            alert('הסידור הועתק. ניתן לערוך אותו ולשלוח.');
+            closeHistoricalScheduleModal();
         }
 
-        closeExistingScheduleModal();
-        openViewScheduleModal();
-    };
+        window.closeExistingScheduleModal = () => document.getElementById("existingScheduleModal").style.display = "none";
 
-    document.getElementById('viewModalHistorySelect').addEventListener('change', (event) => {
-        const selectedValue = event.target.value;
-        let scheduleToShow;
+        window.editExistingSchedule = function () {
+            if (!existingSchedule) return;
+            const shifts = existingSchedule.schedule ? existingSchedule.schedule.split(", ") : [];
+            document.querySelectorAll('input[name="shift"]').forEach(cb => { cb.checked = shifts.includes(cb.value); });
+            document.getElementById("preferences").value = existingSchedule.preferences || "";
+            closeExistingScheduleModal();
+            document.getElementById("shiftsDiv").style.display = "block";
+        };
 
-        if (selectedValue === 'current') {
-            scheduleToShow = existingSchedule;
-        } else {
-            scheduleToShow = historicalSchedules[selectedValue];
-        }
+        window.finishExistingSchedule = function () {
+            closeExistingScheduleModal();
+            resetForm();
+        };
 
-        if (scheduleToShow) {
-            const viewContent = document.getElementById("viewScheduleContent");
-            viewContent.innerHTML = "";
-            viewContent.appendChild(createScheduleTable(scheduleToShow.schedule || ""));
-            if (scheduleToShow.preferences) {
-                viewContent.innerHTML += `<p><strong>העדפות:</strong> ${scheduleToShow.preferences.replace(/\n/g, '<br>')}</p>`;
+        window.viewExistingSchedule = function () {
+            if (!existingSchedule) return;
+
+            const updateViewContent = (scheduleData) => {
+                const viewContent = document.getElementById("viewScheduleContent");
+                viewContent.innerHTML = "";
+                viewContent.appendChild(createScheduleTable(scheduleData.schedule || ""));
+                if (scheduleData.preferences) {
+                    viewContent.innerHTML += `<p><strong>העדפות:</strong> ${scheduleData.preferences.replace(/\n/g, '<br>')}</p>`;
+                }
+            };
+
+            updateViewContent(existingSchedule);
+
+            const historySelect = document.getElementById('viewModalHistorySelect');
+            historySelect.innerHTML = '<option value="current" selected>הסידור הנוכחי</option>';
+            if (historicalSchedules) {
+                const sortedKeys = Object.keys(historicalSchedules).sort((a, b) => b - a);
+                sortedKeys.forEach(timestampKey => {
+                    const date = new Date(parseInt(timestampKey));
+                    const option = document.createElement('option');
+                    option.value = timestampKey;
+                    option.textContent = `סידור מתאריך: ${date.toLocaleDateString('he-IL')}`;
+                    historySelect.add(option);
+                });
             }
-        }
-    });
 
-
-    window.openViewScheduleModal = () => document.getElementById("viewScheduleModal").style.display = "block";
-    
-    window.closeViewScheduleModal = () => {
-        document.getElementById("viewScheduleModal").style.display = "none";
-        resetForm();
-    };
-    
-    window.openAdminModal = () => document.getElementById("adminModal").style.display = "block";
-    window.closeAdminModal = () => document.getElementById("adminModal").style.display = "none";
-    
-    document.getElementById("adminLoginBtn").addEventListener("click", () => {
-        const email = document.getElementById("adminEmail").value;
-        const password = document.getElementById("adminPassword").value;
-        signInWithEmailAndPassword(auth, email, password)
-            .then(() => { window.location.href = "manager.html"; })
-            .catch(err => { alert("שגיאה בהתחברות: " + err.message); });
-    });
-    
-    document.getElementById("viewSubmittedScheduleBtn").onclick = function() {
-        document.getElementById("viewScheduleSelectionModal").style.display = "block";
-        const select = document.getElementById("viewEmployeeSelect");
-        select.innerHTML = "<option value='' disabled selected>בחר שם</option>";
-        
-        const sortedEmployees = Object.entries(employeesData).sort((a, b) => {
-            const nameA = `${a[1].firstName} ${a[1].lastName}`;
-            const nameB = `${b[1].firstName} ${b[1].lastName}`;
-            return nameA.localeCompare(nameB, 'he');
-        });
-
-        sortedEmployees.forEach(([key, emp]) => {
-            const option = document.createElement("option");
-            option.value = key; // Use employee key as value
-            option.textContent = `${emp.firstName} ${emp.lastName}`;
-            select.add(option);
-        });
-    };
-    window.closeViewScheduleSelectionModal = () => document.getElementById("viewScheduleSelectionModal").style.display = "none";
-    
-    window.submitViewScheduleSelection = function() {
-        const selectedEmployeeId = document.getElementById('viewEmployeeSelect').value;
-        if (!selectedEmployeeId) return alert('בחר שם');
-        
-        const employee = employeesData[selectedEmployeeId];
-        const fullName = `${employee.firstName} ${employee.lastName}`;
-        const schedule = Object.values(submittedSchedules).find(s => s.name === fullName);
-
-        if (!schedule) {
-            return alert('לא נמצא סידור עבור העובד שנבחר');
-        }
-
-        if (!submissionsAllowed && employee.code) {
-            codeModalContext = 'view';
-            pendingViewData = { employee, schedule };
-            document.getElementById("employeeCodeInput").value = "";
-            document.getElementById("employeeCodeError").style.display = "none";
-            closeViewScheduleSelectionModal(); // <-- התיקון כאן
-            document.getElementById("employeeCodeModal").style.display = "block";
-        } else {
-            const viewContent = document.getElementById("viewScheduleContent");
-            viewContent.innerHTML = "";
-            viewContent.appendChild(createScheduleTable(schedule.schedule || ""));
-            if (schedule.preferences) {
-                viewContent.innerHTML += `<p><strong>העדפות:</strong> ${schedule.preferences.replace(/\n/g, '<br>')}</p>`;
-            }
-            document.getElementById('viewModalHistorySelect').style.display = 'none'; 
-            closeViewScheduleSelectionModal();
+            closeExistingScheduleModal();
             openViewScheduleModal();
-        }
-    };
-</script>
+        };
+
+        document.getElementById('viewModalHistorySelect').addEventListener('change', (event) => {
+            const selectedValue = event.target.value;
+            let scheduleToShow;
+
+            if (selectedValue === 'current') {
+                scheduleToShow = existingSchedule;
+            } else {
+                scheduleToShow = historicalSchedules[selectedValue];
+            }
+
+            if (scheduleToShow) {
+                const viewContent = document.getElementById("viewScheduleContent");
+                viewContent.innerHTML = "";
+                viewContent.appendChild(createScheduleTable(scheduleToShow.schedule || ""));
+                if (scheduleToShow.preferences) {
+                    viewContent.innerHTML += `<p><strong>העדפות:</strong> ${scheduleToShow.preferences.replace(/\n/g, '<br>')}</p>`;
+                }
+            }
+        });
+
+
+        window.openViewScheduleModal = () => document.getElementById("viewScheduleModal").style.display = "block";
+
+        window.closeViewScheduleModal = () => {
+            document.getElementById("viewScheduleModal").style.display = "none";
+            resetForm();
+        };
+
+        window.openAdminModal = () => document.getElementById("adminModal").style.display = "block";
+        window.closeAdminModal = () => document.getElementById("adminModal").style.display = "none";
+
+        document.getElementById("adminLoginBtn").addEventListener("click", () => {
+            const email = document.getElementById("adminEmail").value;
+            const password = document.getElementById("adminPassword").value;
+            signInWithEmailAndPassword(auth, email, password)
+                .then(() => { window.location.href = "manager.html"; })
+                .catch(err => { alert("שגיאה בהתחברות: " + err.message); });
+        });
+
+        document.getElementById("viewSubmittedScheduleBtn").onclick = function () {
+            document.getElementById("viewScheduleSelectionModal").style.display = "block";
+            const select = document.getElementById("viewEmployeeSelect");
+            select.innerHTML = "<option value='' disabled selected>בחר שם</option>";
+
+            const sortedEmployees = Object.entries(employeesData).sort((a, b) => {
+                const nameA = `${a[1].firstName} ${a[1].lastName}`;
+                const nameB = `${b[1].firstName} ${b[1].lastName}`;
+                return nameA.localeCompare(nameB, 'he');
+            });
+
+            sortedEmployees.forEach(([key, emp]) => {
+                const option = document.createElement("option");
+                option.value = key; // Use employee key as value
+                option.textContent = `${emp.firstName} ${emp.lastName}`;
+                select.add(option);
+            });
+        };
+        window.closeViewScheduleSelectionModal = () => document.getElementById("viewScheduleSelectionModal").style.display = "none";
+
+        window.submitViewScheduleSelection = function () {
+            const selectedEmployeeId = document.getElementById('viewEmployeeSelect').value;
+            if (!selectedEmployeeId) return alert('בחר שם');
+
+            const employee = employeesData[selectedEmployeeId];
+            const fullName = `${employee.firstName} ${employee.lastName}`;
+            const schedule = Object.values(submittedSchedules).find(s => s.name === fullName);
+
+            if (!schedule) {
+                return alert('לא נמצא סידור עבור העובד שנבחר');
+            }
+
+            if (!submissionsAllowed && employee.code) {
+                codeModalContext = 'view';
+                pendingViewData = { employee, schedule };
+                document.getElementById("employeeCodeInput").value = "";
+                document.getElementById("employeeCodeError").style.display = "none";
+                closeViewScheduleSelectionModal(); // <-- התיקון כאן
+                document.getElementById("employeeCodeModal").style.display = "block";
+            } else {
+                const viewContent = document.getElementById("viewScheduleContent");
+                viewContent.innerHTML = "";
+                viewContent.appendChild(createScheduleTable(schedule.schedule || ""));
+                if (schedule.preferences) {
+                    viewContent.innerHTML += `<p><strong>העדפות:</strong> ${schedule.preferences.replace(/\n/g, '<br>')}</p>`;
+                }
+                document.getElementById('viewModalHistorySelect').style.display = 'none';
+                closeViewScheduleSelectionModal();
+                openViewScheduleModal();
+            }
+        };
+    </script>
 
 </body>
-</html>
 
+</html>

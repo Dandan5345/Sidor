@@ -1,36 +1,43 @@
 <!DOCTYPE html>
 <html lang="he">
+
 <head>
   <meta charset="UTF-8">
   <title>ניהול טופס - ערוך חוקיות</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600;700&display=swap" rel="stylesheet">
   <style>
-    /* --- CSS Variables for Elegant Theme --- */
+    /* --- CSS Variables for Modern Glass Theme --- */
     :root {
       --bg-image: url('https://www.mamillahotel.com/content/uploads/2022/09/LobbyMam-1.jpg');
-      --primary-bg: rgba(26, 24, 31, 0.85);
-      --secondary-bg: rgba(44, 40, 51, 0.9);
-      --primary-accent: #D4AF37; /* Dark Gold */
-      --primary-accent-hover: #EACD65;
-      --secondary-accent: #6a5acd; /* Slate Blue / Muted Purple */
-      --text-primary: #F0F2F5;
-      --text-secondary: #a9a9a9;
-      --border-color: rgba(212, 175, 55, 0.3);
-      --danger-color: #B22222; /* Firebrick Red */
-      --success-color: #2E8B57; /* Sea Green */
-      --font-family: 'Heebo', sans-serif;
+      --primary-bg: rgba(255, 255, 255, 0.85);
+      /* שינוי לבהיר ושקוף-למחצה (Glassmorphism) */
+      --secondary-bg: rgba(255, 255, 255, 0.6);
+      --primary-accent: #c5b358;
+      /* צבע הזהב של ממילא */
+      --primary-accent-hover: #a99a4a;
+      --secondary-accent: #1f2937;
+      /* צבע טקסט כהה ומודרני */
+      --text-primary: #1f2937;
+      --text-secondary: #4b5563;
+      --border-color: rgba(222, 226, 230, 0.6);
+      --danger-color: #ef4444;
+      --danger-bg: rgba(239, 68, 68, 0.1);
+      --success-color: #10b981;
+      --font-family: 'Assistant', sans-serif;
+      /* התאמת פונט לאתר הראשי */
     }
 
     /* --- Base Styles --- */
-    html, body {
+    html,
+    body {
       margin: 0;
       padding: 0;
       direction: rtl;
       font-family: var(--font-family);
-      background-color: #1a181f;
+      background-color: #f8f9fa;
       color: var(--text-primary);
       overflow-x: hidden;
     }
@@ -38,49 +45,57 @@
     body::before {
       content: '';
       position: fixed;
-      top: 0; left: 0;
+      top: 0;
+      left: 0;
       width: 100%;
       height: 100%;
       background-image: var(--bg-image);
       background-size: cover;
       background-position: center;
       background-attachment: fixed;
-      filter: blur(5px) brightness(0.6);
+      filter: blur(10px) brightness(0.9);
+      /* טשטוש עמוק יותר ופחות חשוך */
       z-index: -1;
     }
 
     .container {
       max-width: 1200px;
-      margin: 20px auto;
-      padding: 20px;
+      margin: 40px auto;
+      /* יותר ריווח */
+      padding: 40px;
       background: var(--primary-bg);
       border-radius: 20px;
-      border: 1px solid var(--border-color);
-      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1), 0 5px 15px rgba(0, 0, 0, 0.05);
+      /* צלליות מודרניות כהות פחות */
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
     }
-    
+
     /* --- Header --- */
     header {
       text-align: center;
-      margin-bottom: 25px;
-      padding-bottom: 20px;
+      margin-bottom: 35px;
+      padding-bottom: 25px;
       border-bottom: 1px solid var(--border-color);
     }
 
     header h1 {
       margin: 0;
-      font-size: 2.8rem;
+      font-size: 3rem;
+      /* גודל מודרני יותר */
       font-weight: 700;
       color: var(--primary-accent);
-      text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+      /* צל קליל */
+      letter-spacing: 0.5px;
     }
 
     header p {
-      margin: 5px 0 20px;
+      margin: 10px 0 25px;
       font-size: 1.2rem;
       color: var(--text-secondary);
+      font-weight: 400;
     }
 
     .header-menu {
@@ -89,43 +104,46 @@
       gap: 15px;
       flex-wrap: wrap;
     }
-    
+
     .header-menu button {
-      background: transparent;
-      color: var(--primary-accent);
-      border: 1px solid var(--primary-accent);
-      padding: 10px 20px;
-      font-size: 16px;
-      font-weight: 500;
-      border-radius: 30px;
+      background: #ffffff;
+      color: var(--text-primary);
+      border: 2px solid var(--border-color);
+      padding: 10px 24px;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 9999px;
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
     }
 
     .header-menu button:hover {
-      background-color: var(--primary-accent);
-      color: var(--primary-bg);
-      box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+      border-color: var(--primary-accent);
+      color: var(--primary-accent);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(197, 179, 88, 0.2);
     }
 
     /* --- Tabs Navigation --- */
     .tabs {
       display: flex;
-      border-bottom: 1px solid var(--border-color);
-      margin-bottom: 20px;
+      border-bottom: 2px solid var(--border-color);
+      margin-bottom: 30px;
     }
 
     .tab-link {
-      padding: 15px 25px;
+      padding: 15px 30px;
       cursor: pointer;
       border: none;
       background: none;
       color: var(--text-secondary);
-      font-size: 1.1rem;
-      font-weight: 500;
+      font-size: 1.15rem;
+      font-weight: 600;
       transition: all 0.3s ease;
       border-bottom: 3px solid transparent;
-      margin-bottom: -1px; /* Align with container border */
+      margin-bottom: -2px;
+      /* Align with container border */
     }
 
     .tab-link:hover {
@@ -147,63 +165,86 @@
     }
 
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     /* --- General Content Styles (Cards, Fields) --- */
     .card {
       background: var(--secondary-bg);
-      padding: 25px;
-      border-radius: 15px;
-      margin-bottom: 20px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 30px;
+      border-radius: 16px;
+      margin-bottom: 25px;
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      box-shadow: 0 4px 15px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
     }
 
     h2 {
       font-size: 1.8rem;
-      color: var(--primary-accent);
+      color: var(--text-primary);
       margin-top: 0;
-      margin-bottom: 20px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid var(--border-color);
+      font-weight: 700;
     }
 
-    h3, h4 {
-        color: var(--text-primary);
-        margin-bottom: 15px;
+    h3,
+    h4 {
+      color: var(--text-primary);
+      margin-bottom: 15px;
+      font-weight: 600;
     }
 
     label {
       display: block;
       margin-bottom: 8px;
       text-align: right;
-      font-weight: 500;
-      color: var(--text-secondary);
+      font-weight: 600;
+      color: var(--text-primary);
+      font-size: 1.05rem;
     }
 
-    input[type="text"], select {
+    input[type="text"],
+    select {
       width: 100%;
-      padding: 12px;
-      margin-bottom: 15px;
+      padding: 12px 15px;
+      margin-bottom: 20px;
       border: 1px solid var(--border-color);
       border-radius: 8px;
-      font-size: 1rem;
+      font-size: 1.05rem;
       box-sizing: border-box;
-      background-color: var(--primary-bg);
+      background-color: #ffffff;
       color: var(--text-primary);
       transition: all 0.3s ease;
+      font-family: 'Assistant', sans-serif;
     }
 
-    input[type="text"]:focus, select:focus {
+    input[type="text"]:focus,
+    select:focus {
       outline: none;
       border-color: var(--primary-accent);
-      box-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
+      box-shadow: 0 0 0 3px rgba(197, 179, 88, 0.2);
     }
 
     select {
       appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23D4AF37' class='bi bi-chevron-down' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
       background-repeat: no-repeat;
       background-position: left 15px center;
       padding-left: 40px;
@@ -213,11 +254,13 @@
     .toggle-group {
       display: flex;
       border: 1px solid var(--border-color);
-      border-radius: 30px;
+      border-radius: 9999px;
       overflow: hidden;
       width: fit-content;
+      background: #ffffff;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
     }
-    
+
     .toggle-btn {
       padding: 10px 25px;
       border: none;
@@ -225,74 +268,82 @@
       color: var(--text-secondary);
       cursor: pointer;
       transition: all 0.3s ease;
-      font-size: 1rem;
-      font-weight: 500;
+      font-size: 1.05rem;
+      font-weight: 600;
     }
 
     .toggle-btn.active {
       background-color: var(--primary-accent);
-      color: var(--primary-bg);
+      color: #ffffff;
       font-weight: 700;
-      box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
     }
-    
+
     .settings-question {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 20px;
-        padding: 15px;
-        background: rgba(0,0,0,0.1);
-        border-radius: 10px;
-        flex-wrap: wrap;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding: 15px 20px;
+      background: #ffffff;
+      border-radius: 12px;
+      flex-wrap: wrap;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
     }
+
     .settings-question label {
-        margin: 0;
-        margin-left: 15px;
-        color: var(--text-primary);
+      margin: 0;
+      margin-left: 15px;
+      color: var(--text-primary);
+      font-weight: 600;
+      font-size: 1.1rem;
     }
 
 
     /* --- Buttons --- */
     .btn {
-      background-color: var(--primary-accent);
-      color: var(--primary-bg);
+      background: linear-gradient(135deg, var(--primary-accent), var(--primary-accent-hover));
+      color: #ffffff;
       border: none;
-      padding: 12px 25px;
-      font-size: 16px;
+      padding: 12px 28px;
+      font-size: 1.05rem;
       font-weight: 700;
-      border-radius: 30px;
+      border-radius: 9999px;
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       display: inline-flex;
       align-items: center;
       gap: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
 
     .btn:hover {
-      background-color: var(--primary-accent-hover);
-      box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+      box-shadow: 0 8px 15px rgba(197, 179, 88, 0.3);
       transform: translateY(-2px);
     }
-    
+
     .btn-secondary {
-        background-color: transparent;
-        color: var(--primary-accent);
-        border: 1px solid var(--primary-accent);
-    }
-    
-    .btn-secondary:hover {
-        background-color: var(--primary-accent);
-        color: var(--primary-bg);
-    }
-    
-    .btn-danger {
-      background-color: var(--danger-color);
+      background: #ffffff;
       color: var(--text-primary);
+      border: 1px solid var(--border-color);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--primary-accent);
+      color: var(--primary-accent);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    }
+
+    .btn-danger {
+      background: var(--danger-color);
+      color: #ffffff;
     }
 
     .btn-danger:hover {
-      background-color: #d32f2f;
+      background-color: #dc2626;
+      box-shadow: 0 8px 15px rgba(239, 68, 68, 0.3);
     }
 
 
@@ -300,7 +351,9 @@
     .table-container {
       overflow-x: auto;
       border: 1px solid var(--border-color);
-      border-radius: 15px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.7);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
     }
 
     table {
@@ -308,55 +361,63 @@
       border-collapse: collapse;
     }
 
-    table th, table td {
+    table th,
+    table td {
       padding: 15px;
       text-align: center;
       border-bottom: 1px solid var(--border-color);
     }
 
     table th {
-      background-color: rgba(212, 175, 55, 0.1);
-      color: var(--primary-accent);
+      background-color: #f3f4f6;
+      color: var(--text-secondary);
       font-weight: 700;
-      font-size: 1rem;
+      font-size: 1.05rem;
     }
 
     table tbody tr {
-        transition: background-color 0.3s ease;
+      transition: background-color 0.3s ease;
     }
-    
+
     table tbody tr:last-child td {
-        border-bottom: none;
+      border-bottom: none;
     }
 
     table tbody tr:hover {
-        background-color: rgba(255, 255, 255, 0.05);
+      background-color: rgba(197, 179, 88, 0.05);
+      /* Highlight gold עדין */
     }
 
     .action-btn {
       padding: 6px 14px;
-      font-size: 14px;
+      font-size: 0.9rem;
       border: none;
       border-radius: 20px;
       cursor: pointer;
       transition: all 0.3s ease;
       margin: 2px;
-      font-weight: 500;
+      font-weight: 600;
     }
 
     .edit-btn {
       background-color: var(--secondary-accent);
-      color: var(--text-primary);
+      color: #ffffff;
     }
+
     .edit-btn:hover {
-        filter: brightness(1.2);
+      transform: scale(1.05);
+      box-shadow: 0 2px 4px rgba(31, 41, 55, 0.2);
     }
+
     .delete-btn {
-      background-color: var(--danger-color);
-      color: var(--text-primary);
+      background-color: var(--danger-bg);
+      color: var(--danger-color);
     }
+
     .delete-btn:hover {
-        filter: brightness(1.2);
+      background-color: var(--danger-color);
+      color: #ffffff;
+      transform: scale(1.05);
     }
 
     /* --- Modal Styles --- */
@@ -369,40 +430,47 @@
       width: 100%;
       height: 100%;
       overflow: auto;
-      background-color: rgba(0,0,0,0.7);
+      background-color: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
       animation: fadeIn 0.3s;
     }
 
     .modal-content {
       position: relative;
       margin: 10% auto;
-      padding: 30px;
+      padding: 35px;
       width: 90%;
       max-width: 500px;
-      background: var(--secondary-bg);
+      background: #ffffff;
       border: 1px solid var(--border-color);
-      border-radius: 15px;
-      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
-      backdrop-filter: blur(15px);
-      -webkit-backdrop-filter: blur(15px);
+      border-radius: 20px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
       animation: slideIn 0.4s ease-out;
     }
-    
+
     @keyframes slideIn {
-        from { transform: translateY(-50px); opacity: 0; }
-        to { transform: translateY(0); opacity: 1; }
+      from {
+        transform: translateY(-50px);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
     }
 
     .modal-content h3 {
       text-align: center;
-      color: var(--primary-accent);
+      color: var(--text-primary);
       font-size: 1.8rem;
+      font-weight: 700;
       margin-top: 0;
       margin-bottom: 25px;
     }
-    
+
     .modal .toggle-group {
-        margin: 0 auto 15px auto;
+      margin: 0 auto 15px auto;
     }
 
     .close {
@@ -417,73 +485,95 @@
     }
 
     .close:hover {
-      color: var(--primary-accent);
+      color: var(--danger-color);
     }
 
     /* --- Rules Feature Specific Styles --- */
     #rulesPanel {
-        text-align: right;
+      text-align: right;
     }
-    
+
     .shift-selection-table {
-        margin: 20px 0;
+      margin: 20px 0;
+      background: transparent;
+      box-shadow: none;
+      border: none;
     }
-    .shift-selection-table th, .shift-selection-table td {
-        padding: 8px;
+
+    .shift-selection-table th,
+    .shift-selection-table td {
+      padding: 5px;
+      border: none;
     }
+
     .shift-btn {
-      padding: 8px 12px;
+      padding: 10px 15px;
       border: 1px solid var(--border-color);
-      border-radius: 8px;
-      background-color: transparent;
+      border-radius: 10px;
+      background-color: #f9fafb;
       color: var(--text-primary);
       cursor: pointer;
       transition: all 0.3s;
       margin: 2px;
-      width: 80px;
+      width: 100%;
+      font-weight: 600;
     }
-    
+
+    .shift-btn:hover {
+      background-color: #e5e7eb;
+    }
+
     .shift-btn.active {
       background-color: var(--danger-color);
-      color: var(--text-primary);
+      color: #ffffff;
       border-color: var(--danger-color);
+      box-shadow: 0 4px 6px rgba(239, 68, 68, 0.2);
+      transform: scale(1.05);
     }
-    #selectedShiftsInfo, #employeeSelectedShiftsInfo {
+
+    #selectedShiftsInfo,
+    #employeeSelectedShiftsInfo {
       margin: 15px 0;
       font-weight: 500;
       color: var(--primary-accent);
       min-height: 20px;
     }
-    
+
     .employee-specific-section {
       margin-top: 20px;
       text-align: right;
       border: 1px solid var(--border-color);
       padding: 15px;
-      border-radius: 10px;
+      border-radius: 12px;
+      background: #f9fafb;
     }
 
     /* --- Custom Notification Modal --- */
     #notificationModal .modal-content {
-        max-width: 400px;
-        text-align: center;
-    }
-    #notificationMessage {
-        font-size: 1.1rem;
-        margin-bottom: 25px;
-        line-height: 1.6;
-    }
-    #notificationModal .btn-group {
-        display: flex;
-        justify-content: center;
-        gap: 15px;
-    }
-    #notificationModal .btn {
-        width: 120px;
+      max-width: 400px;
+      text-align: center;
     }
 
+    #notificationMessage {
+      font-size: 1.15rem;
+      margin-bottom: 25px;
+      line-height: 1.6;
+      color: var(--text-primary);
+    }
+
+    #notificationModal .btn-group {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+    }
+
+    #notificationModal .btn {
+      width: 120px;
+      justify-content: center;
+    }
   </style>
 </head>
+
 <body>
   <div class="container">
     <header>
@@ -499,7 +589,7 @@
       <button class="tab-link active" onclick="openTab(event, 'settingsSection')">הגדרות וחוקיות</button>
       <button class="tab-link" onclick="openTab(event, 'employeeManagement')">ניהול עובדים</button>
     </nav>
-    
+
     <!-- Tab: Settings Section -->
     <div id="settingsSection" class="tab-content active">
       <div class="card">
@@ -507,19 +597,23 @@
         <div class="settings-question">
           <label>האם לאפשר הגשת סידור עבודה:</label>
           <div class="toggle-group" id="scheduleSubmissionGroup">
-            <div class="toggle-btn" data-value="כן" onclick="selectToggle(this, 'scheduleSubmission'); updateSubmissionSetting('כן');">כן</div>
-            <div class="toggle-btn" data-value="לא" onclick="selectToggle(this, 'scheduleSubmission'); updateSubmissionSetting('לא');">לא</div>
+            <div class="toggle-btn" data-value="כן"
+              onclick="selectToggle(this, 'scheduleSubmission'); updateSubmissionSetting('כן');">כן</div>
+            <div class="toggle-btn" data-value="לא"
+              onclick="selectToggle(this, 'scheduleSubmission'); updateSubmissionSetting('לא');">לא</div>
           </div>
         </div>
         <div class="settings-question">
           <label>האם לבקש קוד עובד בעת בחירת שם:</label>
           <div class="toggle-group" id="requireEmployeeCodeGroup">
-            <div class="toggle-btn" data-value="כן" onclick="selectToggle(this, 'requireEmployeeCode'); updateRequireCodeSetting('כן');">כן</div>
-            <div class="toggle-btn" data-value="לא" onclick="selectToggle(this, 'requireEmployeeCode'); updateRequireCodeSetting('לא');">לא</div>
+            <div class="toggle-btn" data-value="כן"
+              onclick="selectToggle(this, 'requireEmployeeCode'); updateRequireCodeSetting('כן');">כן</div>
+            <div class="toggle-btn" data-value="לא"
+              onclick="selectToggle(this, 'requireEmployeeCode'); updateRequireCodeSetting('לא');">לא</div>
           </div>
         </div>
       </div>
-      
+
       <div class="card">
         <h2>חוקיות כלליות</h2>
         <label for="ruleCategorySelect">בחר קטגוריה לעריכה:</label>
@@ -535,7 +629,7 @@
         <div id="ruleList" style="margin-top: 20px;"></div>
       </div>
     </div>
-    
+
     <!-- Tab: Employee Management Section -->
     <div id="employeeManagement" class="tab-content">
       <div class="card">
@@ -582,12 +676,14 @@
       </div>
       <label style="margin-top: 15px;" for="addCode">מספר עובד (קוד):</label>
       <input type="text" id="addCode" placeholder="00000" maxlength="5">
-      
+
       <div class="settings-question">
         <label>האם ליצור חוקיות ספציפית לעובד זה?</label>
         <div class="toggle-group" id="employeeSpecificRulesToggleGroup">
-          <div class="toggle-btn active" data-value="לא" onclick="selectToggle(this, 'employeeSpecificRulesToggle'); handleEmployeeSpecificToggle(this);">לא</div>
-          <div class="toggle-btn" data-value="כן" onclick="selectToggle(this, 'employeeSpecificRulesToggle'); handleEmployeeSpecificToggle(this);">כן</div>
+          <div class="toggle-btn active" data-value="לא"
+            onclick="selectToggle(this, 'employeeSpecificRulesToggle'); handleEmployeeSpecificToggle(this);">לא</div>
+          <div class="toggle-btn" data-value="כן"
+            onclick="selectToggle(this, 'employeeSpecificRulesToggle'); handleEmployeeSpecificToggle(this);">כן</div>
         </div>
       </div>
 
@@ -596,7 +692,7 @@
         <button class="btn btn-secondary" onclick="openEmployeeSpecificRuleModal()">+ הוסף חוקיות ספציפית</button>
         <div id="employeeRuleList"></div>
       </div>
-      
+
       <button class="btn" style="width: 100%; margin-top: 20px;" onclick="saveNewEmployee()">שמור עובד</button>
     </div>
   </div>
@@ -604,25 +700,25 @@
   <!-- Modal: Edit Employee -->
   <div id="editEmployeeModal" class="modal">
     <div class="modal-content">
-        <span class="close" onclick="closeEditEmployeeModal()">&times;</span>
-        <h3>ערוך עובד</h3>
-        <label for="editFirstName">שם פרטי:</label>
-        <input type="text" id="editFirstName">
-        <label for="editLastName">שם משפחה:</label>
-        <input type="text" id="editLastName">
-        <label>סוג עובד:</label>
-        <div class="toggle-group" id="editTypeGroup">
-            <div class="toggle-btn" data-value="אחמ״ש" onclick="selectToggle(this, 'editType')">אחמ״ש</div>
-            <div class="toggle-btn" data-value="קב״ט" onclick="selectToggle(this, 'editType')">קב״ט</div>
-        </div>
-        <label style="margin-top: 15px;">סטודנט:</label>
-        <div class="toggle-group" id="editStudentGroup">
-            <div class="toggle-btn" data-value="כן" onclick="selectToggle(this, 'editStudent')">כן</div>
-            <div class="toggle-btn" data-value="לא" onclick="selectToggle(this, 'editStudent')">לא</div>
-        </div>
-        <label style="margin-top: 15px;" for="editCode">מספר עובד (קוד):</label>
-        <input type="text" id="editCode">
-        <button class="btn" style="width: 100%; margin-top: 20px;" onclick="updateEmployee()">עדכן עובד</button>
+      <span class="close" onclick="closeEditEmployeeModal()">&times;</span>
+      <h3>ערוך עובד</h3>
+      <label for="editFirstName">שם פרטי:</label>
+      <input type="text" id="editFirstName">
+      <label for="editLastName">שם משפחה:</label>
+      <input type="text" id="editLastName">
+      <label>סוג עובד:</label>
+      <div class="toggle-group" id="editTypeGroup">
+        <div class="toggle-btn" data-value="אחמ״ש" onclick="selectToggle(this, 'editType')">אחמ״ש</div>
+        <div class="toggle-btn" data-value="קב״ט" onclick="selectToggle(this, 'editType')">קב״ט</div>
+      </div>
+      <label style="margin-top: 15px;">סטודנט:</label>
+      <div class="toggle-group" id="editStudentGroup">
+        <div class="toggle-btn" data-value="כן" onclick="selectToggle(this, 'editStudent')">כן</div>
+        <div class="toggle-btn" data-value="לא" onclick="selectToggle(this, 'editStudent')">לא</div>
+      </div>
+      <label style="margin-top: 15px;" for="editCode">מספר עובד (קוד):</label>
+      <input type="text" id="editCode">
+      <button class="btn" style="width: 100%; margin-top: 20px;" onclick="updateEmployee()">עדכן עובד</button>
     </div>
   </div>
 
@@ -633,15 +729,22 @@
       <h3 id="addRuleModalTitle">הוסף חוקיות כלליות</h3>
       <label for="ruleName">שם החוקיות:</label>
       <input type="text" id="ruleName" placeholder="לדוגמה: מינימום משמרות סופ״ש">
-      
+
       <div class="shift-selection-table">
-          <p style="text-align:center;">בחר קבוצה של משמרות:</p>
-          <table id="shiftTable">
-            <thead><tr><th>יום</th><th>בוקר</th><th>ערב</th><th>לילה</th></tr></thead>
-            <tbody>
-              <!-- Rows will be generated by JS -->
-            </tbody>
-          </table>
+        <p style="text-align:center;">בחר קבוצה של משמרות:</p>
+        <table id="shiftTable">
+          <thead>
+            <tr>
+              <th>יום</th>
+              <th>בוקר</th>
+              <th>ערב</th>
+              <th>לילה</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Rows will be generated by JS -->
+          </tbody>
+        </table>
       </div>
 
       <div id="selectedShiftsInfo"></div>
@@ -649,8 +752,9 @@
         <label>בחר מינימום משמרות לקבוצה שבחרת:</label>
         <select id="minShiftsSelect"></select>
       </div>
-      
-      <button id="saveRuleBtn" class="btn" style="width: 100%; margin-top: 20px;" onclick="saveNewRule()">הוסף חוקיות</button>
+
+      <button id="saveRuleBtn" class="btn" style="width: 100%; margin-top: 20px;" onclick="saveNewRule()">הוסף
+        חוקיות</button>
     </div>
   </div>
 
@@ -661,15 +765,22 @@
       <h3>הוסף חוקיות ספציפית</h3>
       <label for="employeeRuleName">שם החוקיות:</label>
       <input type="text" id="employeeRuleName" placeholder="לדוגמה: לא עובד בלילות">
-      
+
       <div class="shift-selection-table">
-          <p style="text-align:center;">בחר קבוצה של משמרות:</p>
-          <table id="employeeShiftTable">
-             <thead><tr><th>יום</th><th>בוקר</th><th>ערב</th><th>לילה</th></tr></thead>
-             <tbody>
-               <!-- Rows will be generated by JS -->
-             </tbody>
-          </table>
+        <p style="text-align:center;">בחר קבוצה של משמרות:</p>
+        <table id="employeeShiftTable">
+          <thead>
+            <tr>
+              <th>יום</th>
+              <th>בוקר</th>
+              <th>ערב</th>
+              <th>לילה</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Rows will be generated by JS -->
+          </tbody>
+        </table>
       </div>
 
       <div id="employeeSelectedShiftsInfo"></div>
@@ -677,28 +788,29 @@
         <label>בחר מינימום משמרות לקבוצה שבחרת:</label>
         <select id="employeeMinShiftsSelect"></select>
       </div>
-      
-      <button class="btn" style="width: 100%; margin-top: 20px;" onclick="saveEmployeeSpecificRule()">הוסף חוקיות ספציפית</button>
+
+      <button class="btn" style="width: 100%; margin-top: 20px;" onclick="saveEmployeeSpecificRule()">הוסף חוקיות
+        ספציפית</button>
     </div>
   </div>
-  
+
   <!-- Custom Notification Modal -->
-    <div id="notificationModal" class="modal">
-        <div class="modal-content">
-            <h3 id="notificationTitle">הודעה</h3>
-            <p id="notificationMessage"></p>
-            <div class="btn-group">
-                <button id="notificationConfirm" class="btn">אישור</button>
-                <button id="notificationCancel" class="btn btn-secondary" style="display:none;">ביטול</button>
-            </div>
-        </div>
+  <div id="notificationModal" class="modal">
+    <div class="modal-content">
+      <h3 id="notificationTitle">הודעה</h3>
+      <p id="notificationMessage"></p>
+      <div class="btn-group">
+        <button id="notificationConfirm" class="btn">אישור</button>
+        <button id="notificationCancel" class="btn btn-secondary" style="display:none;">ביטול</button>
+      </div>
     </div>
+  </div>
 
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
     import { getDatabase, ref, push, onValue, set, remove } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-database.js";
-    
+
     // --- Firebase Configuration ---
     const firebaseConfig = {
       apiKey: "AIzaSyCeYVNOdp8N9BJdsO9eLeATX1_PX5LRG_A",
@@ -710,7 +822,7 @@
       measurementId: "G-SFFCVQGW37",
       databaseURL: "https://sidoravoda111-default-rtdb.europe-west1.firebasedatabase.app/"
     };
-    
+
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
@@ -731,49 +843,49 @@
     const notificationCancel = document.getElementById('notificationCancel');
 
     function showNotification(message, title = 'הודעה') {
-        notificationTitle.textContent = title;
-        notificationMessage.textContent = message;
-        notificationConfirm.textContent = 'אישור';
-        notificationCancel.style.display = 'none';
-        notificationModal.style.display = 'block';
+      notificationTitle.textContent = title;
+      notificationMessage.textContent = message;
+      notificationConfirm.textContent = 'אישור';
+      notificationCancel.style.display = 'none';
+      notificationModal.style.display = 'block';
 
-        return new Promise(resolve => {
-            notificationConfirm.onclick = () => {
-                notificationModal.style.display = 'none';
-                resolve(true);
-            };
-        });
+      return new Promise(resolve => {
+        notificationConfirm.onclick = () => {
+          notificationModal.style.display = 'none';
+          resolve(true);
+        };
+      });
     }
 
     function showConfirmation(message, title = 'אישור פעולה') {
-        notificationTitle.textContent = title;
-        notificationMessage.textContent = message;
-        notificationConfirm.textContent = 'אישור';
-        notificationCancel.style.display = 'inline-block';
-        notificationModal.style.display = 'block';
+      notificationTitle.textContent = title;
+      notificationMessage.textContent = message;
+      notificationConfirm.textContent = 'אישור';
+      notificationCancel.style.display = 'inline-block';
+      notificationModal.style.display = 'block';
 
-        return new Promise(resolve => {
-            notificationConfirm.onclick = () => {
-                notificationModal.style.display = 'none';
-                resolve(true);
-            };
-            notificationCancel.onclick = () => {
-                notificationModal.style.display = 'none';
-                resolve(false);
-            };
-        });
+      return new Promise(resolve => {
+        notificationConfirm.onclick = () => {
+          notificationModal.style.display = 'none';
+          resolve(true);
+        };
+        notificationCancel.onclick = () => {
+          notificationModal.style.display = 'none';
+          resolve(false);
+        };
+      });
     }
 
     // --- Tab Management ---
-    window.openTab = function(evt, tabName) {
+    window.openTab = function (evt, tabName) {
       document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
       document.querySelectorAll('.tab-link').forEach(link => link.classList.remove('active'));
       document.getElementById(tabName).classList.add('active');
       evt.currentTarget.classList.add('active');
     }
-    
+
     // --- Settings Management ---
-    window.updateSubmissionSetting = async function(value) {
+    window.updateSubmissionSetting = async function (value) {
       try {
         await set(ref(db, "settings/allowScheduleSubmission"), value);
         showNotification("הגדרת הגשת סידור עודכנה ל: " + value);
@@ -781,8 +893,8 @@
         showNotification("אירעה שגיאה בעדכון: " + err.message, "שגיאה");
       }
     };
-    
-    window.updateRequireCodeSetting = async function(value) {
+
+    window.updateRequireCodeSetting = async function (value) {
       try {
         await set(ref(db, "settings/requireEmployeeCode"), value);
         showNotification("הגדרת דרישת קוד עובד עודכנה ל: " + value);
@@ -792,33 +904,33 @@
     };
 
     onValue(ref(db, "settings/allowScheduleSubmission"), (snapshot) => {
-        if(snapshot.exists()) setToggleGroupValue("scheduleSubmissionGroup", snapshot.val());
+      if (snapshot.exists()) setToggleGroupValue("scheduleSubmissionGroup", snapshot.val());
     });
     onValue(ref(db, "settings/requireEmployeeCode"), (snapshot) => {
-        if(snapshot.exists()) setToggleGroupValue("requireEmployeeCodeGroup", snapshot.val());
+      if (snapshot.exists()) setToggleGroupValue("requireEmployeeCodeGroup", snapshot.val());
     });
 
     // --- Toggle Button Helpers ---
-    window.selectToggle = function(el, groupId) {
+    window.selectToggle = function (el, groupId) {
       const group = el.closest('.toggle-group');
       Array.from(group.children).forEach(btn => btn.classList.remove("active"));
       el.classList.add("active");
       group.setAttribute("data-selected", el.getAttribute("data-value"));
     };
-    
-    window.clearToggleGroup = function(groupId) {
+
+    window.clearToggleGroup = function (groupId) {
       const group = document.getElementById(groupId);
-      if(group) {
+      if (group) {
         Array.from(group.children).forEach(btn => btn.classList.remove("active"));
         group.removeAttribute("data-selected");
       }
     };
-    
-    window.setToggleGroupValue = function(groupId, value) {
+
+    window.setToggleGroupValue = function (groupId, value) {
       const group = document.getElementById(groupId);
       if (!group) return;
       Array.from(group.children).forEach(btn => {
-        if(btn.getAttribute("data-value") === value) {
+        if (btn.getAttribute("data-value") === value) {
           btn.classList.add("active");
           group.setAttribute("data-selected", value);
         } else {
@@ -861,10 +973,10 @@
       });
     }
 
-    window.openAddEmployeeModal = function() {
+    window.openAddEmployeeModal = function () {
       document.getElementById("addEmployeeModal").style.display = "block";
     };
-    window.closeAddEmployeeModal = function() {
+    window.closeAddEmployeeModal = function () {
       document.getElementById("addEmployeeModal").style.display = "none";
       document.getElementById("addFirstName").value = "";
       document.getElementById("addLastName").value = "";
@@ -877,19 +989,19 @@
       tempEmployeeRules = [];
       document.getElementById("employeeRuleList").innerHTML = "";
     };
-    
-    window.saveNewEmployee = async function() {
+
+    window.saveNewEmployee = async function () {
       const firstName = document.getElementById("addFirstName").value.trim();
       const lastName = document.getElementById("addLastName").value.trim();
       const code = document.getElementById("addCode").value.trim();
       const type = document.getElementById("addTypeGroup").getAttribute("data-selected");
       const student = document.getElementById("addStudentGroup").getAttribute("data-selected");
-      
-      if(!firstName || !lastName || !code || !type || !student) {
+
+      if (!firstName || !lastName || !code || !type || !student) {
         showNotification("נא למלא את כל השדות.", "שגיאה");
         return;
       }
-      
+
       const newEmployee = { firstName, lastName, code, type, student };
       try {
         const data = await push(ref(db, "employees"), newEmployee);
@@ -907,8 +1019,8 @@
         showNotification("אירעה שגיאה: " + err.message, "שגיאה");
       }
     };
-    
-    window.openEditEmployeeModal = function(key) {
+
+    window.openEditEmployeeModal = function (key) {
       currentEditKey = key;
       const emp = employees[key];
       document.getElementById("editFirstName").value = emp.firstName;
@@ -918,18 +1030,18 @@
       setToggleGroupValue("editStudentGroup", emp.student);
       document.getElementById("editEmployeeModal").style.display = "block";
     };
-    window.closeEditEmployeeModal = function() {
+    window.closeEditEmployeeModal = function () {
       document.getElementById("editEmployeeModal").style.display = "none";
     };
-    
-    window.updateEmployee = async function() {
+
+    window.updateEmployee = async function () {
       const firstName = document.getElementById("editFirstName").value.trim();
       const lastName = document.getElementById("editLastName").value.trim();
       const code = document.getElementById("editCode").value.trim();
       const type = document.getElementById("editTypeGroup").getAttribute("data-selected");
       const student = document.getElementById("editStudentGroup").getAttribute("data-selected");
 
-      if(!firstName || !lastName || !code || !type || !student) {
+      if (!firstName || !lastName || !code || !type || !student) {
         showNotification("נא למלא את כל השדות לעדכון.", "שגיאה");
         return;
       }
@@ -944,8 +1056,8 @@
       }
     };
 
-    window.deleteEmployee = async function(key) {
-      if(await showConfirmation("האם אתה בטוח שברצונך למחוק עובד זה? הפעולה אינה הפיכה.")) {
+    window.deleteEmployee = async function (key) {
+      if (await showConfirmation("האם אתה בטוח שברצונך למחוק עובד זה? הפעולה אינה הפיכה.")) {
         try {
           await remove(ref(db, "employees/" + key));
           await remove(ref(db, "employeeRules/" + key)); // Also delete specific rules
@@ -955,9 +1067,9 @@
         }
       }
     };
-    
+
     // --- Rules Feature (General) ---
-    window.onRuleCategoryChange = function() {
+    window.onRuleCategoryChange = function () {
       const category = document.getElementById("ruleCategorySelect").value;
       currentRuleCategory = category;
       currentRuleKey = "";
@@ -984,7 +1096,7 @@
         ruleListDiv.innerHTML = "<p>אין חוקיות מוגדרת לקטגוריה זו.</p>";
         return;
       }
-      
+
       const table = document.createElement("table");
       table.innerHTML = `
         <thead><tr><th>שם חוקיות</th><th>משמרות</th><th>מינימום</th><th>פעולות</th></tr></thead>
@@ -1005,64 +1117,64 @@
       ruleListDiv.appendChild(table);
     }
 
-    window.deleteRule = async function(category, ruleKey) {
-      if(await showConfirmation("האם למחוק את החוקיות?")) {
+    window.deleteRule = async function (category, ruleKey) {
+      if (await showConfirmation("האם למחוק את החוקיות?")) {
         try {
           await remove(ref(db, `rules/${category}/${ruleKey}`));
           showNotification("החוקיות נמחקה.");
-        } catch(err) {
+        } catch (err) {
           showNotification("שגיאה במחיקה: " + err.message, "שגיאה");
         }
       }
     };
 
-    window.editRule = function(category, ruleKey) {
-        currentRuleCategory = category;
-        currentRuleKey = ruleKey;
-        const ruleRef = ref(db, `rules/${category}/${ruleKey}`);
-        
-        onValue(ruleRef, (snapshot) => {
-            const ruleData = snapshot.val();
-            if (!ruleData) return;
+    window.editRule = function (category, ruleKey) {
+      currentRuleCategory = category;
+      currentRuleKey = ruleKey;
+      const ruleRef = ref(db, `rules/${category}/${ruleKey}`);
 
-            document.getElementById("addRuleModalTitle").innerText = "ערוך חוקיות";
-            document.getElementById("saveRuleBtn").innerText = "עדכן חוקיות";
-            document.getElementById("ruleName").value = ruleData.name;
-            
-            selectedShifts = [...ruleData.shifts];
-            updateSelectedShiftsInfo('general');
-            
-            const shiftButtons = document.querySelectorAll("#shiftTable .shift-btn");
-            shiftButtons.forEach(btn => {
-                btn.classList.toggle("active", selectedShifts.includes(btn.dataset.shift));
-            });
-            
-            const minSelect = document.getElementById("minShiftsSelect");
-            setTimeout(() => { minSelect.value = ruleData.minRequired; }, 0); // timeout to ensure options are rendered
+      onValue(ruleRef, (snapshot) => {
+        const ruleData = snapshot.val();
+        if (!ruleData) return;
 
-            document.getElementById("addRuleModal").style.display = "block";
-        }, { onlyOnce: true });
-    };
+        document.getElementById("addRuleModalTitle").innerText = "ערוך חוקיות";
+        document.getElementById("saveRuleBtn").innerText = "עדכן חוקיות";
+        document.getElementById("ruleName").value = ruleData.name;
 
-    window.openAddRuleModal = function() {
-        currentRuleKey = "";
-        selectedShifts = [];
-        
-        document.getElementById("addRuleModalTitle").innerText = "הוסף חוקיות חדשה";
-        document.getElementById("saveRuleBtn").innerText = "הוסף חוקיות";
-        document.getElementById("ruleName").value = "";
-        
-        document.querySelectorAll("#shiftTable .shift-btn").forEach(btn => btn.classList.remove("active"));
+        selectedShifts = [...ruleData.shifts];
         updateSelectedShiftsInfo('general');
-        
+
+        const shiftButtons = document.querySelectorAll("#shiftTable .shift-btn");
+        shiftButtons.forEach(btn => {
+          btn.classList.toggle("active", selectedShifts.includes(btn.dataset.shift));
+        });
+
+        const minSelect = document.getElementById("minShiftsSelect");
+        setTimeout(() => { minSelect.value = ruleData.minRequired; }, 0); // timeout to ensure options are rendered
+
         document.getElementById("addRuleModal").style.display = "block";
+      }, { onlyOnce: true });
     };
 
-    window.closeAddRuleModal = function() {
+    window.openAddRuleModal = function () {
+      currentRuleKey = "";
+      selectedShifts = [];
+
+      document.getElementById("addRuleModalTitle").innerText = "הוסף חוקיות חדשה";
+      document.getElementById("saveRuleBtn").innerText = "הוסף חוקיות";
+      document.getElementById("ruleName").value = "";
+
+      document.querySelectorAll("#shiftTable .shift-btn").forEach(btn => btn.classList.remove("active"));
+      updateSelectedShiftsInfo('general');
+
+      document.getElementById("addRuleModal").style.display = "block";
+    };
+
+    window.closeAddRuleModal = function () {
       document.getElementById("addRuleModal").style.display = "none";
     };
 
-    window.toggleShiftSelection = function(btn, type) {
+    window.toggleShiftSelection = function (btn, type) {
       const shift = btn.dataset.shift;
       const targetArray = type === 'employee' ? selectedShiftsEmployee : selectedShifts;
 
@@ -1093,22 +1205,22 @@
       }
     }
 
-    window.saveNewRule = async function() {
+    window.saveNewRule = async function () {
       const ruleName = document.getElementById("ruleName").value.trim();
       if (!ruleName) return showNotification("נא להזין שם חוקיות.", "שגיאה");
       if (selectedShifts.length === 0) return showNotification("נא לבחור משמרות.", "שגיאה");
-      
+
       const minRequired = document.getElementById("minShiftsSelect").value;
       const category = document.getElementById("ruleCategorySelect").value;
       if (!category) return showNotification("קטגוריה לא נבחרה.", "שגיאה");
-      
+
       const ruleData = {
         name: ruleName,
         shifts: selectedShifts,
         minRequired: Number(minRequired),
         category: category
       };
-      
+
       const path = `rules/${category}/${currentRuleKey || ''}`;
       const dbRef = currentRuleKey ? ref(db, path) : push(ref(db, `rules/${category}`));
 
@@ -1120,9 +1232,9 @@
         showNotification("שגיאה בשמירה: " + err.message, "שגיאה");
       }
     };
-    
+
     // --- Employee-Specific Rules ---
-    window.handleEmployeeSpecificToggle = function(btn) {
+    window.handleEmployeeSpecificToggle = function (btn) {
       const isYes = btn.getAttribute("data-value") === "כן";
       document.getElementById("employeeSpecificRulesSection").style.display = isYes ? "block" : "none";
       updateSpecificRuleEmployeeName();
@@ -1138,31 +1250,31 @@
       document.getElementById(id).addEventListener('input', updateSpecificRuleEmployeeName);
     });
 
-    window.openEmployeeSpecificRuleModal = function() {
-        selectedShiftsEmployee = [];
-        document.getElementById("employeeRuleName").value = "";
-        document.querySelectorAll("#employeeShiftTable .shift-btn").forEach(btn => btn.classList.remove("active"));
-        updateSelectedShiftsInfo('employee');
-        document.getElementById("employeeRuleModal").style.display = "block";
+    window.openEmployeeSpecificRuleModal = function () {
+      selectedShiftsEmployee = [];
+      document.getElementById("employeeRuleName").value = "";
+      document.querySelectorAll("#employeeShiftTable .shift-btn").forEach(btn => btn.classList.remove("active"));
+      updateSelectedShiftsInfo('employee');
+      document.getElementById("employeeRuleModal").style.display = "block";
     };
-    
-    window.closeEmployeeSpecificRuleModal = function() {
+
+    window.closeEmployeeSpecificRuleModal = function () {
       document.getElementById("employeeRuleModal").style.display = "none";
     };
 
-    window.saveEmployeeSpecificRule = function() {
+    window.saveEmployeeSpecificRule = function () {
       const ruleName = document.getElementById("employeeRuleName").value.trim();
       if (!ruleName) return showNotification("נא להזין שם חוקיות.", "שגיאה");
       if (selectedShiftsEmployee.length === 0) return showNotification("נא לבחור משמרות.", "שגיאה");
 
       const minRequired = document.getElementById("employeeMinShiftsSelect").value;
-      
+
       tempEmployeeRules.push({
         name: ruleName,
         shifts: [...selectedShiftsEmployee],
         minRequired: Number(minRequired),
       });
-      
+
       showNotification("חוקיות ספציפית נוספה (תישמר יחד עם העובד).");
       renderEmployeeRuleList();
       closeEmployeeSpecificRuleModal();
@@ -1190,44 +1302,45 @@
       listDiv.innerHTML = "<h4>חוקיות ספציפיות שהוגדרו:</h4>";
       listDiv.appendChild(table);
     }
-    
-    window.deleteEmployeeRule = async function(index) {
-        if (await showConfirmation("למחוק את החוקיות הספציפית הזו?")) {
-            tempEmployeeRules.splice(index, 1);
-            renderEmployeeRuleList();
-        }
+
+    window.deleteEmployeeRule = async function (index) {
+      if (await showConfirmation("למחוק את החוקיות הספציפית הזו?")) {
+        tempEmployeeRules.splice(index, 1);
+        renderEmployeeRuleList();
+      }
     };
-    
+
     // --- Dynamic Content Initialization ---
     function populateShiftTables() {
-        const days = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
-        const shifts = ['בוקר', 'ערב', 'לילה'];
-        const generalTbody = document.querySelector("#shiftTable tbody");
-        const employeeTbody = document.querySelector("#employeeShiftTable tbody");
-        
-        let generalHtml = '', employeeHtml = '';
+      const days = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
+      const shifts = ['בוקר', 'ערב', 'לילה'];
+      const generalTbody = document.querySelector("#shiftTable tbody");
+      const employeeTbody = document.querySelector("#employeeShiftTable tbody");
 
-        days.forEach(day => {
-            generalHtml += `<tr><td>${day}</td>`;
-            employeeHtml += `<tr><td>${day}</td>`;
-            shifts.forEach(shift => {
-                const shiftId = `${day}-${shift}`;
-                generalHtml += `<td><button type="button" class="shift-btn" data-shift="${shiftId}" onclick="toggleShiftSelection(this, 'general')">${shift}</button></td>`;
-                employeeHtml += `<td><button type="button" class="shift-btn" data-shift="${shiftId}" onclick="toggleShiftSelection(this, 'employee')">${shift}</button></td>`;
-            });
-            generalHtml += `</tr>`;
-            employeeHtml += `</tr>`;
+      let generalHtml = '', employeeHtml = '';
+
+      days.forEach(day => {
+        generalHtml += `<tr><td>${day}</td>`;
+        employeeHtml += `<tr><td>${day}</td>`;
+        shifts.forEach(shift => {
+          const shiftId = `${day}-${shift}`;
+          generalHtml += `<td><button type="button" class="shift-btn" data-shift="${shiftId}" onclick="toggleShiftSelection(this, 'general')">${shift}</button></td>`;
+          employeeHtml += `<td><button type="button" class="shift-btn" data-shift="${shiftId}" onclick="toggleShiftSelection(this, 'employee')">${shift}</button></td>`;
         });
+        generalHtml += `</tr>`;
+        employeeHtml += `</tr>`;
+      });
 
-        generalTbody.innerHTML = generalHtml;
-        employeeTbody.innerHTML = employeeHtml;
+      generalTbody.innerHTML = generalHtml;
+      employeeTbody.innerHTML = employeeHtml;
     }
-    
+
     // --- Run on page load ---
     document.addEventListener('DOMContentLoaded', () => {
-        populateShiftTables();
+      populateShiftTables();
     });
 
   </script>
 </body>
+
 </html>
