@@ -1,14 +1,17 @@
 <!DOCTYPE html>
 <html lang="he">
+
 <head>
   <meta charset="UTF-8">
   <title>סידורים</title>
   <!-- התאמה לנייד ומניעת זום כפול -->
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2, user-scalable=yes">
   <style>
-    html, body {
+    html,
+    body {
       touch-action: manipulation;
     }
+
     body {
       font-family: Arial, sans-serif;
       background: #f2f2f2;
@@ -16,11 +19,13 @@
       padding: 20px;
       color: #333;
     }
+
     .top-buttons {
       margin-bottom: 20px;
       display: flex;
       gap: 10px;
     }
+
     .top-buttons button {
       background-color: #00796b;
       color: #fff;
@@ -30,14 +35,17 @@
       border-radius: 4px;
       cursor: pointer;
     }
+
     .top-buttons button:hover {
       background-color: #005b4f;
     }
+
     h1 {
       text-align: center;
       color: #00796b;
       margin-bottom: 30px;
     }
+
     .group-header {
       background: linear-gradient(135deg, #009688, #4db6ac);
       color: #fff;
@@ -45,28 +53,33 @@
       margin-top: 20px;
       border-radius: 4px;
       font-size: 1.2em;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
       position: relative;
     }
+
     .schedule-entry {
       background: #fff;
       padding: 15px;
       margin-top: 10px;
       border-radius: 4px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       position: relative;
     }
+
     .schedule-entry h3 {
       margin: 0 0 10px 0;
       color: #00796b;
       font-size: 1.1em;
     }
+
     .preferences {
       margin-top: 10px;
       line-height: 1.4;
       font-size: 0.95em;
     }
-    .print-btn, .copy-btn {
+
+    .print-btn,
+    .copy-btn {
       display: block;
       margin: 30px auto;
       padding: 10px 20px;
@@ -77,9 +90,12 @@
       border-radius: 4px;
       cursor: pointer;
     }
-    .print-btn:hover, .copy-btn:hover {
+
+    .print-btn:hover,
+    .copy-btn:hover {
       background-color: #005b4f;
     }
+
     /* טבלת המשמרות */
     .schedule-table {
       width: 100%;
@@ -87,37 +103,47 @@
       margin-top: 10px;
       border: 1px solid #ccc;
     }
-    .schedule-table th, .schedule-table td {
+
+    .schedule-table th,
+    .schedule-table td {
       border: 1px solid #ccc;
       padding: 8px;
       text-align: center;
     }
+
     .schedule-table th {
       background-color: #eee;
       font-weight: bold;
     }
+
     .schedule-day {
       background-color: #fafafa;
     }
+
     .schedule-boker {
       background-color: #e1f5fe;
     }
+
     .schedule-erev {
       background-color: #ffe0b2;
     }
+
     .schedule-laila {
       background-color: #f3e5f5;
     }
+
     .schedule-title {
       font-weight: bold;
       margin-bottom: 5px;
       color: #555;
     }
+
     /* סימן וי מעוצב */
     .checkmark {
       color: #2e7d32;
       font-weight: bold;
     }
+
     /* מחלקה לאייקוני מחיקה – לא יודפסו */
     .delete-icon {
       background: none;
@@ -125,26 +151,36 @@
       cursor: pointer;
       font-size: 20px;
     }
+
     /* Print styles */
     @media print {
       .print-group {
         page-break-after: always;
         break-after: page;
       }
+
       .group-header {
         font-weight: bold;
         font-size: 1.4em;
       }
+
       .schedule-entry {
         page-break-inside: avoid;
       }
-      .top-buttons, .print-btn, .copy-btn, #printModal, #copyModal {
+
+      .top-buttons,
+      .print-btn,
+      .copy-btn,
+      #printModal,
+      #copyModal {
         display: none;
       }
+
       .delete-icon {
         display: none;
       }
     }
+
     /* סטייל למודלים (בחירת מצב הדפסה והעתקה) */
     .modal {
       display: none;
@@ -154,8 +190,9 @@
       top: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0,0,0,0.5);
+      background: rgba(0, 0, 0, 0.5);
     }
+
     .modal .modal-content {
       background: #fff;
       margin: 20% auto;
@@ -166,9 +203,11 @@
       text-align: center;
       position: relative;
     }
+
     .modal .modal-content h3 {
       margin-top: 0;
     }
+
     .modal .modal-content button {
       background-color: #2c3e50;
       color: #fff;
@@ -179,9 +218,11 @@
       cursor: pointer;
       font-size: 1rem;
     }
+
     .modal .modal-content button:hover {
       background-color: #1a252f;
     }
+
     .modal .close {
       color: #aaa;
       position: absolute;
@@ -191,11 +232,13 @@
       font-weight: bold;
       cursor: pointer;
     }
+
     .modal .close:hover {
       color: #000;
     }
   </style>
 </head>
+
 <body>
   <!-- כפתורי ניווט -->
   <div class="top-buttons">
@@ -206,7 +249,7 @@
   <div id="schedulesContainer"></div>
   <button class="print-btn" id="printBtn">הדפס</button>
   <button class="copy-btn" id="copyBtn">העתקה להודעה</button>
-  
+
   <!-- מודל בחירת מצב הדפסה -->
   <div id="printModal" class="modal">
     <div class="modal-content">
@@ -216,7 +259,7 @@
       <button onclick="choosePrintMode('single')">סידור בכל דף</button>
     </div>
   </div>
-  
+
   <!-- מודל בחירת סוג העתקה -->
   <div id="copyModal" class="modal">
     <div class="modal-content">
@@ -226,7 +269,7 @@
       <button onclick="chooseCopyMode('chatgpt')">הודעה לצאט גי פי טי</button>
     </div>
   </div>
-  
+
   <!-- Firebase code -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
@@ -320,6 +363,9 @@
               groups[roleKey] += `${day} - ${shifts.join(" ,")}\n`;
             }
           });
+          if (entry.preferences && entry.preferences.trim() !== "") {
+            groups[roleKey] += `העדפות: ${entry.preferences}\n`;
+          }
           groups[roleKey] += "\n";
         });
       });
@@ -360,7 +406,7 @@
     function renderSchedules() {
       const container = document.getElementById("schedulesContainer");
       container.innerHTML = "";
-      
+
       const deleteAllBtn = document.createElement("button");
       deleteAllBtn.style.backgroundColor = "#f44336";
       deleteAllBtn.style.color = "#fff";
@@ -378,7 +424,7 @@
         }
       });
       container.appendChild(deleteAllBtn);
-      
+
       const roles = ["אחמ״ש", "סטודנטים", "קב״ט"];
       roles.forEach(role => {
         const groupSubmissions = window.allSubmissions.filter(s => s.role === role);
@@ -421,7 +467,7 @@
     }
 
     /* onbeforeprint – ארגון תוכן ההדפסה לפי בחירת המשתמש */
-    window.onbeforeprint = function() {
+    window.onbeforeprint = function () {
       const container = document.getElementById("schedulesContainer");
       window.originalSchedulesHTML = container.innerHTML;
       let newContainer = document.createElement("div");
@@ -529,7 +575,7 @@
       container.appendChild(newContainer);
     };
 
-    window.onafterprint = function() {
+    window.onafterprint = function () {
       const container = document.getElementById("schedulesContainer");
       if (window.originalSchedulesHTML) {
         container.innerHTML = window.originalSchedulesHTML;
@@ -549,7 +595,7 @@
       closePrintModal();
       window.print();
     }
-    document.getElementById("printBtn").onclick = function() {
+    document.getElementById("printBtn").onclick = function () {
       openPrintModal();
     };
 
@@ -571,9 +617,10 @@
       });
       closeCopyModal();
     }
-    document.getElementById("copyBtn").onclick = function() {
+    document.getElementById("copyBtn").onclick = function () {
       openCopyModal();
     };
   </script>
 </body>
+
 </html>
