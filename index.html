@@ -7,24 +7,33 @@
     <!-- התאמה מלאה לנייד -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <style>
-        /* --- יבוא גופן --- */
-        @import url('https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;500;600;700;800&display=swap');
+        /* --- יבוא גופנים --- */
+        @import url('https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;500;600;700;800&family=Heebo:wght@300;400;500;700;800;900&display=swap');
 
-        /* --- משתני צבעים לעיצוב פרימיום מודרני --- */
+        /* --- משתני צבעים לעיצוב פרימיום מודרני (סגנון Hyde) --- */
         :root {
-            --gold-primary: #b89047;
-            --gold-hover: #9c7a3c;
-            --gold-light: rgba(184, 144, 71, 0.15);
+            --gold-primary: #c9a227;
+            --gold-hover: #a88620;
+            --gold-light: rgba(201, 162, 39, 0.13);
+            --gold-glow: rgba(201, 162, 39, 0.35);
+            --dark-bg: #0f1724;
+            --dark-surface: #1a2438;
             --dark-text: #1e293b;
             --muted-text: #64748b;
             --light-text: #ffffff;
-            --background-card: rgba(255, 255, 255, 0.92);
-            --card-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            --border-color: rgba(226, 232, 240, 0.8);
+            --background-card: rgba(255, 255, 255, 0.95);
+            --card-shadow: 0 25px 60px -12px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255,255,255,0.1);
+            --border-color: rgba(226, 232, 240, 0.7);
             --error-color: #ef4444;
             --error-bg: #fef2f2;
             --success-color: #10b981;
-            --surface-bg: #f8fafc;
+            --surface-bg: #f1f5f9;
+            --morning-color: #e89912;
+            --morning-bg: #fef3c7;
+            --evening-color: #f97316;
+            --evening-bg: #fff7ed;
+            --night-color: #6366f1;
+            --night-bg: #eef2ff;
         }
 
         /* --- עיצוב בסיסי --- */
@@ -33,10 +42,11 @@
             margin: 0;
             padding: 0;
             direction: rtl;
-            font-family: 'Assistant', sans-serif;
+            font-family: 'Heebo', 'Assistant', sans-serif;
             color: var(--dark-text);
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         body {
@@ -45,7 +55,7 @@
             background-position: center;
             background-attachment: fixed;
             min-height: 100vh;
-            padding: 6vh 15px;
+            padding: 5vh 15px 4vh;
             box-sizing: border-box;
             position: relative;
         }
@@ -57,20 +67,30 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(135deg, rgba(15, 23, 42, 0.85) 0%, rgba(15, 23, 42, 0.6) 100%);
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
+            background: linear-gradient(160deg, rgba(10, 16, 30, 0.92) 0%, rgba(15, 23, 42, 0.78) 50%, rgba(10, 16, 30, 0.88) 100%);
+            backdrop-filter: blur(6px) saturate(1.2);
+            -webkit-backdrop-filter: blur(6px) saturate(1.2);
             z-index: -1;
         }
 
         /* --- אנימציות כניסה --- */
         @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(20px); }
+            from { opacity: 0; transform: translateY(25px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
+        @keyframes shimmer {
+            0% { background-position: -200% center; }
+            100% { background-position: 200% center; }
+        }
+
+        @keyframes goldPulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
         .fade-in {
-            animation: fadeUp 0.5s ease forwards;
+            animation: fadeUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
         }
 
         /* --- כפתור מנהל צף --- */
@@ -78,55 +98,70 @@
             position: absolute;
             top: 20px;
             left: 20px;
-            background-color: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            color: var(--light-text);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 8px 16px;
+            background-color: rgba(255, 255, 255, 0.07);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            color: rgba(255, 255, 255, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 9px 18px;
             border-radius: 99px;
             cursor: pointer;
             transition: all 0.3s ease;
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             z-index: 10;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 7px;
+            letter-spacing: 0.3px;
         }
 
         .admin-login:hover {
             background-color: var(--gold-primary);
             border-color: var(--gold-primary);
+            color: var(--light-text);
             transform: scale(1.05);
+            box-shadow: 0 4px 20px var(--gold-glow);
         }
 
         /* --- כותרות --- */
         .header-section {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 35px;
+            padding-top: 10px;
         }
 
         .page-title {
-            font-size: 3.5rem;
-            font-weight: 800;
-            margin: 0 0 10px 0;
+            font-size: 3.2rem;
+            font-weight: 900;
+            margin: 0 0 6px 0;
             color: var(--gold-primary);
-            text-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-            letter-spacing: -0.5px;
+            text-shadow: 0 2px 20px rgba(201, 162, 39, 0.3), 0 4px 15px rgba(0, 0, 0, 0.4);
+            letter-spacing: 0.5px;
+            line-height: 1.2;
+        }
+
+        .header-divider {
+            width: 70px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--gold-primary), transparent);
+            margin: 14px auto;
+            border-radius: 2px;
+            animation: goldPulse 3s ease-in-out infinite;
         }
 
         .page-subtitle {
-            font-size: 1.4rem;
+            font-size: 1.2rem;
             font-weight: 400;
-            color: rgba(255, 255, 255, 0.9);
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            color: rgba(255, 255, 255, 0.75);
+            text-shadow: 0 1px 8px rgba(0, 0, 0, 0.4);
+            letter-spacing: 1.5px;
         }
 
         /* --- קונטיינר ראשי --- */
         .main-container {
             width: 100%;
-            max-width: 750px;
+            max-width: 720px;
             margin: auto;
             position: relative;
         }
@@ -134,42 +169,57 @@
         /* --- עיצוב טופס --- */
         form {
             background-color: var(--background-card);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            padding: 40px;
-            border-radius: 24px;
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            padding: 38px 36px;
+            border-radius: 22px;
             box-shadow: var(--card-shadow);
             text-align: right;
-            border: 1px solid rgba(255, 255, 255, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            border-top: 3px solid var(--gold-primary);
             transition: all 0.3s ease;
         }
 
         label.section-label {
-            display: block;
-            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 14px;
             font-weight: 700;
-            font-size: 1.2rem;
+            font-size: 1.15rem;
             color: var(--dark-text);
+            letter-spacing: 0.2px;
+        }
+
+        label.section-label::before {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 20px;
+            background: var(--gold-primary);
+            border-radius: 3px;
+            flex-shrink: 0;
         }
 
         /* --- בחירת תפקיד (Segmented Control מודרני) --- */
         .role-buttons {
             display: flex;
-            background: #e2e8f0;
+            background: linear-gradient(135deg, #e8ecf2, #e2e8f0);
             border-radius: 16px;
-            padding: 6px;
-            margin-bottom: 30px;
-            gap: 6px;
+            padding: 5px;
+            margin-bottom: 28px;
+            gap: 5px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);
         }
 
         .role-button {
             flex: 1;
             text-align: center;
-            padding: 12px 20px;
-            border-radius: 12px;
+            padding: 13px 20px;
+            border-radius: 13px;
             cursor: pointer;
             font-size: 1.1rem;
-            font-weight: 600;
+            font-weight: 700;
             color: var(--muted-text);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             user-select: none;
@@ -179,7 +229,13 @@
         .role-button.active {
             background-color: #ffffff;
             color: var(--gold-primary);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04);
+            font-weight: 800;
+        }
+
+        .role-button:not(.active):hover {
+            color: var(--dark-text);
+            background: rgba(255, 255, 255, 0.4);
         }
 
         .role-button input {
@@ -194,11 +250,11 @@
             background-color: var(--surface-bg);
             border: 1.5px solid var(--border-color);
             border-radius: 14px;
-            padding: 16px 45px 16px 20px;
-            font-size: 1.05rem;
+            padding: 15px 42px 15px 18px;
+            font-size: 1.02rem;
             color: var(--dark-text);
-            font-family: 'Assistant', sans-serif;
-            transition: all 0.3s ease;
+            font-family: 'Heebo', 'Assistant', sans-serif;
+            transition: all 0.25s ease;
             box-sizing: border-box;
             text-align: right;
         }
@@ -206,9 +262,9 @@
         .form-select {
             background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
             background-repeat: no-repeat;
-            background-position: left 15px center;
-            background-size: 20px;
-            margin-bottom: 25px;
+            background-position: left 14px center;
+            background-size: 18px;
+            margin-bottom: 22px;
         }
 
         .form-select:focus, #preferences:focus, .modal-content input:focus {
@@ -219,10 +275,11 @@
         }
 
         #preferences {
-            padding: 16px;
+            padding: 15px;
             resize: vertical;
             min-height: 100px;
             margin-bottom: 15px;
+            line-height: 1.7;
         }
 
         /* --- אזור משמרות (עיצוב שורות מרחפות) --- */
@@ -235,42 +292,50 @@
         .shifts-container {
             width: 100%;
             border-collapse: separate;
-            border-spacing: 0 10px; /* ריווח בין השורות */
-            margin-bottom: 30px;
+            border-spacing: 0 8px;
+            margin-bottom: 28px;
         }
 
         .shifts-container th {
-            padding: 0 10px 10px 10px;
+            padding: 0 8px 12px 8px;
             color: var(--muted-text);
-            font-weight: 600;
-            font-size: 0.95rem;
+            font-weight: 700;
+            font-size: 0.9rem;
             text-align: center;
             border: none;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
+
+        .shifts-container th:nth-child(2) { color: var(--morning-color); }
+        .shifts-container th:nth-child(3) { color: var(--evening-color); }
+        .shifts-container th:nth-child(4) { color: var(--night-color); }
 
         .shifts-container tr.day-row {
             background: var(--surface-bg);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
-            transition: transform 0.2s ease;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+            transition: all 0.25s ease;
         }
         
         .shifts-container tr.day-row:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.06);
         }
 
         .shifts-container td {
-            padding: 10px;
+            padding: 8px;
             text-align: center;
             border: none;
         }
 
         .shifts-container td:first-child {
             border-radius: 0 14px 14px 0;
-            font-weight: 700;
-            font-size: 1.1rem;
+            font-weight: 800;
+            font-size: 1.05rem;
             color: var(--dark-text);
-            width: 25%;
+            width: 22%;
+            text-align: right;
+            padding-right: 16px;
         }
 
         .shifts-container td:last-child {
@@ -288,19 +353,46 @@
             font-weight: 600;
             color: var(--muted-text);
             user-select: none;
+            font-size: 0.95rem;
         }
 
-        .shift-cell:hover {
-            border-color: var(--gold-primary);
-            color: var(--gold-primary);
+        /* הצבעים המיוחדים בעת ריחוף ובחירה לכל סוג משמרת */
+        td:nth-child(2) .shift-cell:hover {
+            border-color: var(--morning-color);
+            color: var(--morning-color);
+            background: var(--morning-bg);
+        }
+        td:nth-child(3) .shift-cell:hover {
+            border-color: var(--evening-color);
+            color: var(--evening-color);
+            background: var(--evening-bg);
+        }
+        td:nth-child(4) .shift-cell:hover {
+            border-color: var(--night-color);
+            color: var(--night-color);
+            background: var(--night-bg);
         }
 
-        .shift-cell:has(input[type="checkbox"]:checked) {
-            background-color: var(--gold-primary);
-            border-color: var(--gold-primary);
+        td:nth-child(2) .shift-cell:has(input[type="checkbox"]:checked) {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            border-color: #d97706;
             color: #ffffff;
-            box-shadow: 0 4px 10px var(--gold-light);
-            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.35);
+            transform: scale(1.04);
+        }
+        td:nth-child(3) .shift-cell:has(input[type="checkbox"]:checked) {
+            background: linear-gradient(135deg, #f97316, #ea580c);
+            border-color: #ea580c;
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(249, 115, 22, 0.35);
+            transform: scale(1.04);
+        }
+        td:nth-child(4) .shift-cell:has(input[type="checkbox"]:checked) {
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            border-color: #4f46e5;
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35);
+            transform: scale(1.04);
         }
 
         .shift-cell input[type="checkbox"] {
@@ -311,65 +403,90 @@
         .preset-comments {
             display: flex;
             flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 20px;
+            gap: 9px;
+            margin-bottom: 18px;
         }
 
         .preset-comment-btn {
             background-color: var(--surface-bg);
             color: var(--dark-text);
-            border: 1px solid var(--border-color);
+            border: 1.5px solid var(--border-color);
             border-radius: 99px;
             padding: 8px 16px;
-            font-size: 0.95rem;
-            font-family: 'Assistant', sans-serif;
+            font-size: 0.92rem;
+            font-family: 'Heebo', 'Assistant', sans-serif;
             cursor: pointer;
             transition: all 0.2s ease;
+            font-weight: 500;
         }
 
         .preset-comment-btn:hover {
             background-color: var(--gold-light);
             border-color: var(--gold-primary);
             color: var(--gold-primary);
+            transform: translateY(-1px);
         }
 
         /* --- כפתור הגשה ראשי --- */
         .submit-container {
             text-align: center;
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 1px solid var(--border-color);
+            margin-top: 35px;
+            padding-top: 22px;
+            border-top: 1.5px solid var(--border-color);
         }
 
         .submit-btn {
-            background: linear-gradient(135deg, var(--gold-primary), #d4af37);
+            background: linear-gradient(135deg, var(--gold-primary) 0%, #d4a520 50%, var(--gold-primary) 100%);
+            background-size: 200% auto;
             color: var(--light-text);
             border: none;
-            padding: 18px 45px;
-            font-size: 1.3rem;
-            font-family: 'Assistant', sans-serif;
+            padding: 17px 45px;
+            font-size: 1.25rem;
+            font-family: 'Heebo', 'Assistant', sans-serif;
             font-weight: 700;
             border-radius: 99px;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
             display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 12px;
-            box-shadow: 0 10px 25px rgba(184, 144, 71, 0.4);
+            box-shadow: 0 8px 25px rgba(201, 162, 39, 0.4);
             width: 100%;
-            max-width: 350px;
+            max-width: 340px;
+            letter-spacing: 0.3px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .submit-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .submit-btn:hover::before {
+            left: 100%;
         }
 
         .submit-btn:hover {
             transform: translateY(-3px);
-            box-shadow: 0 15px 30px rgba(184, 144, 71, 0.5);
-            background: linear-gradient(135deg, var(--gold-hover), var(--gold-primary));
+            box-shadow: 0 14px 35px rgba(201, 162, 39, 0.5);
+            background-position: right center;
+        }
+
+        .submit-btn:active {
+            transform: translateY(-1px);
         }
 
         .submit-btn svg {
-            width: 24px;
-            height: 24px;
+            width: 22px;
+            height: 22px;
             fill: none;
             stroke: currentColor;
             stroke-width: 2.5;
@@ -386,47 +503,59 @@
         #submissionDisabledMessage {
             display: none;
             text-align: center;
-            padding: 20px;
-            font-size: 1.3rem;
-            font-weight: 600;
+            padding: 22px 20px;
+            font-size: 1.2rem;
+            font-weight: 700;
             color: #fff;
-            background: rgba(239, 68, 68, 0.9);
-            backdrop-filter: blur(10px);
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.9), rgba(220, 38, 38, 0.9));
+            backdrop-filter: blur(12px);
             border-radius: 16px;
-            margin-bottom: 25px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            margin-bottom: 22px;
+            box-shadow: 0 10px 25px rgba(220, 38, 38, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.15);
         }
 
         #viewSubmittedScheduleBtn {
             display: none;
-            margin: 0 auto 30px auto;
-            padding: 16px 30px;
-            font-size: 1.2rem;
+            margin: 0 auto 28px auto;
+            padding: 15px 30px;
+            font-size: 1.15rem;
             font-weight: 700;
-            font-family: 'Assistant', sans-serif;
-            background-color: var(--background-card);
+            font-family: 'Heebo', 'Assistant', sans-serif;
+            background-color: rgba(255,255,255,0.95);
             color: var(--gold-primary);
             border: 2px solid var(--gold-primary);
             border-radius: 99px;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            letter-spacing: 0.3px;
         }
         
         #viewSubmittedScheduleBtn:hover {
             background-color: var(--gold-primary);
             color: #fff;
             transform: translateY(-2px);
+            box-shadow: 0 12px 30px var(--gold-glow);
         }
 
         /* --- טקסט תחתון --- */
         .footer-text {
-            color: rgba(255, 255, 255, 0.7);
+            color: rgba(255, 255, 255, 0.5);
             text-align: center;
-            margin-top: 30px;
-            font-weight: 500;
-            font-size: 1.1rem;
-            letter-spacing: 1px;
+            margin-top: 28px;
+            font-weight: 400;
+            font-size: 0.95rem;
+            letter-spacing: 1.5px;
+        }
+
+        .footer-text::before {
+            content: '';
+            display: block;
+            width: 40px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(201, 162, 39, 0.4), transparent);
+            margin: 0 auto 12px auto;
         }
 
         /* --- עיצוב מודלים (Modals) --- */
@@ -439,9 +568,9 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
-            background: rgba(15, 23, 42, 0.7);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
+            background: rgba(10, 16, 30, 0.75);
+            backdrop-filter: blur(10px) saturate(1.3);
+            -webkit-backdrop-filter: blur(10px) saturate(1.3);
             opacity: 0;
             animation: fadeInModal 0.3s ease forwards;
         }
@@ -452,27 +581,31 @@
         }
 
         @keyframes scaleIn {
-            from { transform: scale(0.95); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
+            from { transform: scale(0.92) translateY(10px); opacity: 0; }
+            to { transform: scale(1) translateY(0); opacity: 1; }
         }
 
         .modal-content {
             background: #ffffff;
-            margin: 10vh auto;
-            padding: 40px;
-            border-radius: 24px;
+            margin: 8vh auto;
+            padding: 38px;
+            border-radius: 22px;
             width: 90%;
             max-width: 500px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 25px 60px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255,255,255,0.05);
             position: relative;
             text-align: right;
-            animation: scaleIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            animation: scaleIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
             max-height: 80vh;
             overflow-y: auto;
+            border-top: 3px solid var(--gold-primary);
         }
 
         .modal-content::-webkit-scrollbar {
-            width: 8px;
+            width: 6px;
+        }
+        .modal-content::-webkit-scrollbar-track {
+            background: transparent;
         }
         .modal-content::-webkit-scrollbar-thumb {
             background-color: #cbd5e1;
@@ -482,11 +615,12 @@
         .modal-content h2,
         .modal-content h3 {
             margin-top: 0;
-            margin-bottom: 25px;
+            margin-bottom: 22px;
             color: var(--dark-text);
             font-weight: 800;
-            font-size: 1.6rem;
+            font-size: 1.5rem;
             text-align: center;
+            letter-spacing: 0.3px;
         }
 
         /* תיקון כיווניות לשדות מיוחדים */
@@ -497,10 +631,10 @@
 
         .close {
             position: absolute;
-            top: 20px;
-            left: 20px;
-            width: 32px;
-            height: 32px;
+            top: 18px;
+            left: 18px;
+            width: 34px;
+            height: 34px;
             background: var(--surface-bg);
             border-radius: 50%;
             display: flex;
@@ -510,40 +644,43 @@
             font-size: 20px;
             cursor: pointer;
             transition: all 0.2s ease;
+            border: 1px solid var(--border-color);
         }
 
         .close:hover {
-            background: #e2e8f0;
-            color: var(--dark-text);
+            background: #fee2e2;
+            color: #ef4444;
+            border-color: rgba(239, 68, 68, 0.2);
         }
 
         .modal-buttons {
             display: flex;
             justify-content: space-between;
-            gap: 15px;
-            margin-top: 30px;
+            gap: 12px;
+            margin-top: 28px;
         }
 
         .modal-buttons button {
             flex: 1;
-            padding: 14px 20px;
-            font-size: 1.1rem;
-            font-family: 'Assistant', sans-serif;
+            padding: 14px 18px;
+            font-size: 1.05rem;
+            font-family: 'Heebo', 'Assistant', sans-serif;
             font-weight: 700;
             border-radius: 14px;
             border: none;
             cursor: pointer;
             transition: all 0.2s ease;
+            letter-spacing: 0.2px;
         }
 
         .modal-buttons .confirm-btn {
-            background-color: var(--gold-primary);
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-hover));
             color: var(--light-text);
             box-shadow: 0 4px 15px var(--gold-light);
         }
 
         .modal-buttons .confirm-btn:hover {
-            background-color: var(--gold-hover);
+            box-shadow: 0 6px 20px var(--gold-glow);
             transform: translateY(-2px);
         }
 
@@ -563,7 +700,7 @@
 
         /* --- מודל שגיאות הגשה --- */
         #validationErrorModal .modal-content {
-            border-top: 6px solid var(--error-color);
+            border-top: 4px solid var(--error-color);
         }
 
         #validationErrorModal h3 {
@@ -578,7 +715,7 @@
 
         .error-item {
             background: var(--error-bg);
-            border: 1px solid rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.15);
             border-radius: 12px;
             padding: 15px;
             margin-bottom: 10px;
@@ -589,18 +726,20 @@
             color: #991b1b;
             font-weight: 600;
             margin-bottom: 10px;
+            line-height: 1.6;
         }
 
         .details-btn {
             background-color: #ffffff;
-            border: 1px solid rgba(239, 68, 68, 0.3);
+            border: 1px solid rgba(239, 68, 68, 0.25);
             color: #b91c1c;
             border-radius: 8px;
             padding: 6px 14px;
-            font-size: 0.9rem;
+            font-size: 0.88rem;
             cursor: pointer;
             transition: all 0.2s;
-            font-family: 'Assistant', sans-serif;
+            font-family: 'Heebo', 'Assistant', sans-serif;
+            font-weight: 600;
         }
 
         .details-btn:hover {
@@ -612,12 +751,13 @@
             margin-top: 15px;
             padding: 15px;
             background-color: #ffffff;
-            border-radius: 8px;
+            border-radius: 10px;
             font-size: 0.95rem;
             color: var(--dark-text);
+            border: 1px solid var(--border-color);
         }
 
-        .details-content p { margin: 5px 0; }
+        .details-content p { margin: 5px 0; line-height: 1.6; }
         .details-content ul { padding-right: 20px; margin-top: 5px; color: var(--muted-text); }
 
         /* --- טבלאות תצוגה מקדימה (במודלים) --- */
@@ -626,12 +766,13 @@
             border-collapse: collapse;
             margin: 15px 0;
             background: #fff;
-            border-radius: 12px;
+            border-radius: 14px;
             overflow: hidden;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            border: 1px solid var(--border-color);
         }
         .preview-table th, .preview-table td {
-            padding: 12px;
+            padding: 12px 10px;
             text-align: center;
             border-bottom: 1px solid var(--border-color);
         }
@@ -639,6 +780,7 @@
             background: var(--surface-bg);
             font-weight: 700;
             color: var(--muted-text);
+            font-size: 0.9rem;
         }
         .preview-table tr:last-child td { border-bottom: none; }
         .preview-table td:first-child { font-weight: 700; background: var(--surface-bg); }
@@ -646,31 +788,36 @@
 
         /* --- התאמות למסכים קטנים --- */
         @media (max-width: 600px) {
-            body { padding: 4vh 10px; }
-            .page-title { font-size: 2.5rem; }
-            form { padding: 25px 20px; border-radius: 20px; }
-            .modal-content { padding: 25px; margin: 5vh auto; width: 95%; }
+            body { padding: 3vh 10px 4vh; }
+            .page-title { font-size: 2.4rem; }
+            .page-subtitle { font-size: 1rem; letter-spacing: 1px; }
+            form { padding: 24px 18px; border-radius: 18px; }
+            .modal-content { padding: 24px 20px; margin: 4vh auto; width: 95%; border-radius: 18px; }
             
-            .shifts-container th { display: none; /* הסתרת כותרות הטבלה בנייד */ }
+            .shifts-container th { display: none; }
             .shifts-container tr.day-row {
                 display: flex;
                 flex-wrap: wrap;
                 padding: 10px;
-                border-radius: 16px;
+                border-radius: 14px;
             }
-            .shifts-container td { width: 33.33%; padding: 5px; }
+            .shifts-container td { width: 33.33%; padding: 4px; }
             .shifts-container td:first-child {
                 width: 100%;
                 text-align: right;
-                padding-bottom: 10px;
+                padding-bottom: 8px;
                 border-radius: 0;
-                font-size: 1.2rem;
+                font-size: 1.1rem;
             }
             
-            .shift-cell { padding: 10px 2px; font-size: 0.95rem; }
+            .shift-cell { padding: 10px 2px; font-size: 0.9rem; }
             
             .preset-comments { justify-content: stretch; }
-            .preset-comment-btn { flex: 1 1 calc(50% - 10px); text-align: center; }
+            .preset-comment-btn { flex: 1 1 calc(50% - 9px); text-align: center; font-size: 0.85rem; padding: 7px 12px; }
+
+            label.section-label { font-size: 1.05rem; }
+            .submit-btn { font-size: 1.15rem; padding: 15px 35px; }
+            .header-divider { width: 50px; }
         }
     </style>
 </head>
@@ -687,7 +834,8 @@
 
         <div class="header-section fade-in">
             <h1 class="page-title">סידור עבודה</h1>
-            <div class="page-subtitle">מחלקת ביטחון - מלון ממילא</div>
+            <div class="header-divider"></div>
+            <div class="page-subtitle">מחלקת ביטחון — מלון ממילא</div>
         </div>
 
         <div id="submissionDisabledMessage"></div>
