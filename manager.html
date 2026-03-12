@@ -429,28 +429,32 @@
       top: 0;
       width: 100%;
       height: 100%;
-      overflow: auto;
+      overflow-y: auto;
       background-color: rgba(0, 0, 0, 0.5);
       backdrop-filter: blur(4px);
       animation: fadeIn 0.3s;
+      padding: 20px 0;
+      box-sizing: border-box;
     }
 
     .modal-content {
       position: relative;
-      margin: 10% auto;
-      padding: 35px;
+      margin: 5vh auto;
+      padding: 28px 22px;
       width: 90%;
-      max-width: 500px;
+      max-width: 460px;
       background: #ffffff;
       border: 1px solid var(--border-color);
-      border-radius: 20px;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-      animation: slideIn 0.4s ease-out;
+      border-radius: 18px;
+      box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.25);
+      animation: slideIn 0.35s ease-out;
+      max-height: 85vh;
+      overflow-y: auto;
     }
 
     @keyframes slideIn {
       from {
-        transform: translateY(-50px);
+        transform: translateY(-30px);
         opacity: 0;
       }
 
@@ -463,10 +467,10 @@
     .modal-content h3 {
       text-align: center;
       color: var(--text-primary);
-      font-size: 1.8rem;
+      font-size: 1.5rem;
       font-weight: 700;
       margin-top: 0;
-      margin-bottom: 25px;
+      margin-bottom: 20px;
     }
 
     .modal .toggle-group {
@@ -476,9 +480,9 @@
     .close {
       color: var(--text-secondary);
       position: absolute;
-      left: 20px;
-      top: 15px;
-      font-size: 32px;
+      left: 16px;
+      top: 12px;
+      font-size: 28px;
       font-weight: bold;
       cursor: pointer;
       transition: color 0.3s;
@@ -550,13 +554,13 @@
 
     /* --- Custom Notification Modal --- */
     #notificationModal .modal-content {
-      max-width: 400px;
+      max-width: 360px;
       text-align: center;
     }
 
     #notificationMessage {
-      font-size: 1.15rem;
-      margin-bottom: 25px;
+      font-size: 1.05rem;
+      margin-bottom: 20px;
       line-height: 1.6;
       color: var(--text-primary);
     }
@@ -564,12 +568,45 @@
     #notificationModal .btn-group {
       display: flex;
       justify-content: center;
-      gap: 15px;
+      gap: 12px;
     }
 
     #notificationModal .btn {
-      width: 120px;
+      width: 110px;
       justify-content: center;
+    }
+
+    /* --- התאמות למובייל --- */
+    @media (max-width: 600px) {
+      .container {
+        margin: 12px auto;
+        padding: 18px 12px;
+        border-radius: 14px;
+      }
+      header h1 { font-size: 2rem; }
+      header p { font-size: 1rem; }
+      .header-menu { gap: 8px; }
+      .header-menu button { padding: 8px 16px; font-size: 0.88rem; }
+      .tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+      .tab-link { padding: 12px 16px; font-size: 1rem; white-space: nowrap; }
+      .card { padding: 18px 14px; border-radius: 14px; }
+      h2 { font-size: 1.4rem; margin-bottom: 18px; padding-bottom: 12px; }
+      .modal-content {
+        margin: 3vh auto;
+        padding: 22px 16px;
+        width: 92%;
+        max-width: 360px;
+        border-radius: 14px;
+      }
+      .modal-content h3 { font-size: 1.25rem; margin-bottom: 16px; }
+      .close { font-size: 24px; left: 12px; top: 10px; }
+      .btn { padding: 10px 20px; font-size: 0.95rem; }
+      .settings-question { padding: 12px 14px; flex-wrap: wrap; gap: 10px; }
+      .settings-question label { font-size: 0.98rem; }
+      .toggle-btn { padding: 8px 18px; font-size: 0.95rem; }
+      table th, table td { padding: 10px 8px; font-size: 0.92rem; }
+      .action-btn { padding: 5px 10px; font-size: 0.82rem; }
+      input[type="text"], select { padding: 10px 12px; font-size: 0.95rem; }
     }
   </style>
 </head>
