@@ -712,7 +712,7 @@
         <div class="toggle-btn" data-value="לא" onclick="selectToggle(this, 'addStudent')">לא</div>
       </div>
       <label style="margin-top: 15px;" for="addCode">מספר עובד (קוד):</label>
-      <input type="text" id="addCode" placeholder="00000" maxlength="5">
+      <input type="text" id="addCode" placeholder="הזן מספר עובד" inputmode="numeric">
 
       <div class="settings-question">
         <label>האם ליצור חוקיות ספציפית לעובד זה?</label>
@@ -754,7 +754,7 @@
         <div class="toggle-btn" data-value="לא" onclick="selectToggle(this, 'editStudent')">לא</div>
       </div>
       <label style="margin-top: 15px;" for="editCode">מספר עובד (קוד):</label>
-      <input type="text" id="editCode">
+      <input type="text" id="editCode" inputmode="numeric">
       <button class="btn" style="width: 100%; margin-top: 20px;" onclick="updateEmployee()">עדכן עובד</button>
     </div>
   </div>
