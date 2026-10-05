@@ -1152,6 +1152,7 @@
     </div>
 
 
+    <script src="functions/automation.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
         import { getDatabase, ref, push, onValue, set, get, child } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-database.js";
@@ -1190,31 +1191,55 @@
 
         // --- טעינת נתונים ראשונית מ-Firebase ---
         onValue(ref(db, "employees"), (snapshot) => { employeesData = snapshot.val() || {}; });
-        onValue(ref(db, "schedules"), (snapshot) => { submittedSchedules = snapshot.val() || {}; });
+        onValue(ref(db, "schedules"), (snapshot) => {
+            submittedSchedules = snapshot.val() || {};
+            if (currentScheduleKey && !submittedSchedules[currentScheduleKey]) {
+                currentScheduleKey = null;
+                existingSchedule = null;
+                pendingSubmission = null;
+                document.getElementById("existingScheduleModal").style.display = "none";
+                document.getElementById("previewModal").style.display = "none";
+            }
+        });
         onValue(ref(db, "rules"), (snapshot) => { rulesData = snapshot.val() || {}; });
 
         let requireEmployeeCodeSetting = "לא";
         onValue(ref(db, "settings/requireEmployeeCode"), (snapshot) => { requireEmployeeCodeSetting = snapshot.val() || "לא"; });
 
-        let submissionsAllowed = true;
-        onValue(ref(db, "settings/allowScheduleSubmission"), (snapshot) => {
-            const allow = snapshot.val();
-            submissionsAllowed = !(allow === "לא" || allow === false);
+        let submissionsAllowed = false;
+        let submissionSettings = {};
+        let settingsLoaded = false;
+        let serverTimeOffset = 0;
+        onValue(ref(db, ".info/serverTimeOffset"), snapshot => {
+            serverTimeOffset = snapshot.val() || 0;
+            refreshSubmissionState();
+        });
+        function refreshSubmissionState() {
+            const allow = submissionSettings.allowScheduleSubmission;
+            const automationEnabled = submissionSettings.weeklyAutomationEnabled === true;
+            const closedByTime = automationEnabled && SidorAutomation.isSubmissionWindowClosed(new Date(Date.now() + serverTimeOffset));
+            submissionsAllowed = settingsLoaded && !(allow === "לא" || allow === false) && !closedByTime;
             const msgDiv = document.getElementById("submissionDisabledMessage");
             const viewBtn = document.getElementById("viewSubmittedScheduleBtn");
-            const form = document.getElementById("shiftForm");
-
-            if (!submissionsAllowed) {
-                form.style.display = "none";
-                msgDiv.textContent = "זמן הגשת הסידור הסתיים.";
-                msgDiv.style.display = "block";
-                viewBtn.style.display = "block";
-            } else {
-                form.style.display = "block";
-                msgDiv.style.display = "none";
-                viewBtn.style.display = "none";
-            }
+            document.getElementById("shiftForm").style.display = submissionsAllowed ? "block" : "none";
+            msgDiv.textContent = !settingsLoaded ? "טוען את מצב ההגשה…" :
+                (closedByTime ? "ההגשה נסגרה ביום שלישי ב־14:00 ותיפתח מחדש ביום שישי ב־23:50 (שעון ישראל)." : "זמן הגשת הסידור הסתיים.");
+            msgDiv.style.display = submissionsAllowed ? "none" : "block";
+            viewBtn.style.display = settingsLoaded && !submissionsAllowed ? "block" : "none";
+            if (!submissionsAllowed) document.getElementById("previewModal").style.display = "none";
+        }
+        onValue(ref(db, "settings"), snapshot => {
+            submissionSettings = snapshot.val() || {};
+            settingsLoaded = true;
+            refreshSubmissionState();
+        }, () => {
+            settingsLoaded = false;
+            refreshSubmissionState();
+            document.getElementById("submissionDisabledMessage").textContent = "לא ניתן לבדוק את מצב ההגשה. יש לרענן את הדף.";
         });
+        refreshSubmissionState();
+        setInterval(refreshSubmissionState, 1000);
+        document.addEventListener('visibilitychange', refreshSubmissionState);
 
         // --- פונקציות עזר מעוצבות ---
         function createScheduleTable(scheduleString) {
@@ -1408,6 +1433,8 @@
 
         document.getElementById("shiftForm").addEventListener("submit", (event) => {
             event.preventDefault();
+            refreshSubmissionState();
+            if (!submissionsAllowed) return;
             validateAndPreview();
         });
 
@@ -1484,6 +1511,10 @@
             btn.innerHTML = 'שולח נתונים <svg width="24" height="24" viewBox="0 0 24 24" style="animation: spin 1s linear infinite"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
             try {
+                // Recheck after the preview, including when this tab was left open at the deadline.
+                submissionSettings = (await get(ref(db, "settings"))).val() || {};
+                refreshSubmissionState();
+                if (!submissionsAllowed || !pendingSubmission) throw new Error("הגשת הסידור סגורה כעת או שהשבוע אופס. יש לרענן את הטופס.");
                 const isUpdate = !!currentScheduleKey;
                 let scheduleKey = currentScheduleKey;
 
@@ -1757,3 +1788,4 @@
 </body>
 
 </html>
+

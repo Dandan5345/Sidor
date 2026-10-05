@@ -632,6 +632,15 @@
       <div class="card">
         <h2>הגדרות כלליות</h2>
         <div class="settings-question">
+          <label>אוטומציה שבועית:</label>
+          <div class="toggle-group" id="weeklyAutomationGroup" role="group" aria-label="אוטומציה שבועית">
+            <button type="button" class="toggle-btn" data-value="כן" onclick="updateWeeklyAutomation(true)">פעילה</button>
+            <button type="button" class="toggle-btn" data-value="לא" onclick="updateWeeklyAutomation(false)">כבויה</button>
+          </div>
+        </div>
+        <p>סגירת ההגשה: שלישי 14:00. מחיקת ההגשות השבועיות ופתיחה מחדש: שישי 23:50. לפי שעון ישראל.</p>
+        <p id="weeklyAutomationStatus" role="status">טוען את מצב האוטומציה…</p>
+        <div class="settings-question">
           <label>האם לאפשר הגשת סידור עבודה:</label>
           <div class="toggle-group" id="scheduleSubmissionGroup">
             <div class="toggle-btn" data-value="כן"
@@ -846,7 +855,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
-    import { getDatabase, ref, push, onValue, set, remove } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-database.js";
+    import { getDatabase, ref, push, onValue, set, remove, update, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-database.js";
 
     // --- Firebase Configuration ---
     const firebaseConfig = {
@@ -922,6 +931,34 @@
     }
 
     // --- Settings Management ---
+    window.updateWeeklyAutomation = async function (enabled) {
+      const buttons = document.querySelectorAll('#weeklyAutomationGroup button');
+      buttons.forEach(button => button.disabled = true);
+      try {
+        const values = { weeklyAutomationEnabled: enabled };
+        if (enabled) values.weeklyAutomationEnabledAt = serverTimestamp();
+        await update(ref(db, 'settings'), values);
+        showNotification(enabled ? 'האוטומציה הופעלה' : 'האוטומציה בוטלה. ניתן לשלוט בהגשה ידנית.');
+      } catch (err) {
+        showNotification('לא ניתן לעדכן את האוטומציה: ' + err.message, 'שגיאה');
+      } finally {
+        buttons.forEach(button => button.disabled = false);
+      }
+    };
+    onValue(ref(db, 'settings'), snapshot => {
+      const settings = snapshot.val() || {};
+      const enabled = settings.weeklyAutomationEnabled === true;
+      setToggleGroupValue('weeklyAutomationGroup', enabled ? 'כן' : 'לא');
+      document.querySelectorAll('#weeklyAutomationGroup button').forEach(button =>
+        button.setAttribute('aria-pressed', String((button.dataset.value === 'כן') === enabled)));
+      const status = document.getElementById('weeklyAutomationStatus');
+      status.textContent = enabled ? 'האוטומציה פעילה. הפעולות המתוזמנות דורשות הפעלה של השירות בשרת.' : 'האוטומציה כבויה; השליטה בהגשה ידנית.';
+      if (settings.weeklyAutomationLastEventAt) {
+        status.textContent += ' פעולה אחרונה: ' + (settings.weeklyAutomationLastEvent === 'reset' ? 'איפוס ופתיחה' : 'סגירת הגשה') + ' — ' +
+          new Date(settings.weeklyAutomationLastEventAt).toLocaleString('he-IL', { timeZone: 'Asia/Jerusalem' });
+      }
+    });
+
     window.updateSubmissionSetting = async function (value) {
       try {
         await set(ref(db, "settings/allowScheduleSubmission"), value);
@@ -1381,3 +1418,4 @@
 </body>
 
 </html>
+
