@@ -853,9 +853,10 @@
   </div>
 
 
+  <script src="functions/automation.js"></script>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
-    import { getDatabase, ref, push, onValue, set, remove, update, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-database.js";
+    import { getDatabase, ref, push, onValue, set, get, remove, update, serverTimestamp, runTransaction } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-database.js";
 
     // --- Firebase Configuration ---
     const firebaseConfig = {
@@ -931,6 +932,23 @@
     }
 
     // --- Settings Management ---
+    // Same entry-time catch-up as the public form: whoever opens the site first applies the due close/reset.
+    const settingsRef = ref(db, 'settings');
+    onValue(ref(db, '.info/serverTimeOffset'), async offsetSnap => {
+      try {
+        await SidorAutomation.runCatchUp({
+          getSettings: async () => (await get(settingsRef)).val(),
+          claim: async (action, scheduledAt) => (await runTransaction(settingsRef, current => {
+            const result = SidorAutomation.applyAutomationEvent({ settings: current || {} }, action, scheduledAt);
+            return result ? result.settings : undefined;
+          })).committed,
+          clearSchedules: () => remove(ref(db, 'schedules')),
+          release: (action, scheduledAt) => runTransaction(settingsRef, current => current && current.weeklyAutomationLastEventAt === scheduledAt
+            ? { ...current, allowScheduleSubmission: 'לא', weeklyAutomationLastEventAt: scheduledAt - 1 } : undefined)
+        }, Date.now() + (offsetSnap.val() || 0));
+      } catch (err) { console.error('Weekly automation check failed:', err); }
+    }, { onlyOnce: true });
+
     window.updateWeeklyAutomation = async function (enabled) {
       const buttons = document.querySelectorAll('#weeklyAutomationGroup button');
       buttons.forEach(button => button.disabled = true);
@@ -952,7 +970,7 @@
       document.querySelectorAll('#weeklyAutomationGroup button').forEach(button =>
         button.setAttribute('aria-pressed', String((button.dataset.value === 'כן') === enabled)));
       const status = document.getElementById('weeklyAutomationStatus');
-      status.textContent = enabled ? 'האוטומציה פעילה. הפעולות המתוזמנות דורשות הפעלה של השירות בשרת.' : 'האוטומציה כבויה; השליטה בהגשה ידנית.';
+      status.textContent = enabled ? 'האוטומציה פעילה. הסגירה והאיפוס מתבצעים אוטומטית כשמישהו נכנס לאתר.' : 'האוטומציה כבויה; השליטה בהגשה ידנית.';
       if (settings.weeklyAutomationLastEventAt) {
         status.textContent += ' פעולה אחרונה: ' + (settings.weeklyAutomationLastEvent === 'reset' ? 'איפוס ופתיחה' : 'סגירת הגשה') + ' — ' +
           new Date(settings.weeklyAutomationLastEventAt).toLocaleString('he-IL', { timeZone: 'Asia/Jerusalem' });
