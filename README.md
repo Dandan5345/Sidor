@@ -1,35 +1,23 @@
 # Sidor — weekly submission automation
 
-## Schedule
+## How it works
 
-- Tuesday 14:00: close weekly submissions.
-- Friday 23:50: atomically delete `schedules`, reopen submissions and record the completed reset.
-- Time zone: `Asia/Jerusalem`, including daylight saving changes.
-- Employee records, rules and `scheduleHistory` are retained.
-- Manager page: enable/disable weekly automation. When disabled, the existing manual submission setting controls the form. Enabling does not immediately delete any submissions. Missed events before re-enabling are ignored.
+There is no server and no Cloud Functions (no Blaze plan, no cost). The automation runs in the browser of whoever opens the site:
 
-## Required activation (not activated by a GitHub commit)
+1. On entry, `index.html` shows a loading screen (about 1.2 seconds) while it reads Firebase server time and the automation settings.
+2. It computes which scheduled events came due since the last recorded one, in `Asia/Jerusalem` time (including daylight saving):
+   - Tuesday 14:00: close weekly submissions.
+   - Friday 23:50: delete `schedules` and reopen submissions.
+3. The first visitor to open the site after an event applies it. Others see it already recorded (`settings/weeklyAutomationLastEventAt`) and do nothing. The claim is a Realtime Database transaction on `settings`, so an event runs once. If deleting `schedules` fails, the claim is released so the next visitor retries.
+4. If nobody opens the site for days, both events are applied in order on the next visit. Between the deadline and that visit the form is already closed by the time check in the page.
 
-The frontend is a static site. Scheduled deletion requires the Firebase Functions deployment below; no browser needs to stay open. Automation defaults to disabled until the manager enables it. No data is deleted by installing or deploying these files.
+`manager.html` runs the same check when opened. The manager can enable/disable the automation. When disabled, the manual submission setting controls the form. Enabling does not delete anything, and events before enabling are ignored.
 
-From the repository, using an account authorized for Firebase project `sidoravoda111`:
-
-```sh
-cd functions
-npm install
-npm test
-cd ..
-npx firebase-tools login
-npx firebase-tools deploy --only functions:sidor-weekly-automation --project sidoravoda111
-```
-
-Scheduled Functions require Firebase's Blaze billing plan. Check billing and project access before deployment. After successful deployment, enable weekly automation on `manager.html`. Verify both scheduler jobs in Google Cloud Scheduler (region `europe-west1`), their time zone and upcoming runs. Do not manually run the reset job against real data for verification: that intentionally deletes current submissions.
+Employee records, rules and `scheduleHistory` are retained.
 
 ## Database rules
 
-No existing live Realtime Database security rules were available in this checkout, so this change does not replace or deploy them. The form blocks submission at the deadline using Firebase's server-time offset and rechecks settings at final confirmation. **Direct database writes are only blocked if existing security rules enforce the submission flag.** Before rollout, review existing rules and add the `settings/allowScheduleSubmission` condition to employee schedule write permissions, retaining existing authorization/validation clauses. Do not grant employees write access to the automation settings. An ancestor `.write: true` would bypass a child restriction and must be accounted for.
-
-A browser check is not a substitute for database rules. For strict server-time enforcement at the exact deadline before the scheduled close completes, extend the existing schedule write rule with a server-maintained next-deadline timestamp checked against `now`. That rule integration requires the actual existing rules and is not included here.
+Visitors' browsers write `settings/*` and delete `schedules`, so the Realtime Database rules must allow that for the public form. This also means anyone with the site open can change those values. If the rules should be stricter, they need to be reviewed against the actual live rules, which were not available in this checkout and are not changed here.
 
 ## Verification
 
@@ -38,4 +26,4 @@ cd functions
 npm test
 ```
 
-Tests cover summer/winter cutoff and reopening, preserving history and employees, disabled automation, retry deduplication, old event ordering and events scheduled before re-enabling. Firebase deployment and live rule enforcement must be verified separately.
+Tests cover summer/winter times, missed events, event ordering and duplicate/stale protection. Live database rule behavior must be verified separately.

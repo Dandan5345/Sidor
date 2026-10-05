@@ -900,10 +900,30 @@
                 max-width: 440px;
             }
         }
-    </style>
+    
+        #startupLoader {
+            position: fixed; inset: 0; z-index: 99999; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; gap: 18px;
+            background: #0b0f17; color: #e8ecf3; transition: opacity .45s ease, visibility .45s ease;
+        }
+        #startupLoader.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+        .startup-spinner {
+            width: 46px; height: 46px; border-radius: 50%;
+            border: 3px solid rgba(255,255,255,.15); border-top-color: #c9a96a;
+            animation: startupSpin .9s linear infinite;
+        }
+        .startup-text { font-size: 1rem; letter-spacing: .04em; opacity: .85; }
+        @keyframes startupSpin { to { transform: rotate(360deg); } }
+        @media (prefers-reduced-motion: reduce) { .startup-spinner { animation-duration: 3s; } }
+</style>
 </head>
 
 <body>
+
+    <div id="startupLoader" role="status" aria-live="polite">
+        <div class="startup-spinner"></div>
+        <div class="startup-text">טוען את המערכת…</div>
+    </div>
 
     <!-- כפתור מנהל צף למעלה -->
     <div class="admin-login" onclick="openAdminModal()">
@@ -1155,7 +1175,7 @@
     <script src="functions/automation.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
-        import { getDatabase, ref, push, onValue, set, get, child } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-database.js";
+        import { getDatabase, ref, push, onValue, set, get, child, remove, runTransaction } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-database.js";
         import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-auth.js";
 
         const firebaseConfig = {
@@ -1190,9 +1210,14 @@
         let pendingViewData = null; 
 
         // --- טעינת נתונים ראשונית מ-Firebase ---
-        onValue(ref(db, "employees"), (snapshot) => { employeesData = snapshot.val() || {}; });
+        const initialLoads = {};
+        const loaded = name => initialLoads[name] ||= (() => { let done; const promise = new Promise(resolve => done = resolve); promise.done = done; return promise; })();
+        const markLoaded = name => loaded(name).done();
+        ["employees", "schedules", "rules", "settings"].forEach(loaded);
+        onValue(ref(db, "employees"), (snapshot) => { employeesData = snapshot.val() || {}; markLoaded("employees"); }, () => markLoaded("employees"));
         onValue(ref(db, "schedules"), (snapshot) => {
             submittedSchedules = snapshot.val() || {};
+            markLoaded("schedules");
             if (currentScheduleKey && !submittedSchedules[currentScheduleKey]) {
                 currentScheduleKey = null;
                 existingSchedule = null;
@@ -1201,12 +1226,14 @@
                 document.getElementById("previewModal").style.display = "none";
             }
         });
-        onValue(ref(db, "rules"), (snapshot) => { rulesData = snapshot.val() || {}; });
+        onValue(ref(db, "rules"), (snapshot) => { rulesData = snapshot.val() || {}; markLoaded("rules"); }, () => markLoaded("rules"));
 
         let requireEmployeeCodeSetting = "לא";
         onValue(ref(db, "settings/requireEmployeeCode"), (snapshot) => { requireEmployeeCodeSetting = snapshot.val() || "לא"; });
 
         let submissionsAllowed = false;
+        let systemBlocked = false;
+        const BLOCKED_MESSAGE = "יש בעיה במערכת. אנא בקש מהמנהל למחוק את סידורי העבודה של השבוע הקודם על מנת שהמערכת תעבוד.";
         let submissionSettings = {};
         let settingsLoaded = false;
         let serverTimeOffset = 0;
@@ -1218,11 +1245,11 @@
             const allow = submissionSettings.allowScheduleSubmission;
             const automationEnabled = submissionSettings.weeklyAutomationEnabled === true;
             const closedByTime = automationEnabled && SidorAutomation.isSubmissionWindowClosed(new Date(Date.now() + serverTimeOffset));
-            submissionsAllowed = settingsLoaded && !(allow === "לא" || allow === false) && !closedByTime;
+            submissionsAllowed = settingsLoaded && !systemBlocked && !(allow === "לא" || allow === false) && !closedByTime;
             const msgDiv = document.getElementById("submissionDisabledMessage");
             const viewBtn = document.getElementById("viewSubmittedScheduleBtn");
             document.getElementById("shiftForm").style.display = submissionsAllowed ? "block" : "none";
-            msgDiv.textContent = !settingsLoaded ? "טוען את מצב ההגשה…" :
+            msgDiv.textContent = systemBlocked ? BLOCKED_MESSAGE : !settingsLoaded ? "טוען את מצב ההגשה…" :
                 (closedByTime ? "ההגשה נסגרה ביום שלישי ב־14:00 ותיפתח מחדש ביום שישי ב־23:50 (שעון ישראל)." : "זמן הגשת הסידור הסתיים.");
             msgDiv.style.display = submissionsAllowed ? "none" : "block";
             viewBtn.style.display = settingsLoaded && !submissionsAllowed ? "block" : "none";
@@ -1231,6 +1258,7 @@
         onValue(ref(db, "settings"), snapshot => {
             submissionSettings = snapshot.val() || {};
             settingsLoaded = true;
+            markLoaded("settings");
             refreshSubmissionState();
         }, () => {
             settingsLoaded = false;
@@ -1238,6 +1266,50 @@
             document.getElementById("submissionDisabledMessage").textContent = "לא ניתן לבדוק את מצב ההגשה. יש לרענן את הדף.";
         });
         refreshSubmissionState();
+
+        // --- בדיקת אוטומציה שבועית בכניסה: משלימה סגירה/איפוס שהגיע זמנם, מתחת למסך טעינה ---
+        const settingsRef = ref(db, "settings");
+        const automationIO = {
+            getSettings: async () => (await get(settingsRef)).val(),
+            claim: async (action, scheduledAt) => (await runTransaction(settingsRef, current => {
+                const result = SidorAutomation.applyAutomationEvent({ settings: current || {} }, action, scheduledAt);
+                return result ? result.settings : undefined;
+            })).committed,
+            clearSchedules: () => remove(ref(db, "schedules")),
+            release: (action, scheduledAt) => runTransaction(settingsRef, current => current && current.weeklyAutomationLastEventAt === scheduledAt
+                ? { ...current, allowScheduleSubmission: "לא", weeklyAutomationLastEventAt: scheduledAt - 1 } : undefined)
+        };
+        const CATCH_UP_TIMEOUT_MS = 10000;
+        async function startup() {
+            const loader = document.getElementById("startupLoader");
+            const minimumDelay = new Promise(resolve => setTimeout(resolve, 1200));
+            const deadline = Date.now() + CATCH_UP_TIMEOUT_MS;
+            let succeeded = false;
+            while (!succeeded) {
+                try {
+                    await new Promise(resolve => onValue(ref(db, ".info/serverTimeOffset"), s => { serverTimeOffset = s.val() || 0; resolve(); }, { onlyOnce: true }));
+                    await SidorAutomation.runCatchUp(automationIO, Date.now() + serverTimeOffset);
+                    succeeded = true;
+                } catch (err) {
+                    console.error("Weekly automation check failed:", err);
+                    if (Date.now() >= deadline) break;
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                }
+            }
+            if (!succeeded) {
+                // Keep the loader up with the message: the form must not open with last week's submissions still in place.
+                systemBlocked = true;
+                loader.querySelector(".startup-spinner").style.display = "none";
+                loader.querySelector(".startup-text").textContent = BLOCKED_MESSAGE;
+                refreshSubmissionState();
+                return;
+            }
+            // Hide the loader only once every dataset has arrived, so the first click already works.
+            await Promise.all([minimumDelay, ...Object.values(initialLoads)]);
+            refreshSubmissionState();
+            loader.classList.add("hidden");
+        }
+        startup();
         setInterval(refreshSubmissionState, 1000);
         document.addEventListener('visibilitychange', refreshSubmissionState);
 

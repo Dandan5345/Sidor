@@ -31,3 +31,24 @@ test('disabled, duplicate, stale and pre-enable events cannot delete new submiss
   assert.equal(applyAutomationEvent(opened, 'reset', 200), undefined);
   assert.equal(applyAutomationEvent(opened, 'close', 100), undefined);
 });
+test('dueEvents finds missed Tuesday close and Friday reset in Israel time', () => {
+  const { dueEvents, runCatchUp } = require('../automation.js');
+  const at = s => Date.parse(s);
+  // Summer: Tue 14:00 IDT = 11:00Z, Fri 23:50 IDT = 20:50Z
+  assert.deepEqual(dueEvents(at('2026-10-07T00:00:00Z'), at('2026-10-05T00:00:00Z')).map(e => e.scheduledAt), [at('2026-10-06T11:00:00Z')]);
+  assert.deepEqual(dueEvents(at('2026-10-10T00:00:00Z'), at('2026-10-06T11:00:00Z')).map(e => e.action), ['reset']);
+  assert.equal(dueEvents(at('2026-10-10T00:00:00Z'), at('2026-10-09T20:50:00Z')).length, 0);
+  // Winter: Tue 14:00 IST = 12:00Z
+  assert.deepEqual(dueEvents(at('2026-12-02T00:00:00Z'), at('2026-11-30T00:00:00Z')).map(e => e.scheduledAt), [at('2026-12-01T12:00:00Z')]);
+  assert.equal(dueEvents(at('2026-12-01T11:59:00Z'), at('2026-11-28T00:00:00Z')).length, 0);
+  // Missed both events -> close then reset, in order
+  assert.deepEqual(dueEvents(at('2026-10-10T10:00:00Z'), at('2026-10-05T00:00:00Z')).map(e => e.action), ['close', 'reset']);
+  // runCatchUp: disabled does nothing; enabled claims once and clears on reset
+  const calls = [];
+  const io = settings => ({ getSettings: async () => settings, claim: async (a) => (calls.push('claim:' + a), true),
+    clearSchedules: async () => calls.push('clear'), release: async () => calls.push('release') });
+  return runCatchUp(io({ weeklyAutomationEnabled: false }), at('2026-10-10T10:00:00Z')).then(() => {
+    assert.deepEqual(calls, []);
+    return runCatchUp(io({ weeklyAutomationEnabled: true, weeklyAutomationEnabledAt: at('2026-10-05T00:00:00Z') }), at('2026-10-10T10:00:00Z'));
+  }).then(() => assert.deepEqual(calls, ['claim:close', 'claim:reset', 'clear']));
+});
