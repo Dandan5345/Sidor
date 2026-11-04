@@ -931,7 +931,19 @@
         כניסת מנהל
     </div>
 
-    <div class="main-container">
+    <section id="loginGate" class="main-container" style="max-width:440px;margin-top:100px">
+        <h1 class="page-title">כניסה לסידור עבודה</h1>
+        <p style="text-align:center">יש להזין את מספר העובד האישי כדי להיכנס למערכת.</p>
+        <form id="employeeLoginForm">
+            <label for="loginEmployeeCode">מספר עובד</label>
+            <input id="loginEmployeeCode" type="password" inputmode="numeric" autocomplete="current-password" required style="width:100%;box-sizing:border-box;padding:14px;border-radius:12px;margin:12px 0">
+            <p id="loginError" role="alert" style="color:var(--error-color)"></p>
+            <button id="employeeLoginBtn" class="confirm-btn" style="width:100%;padding:14px;border-radius:12px">כניסה</button>
+        </form>
+    </section>
+    <button id="sessionLogout" onclick="logoutSidor()" style="display:none;position:fixed;left:16px;top:16px;z-index:1000">התנתקות</button>
+
+    <div class="main-container" style="display:none">
 
         <div class="header-section fade-in">
             <h1 class="page-title">סידור עבודה</h1>
@@ -1070,20 +1082,6 @@
         </div>
     </div>
 
-    <!-- מודל קוד עובד -->
-    <div id="employeeCodeModal" class="modal">
-        <div class="modal-content">
-            <h3>אימות עובד</h3>
-            <p style="text-align: center; color: var(--muted-text); margin-bottom: 20px;">אנא הזן את קוד העובד האישי שלך</p>
-            <input type="text" id="employeeCodeInput" placeholder="הזן מספר עובד" inputmode="numeric" style="font-size: 1.2rem; letter-spacing: 2px;">
-            <div id="employeeCodeError" style="color: var(--error-color); display: none; margin-top: 10px; text-align: center; font-weight: 600;">הקוד שהוזן שגוי, נסה שוב.</div>
-            <div class="modal-buttons">
-                <button id="cancelCodeBtn" class="cancel-btn">ביטול</button>
-                <button id="confirmCodeBtn" class="confirm-btn">אישור והמשך</button>
-            </div>
-        </div>
-    </div>
-
     <!-- מודל סידור קיים -->
     <div id="existingScheduleModal" class="modal">
         <div class="modal-content" style="text-align: center;">
@@ -1175,8 +1173,11 @@
     <script src="functions/automation.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
-        import { getDatabase, ref, push, onValue, set, get, child, remove, runTransaction } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-database.js";
-        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-auth.js";
+        import { getDatabase, ref, push, onValue, set, get, child, remove, runTransaction, query, orderByChild, equalTo, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-database.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-auth.js";
+
+        import { employeeCredentials, escapeHtml } from './employee-credentials.mjs';
+        import { accessForUser } from './auth-session.mjs';
 
         const firebaseConfig = {
             apiKey: "AIzaSyCeYVNOdp8N9BJdsO9eLeATX1_PX5LRG_A",
@@ -1192,6 +1193,62 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         const auth = getAuth(app);
+        await setPersistence(auth, browserSessionPersistence);
+        window.openAdminModal = () => document.getElementById('adminModal').style.display = 'block';
+        window.closeAdminModal = () => document.getElementById('adminModal').style.display = 'none';
+        window.logoutSidor = async () => { await signOut(auth); location.reload(); };
+        const gate = document.getElementById('loginGate');
+        const main = document.querySelector('div.main-container');
+        main.style.display = 'none';
+        document.getElementById('startupLoader').classList.add('hidden');
+        const loginError = document.getElementById('loginError');
+        document.getElementById('employeeLoginForm').addEventListener('submit', async event => {
+            event.preventDefault();
+            const button = document.getElementById('employeeLoginBtn');
+            button.disabled = true;
+            loginError.textContent = '';
+            try {
+                const credentials = await employeeCredentials(document.getElementById('loginEmployeeCode').value);
+                await signInWithEmailAndPassword(auth, credentials.email, credentials.password);
+            } catch {
+                loginError.textContent = 'לא ניתן להתחבר. בדוק את מספר העובד ונסה שוב.';
+            } finally { button.disabled = false; }
+        });
+        document.getElementById('adminLoginBtn').addEventListener('click', async () => {
+            const button = document.getElementById('adminLoginBtn');
+            button.disabled = true;
+            try {
+                const result = await signInWithEmailAndPassword(auth, document.getElementById('adminEmail').value.trim(), document.getElementById('adminPassword').value);
+                const access = await accessForUser(db, result.user);
+                if (!access?.manager) throw new Error('not manager');
+                location.href = 'manager.html';
+            } catch {
+                await signOut(auth);
+                alert('שגיאה בהתחברות. ודא שפרטי המנהל נכונים.');
+            } finally { button.disabled = false; }
+        });
+        if (new URLSearchParams(location.search).has('manager')) window.openAdminModal();
+        let sessionUid;
+        const sessionAccess = await new Promise(resolve => {
+            onAuthStateChanged(auth, async user => {
+                if (sessionUid && user?.uid !== sessionUid) { location.reload(); return; }
+                if (!user) return;
+                try {
+                    const access = await accessForUser(db, user);
+                    if (!access) throw new Error('not a member');
+                    sessionUid = user.uid;
+                    resolve(access);
+                } catch {
+                    loginError.textContent = 'לחשבון אין הרשאה למערכת. פנה למנהל.';
+                    await signOut(auth);
+                }
+            });
+        });
+        gate.style.display = 'none';
+        main.style.display = '';
+        document.getElementById('sessionLogout').style.display = 'block';
+        document.getElementById('startupLoader').classList.remove('hidden');
+
 
         // --- משתנים גלובליים ---
         let employeesData = {};
@@ -1206,16 +1263,20 @@
         let pendingSubmission = null;
 
         // --- משתנים לניהול מצב צפייה בסידור חסום ---
-        let codeModalContext = 'submit'; 
-        let pendingViewData = null; 
 
         // --- טעינת נתונים ראשונית מ-Firebase ---
         const initialLoads = {};
         const loaded = name => initialLoads[name] ||= (() => { let done; const promise = new Promise(resolve => done = resolve); promise.done = done; return promise; })();
         const markLoaded = name => loaded(name).done();
         ["employees", "schedules", "rules", "settings"].forEach(loaded);
-        onValue(ref(db, "employees"), (snapshot) => { employeesData = snapshot.val() || {}; markLoaded("employees"); }, () => markLoaded("employees"));
-        onValue(ref(db, "schedules"), (snapshot) => {
+        const employeesRef = ref(db, sessionAccess.manager ? 'employees' : `employeeProfiles/${sessionAccess.employeeId}`);
+        onValue(employeesRef, snapshot => {
+            employeesData = sessionAccess.manager ? (snapshot.val() || {}) : { [sessionAccess.employeeId]: snapshot.val() || {} };
+            if (currentEmployeeId && employeesData[currentEmployeeId]) currentEmployeeData = employeesData[currentEmployeeId];
+            markLoaded('employees');
+        }, () => { systemBlocked = true; markLoaded('employees'); });
+        const schedulesRef = sessionAccess.manager ? ref(db, 'schedules') : query(ref(db, 'schedules'), orderByChild('employeeId'), equalTo(sessionAccess.employeeId));
+        onValue(schedulesRef, (snapshot) => {
             submittedSchedules = snapshot.val() || {};
             markLoaded("schedules");
             if (currentScheduleKey && !submittedSchedules[currentScheduleKey]) {
@@ -1225,11 +1286,9 @@
                 document.getElementById("existingScheduleModal").style.display = "none";
                 document.getElementById("previewModal").style.display = "none";
             }
-        });
-        onValue(ref(db, "rules"), (snapshot) => { rulesData = snapshot.val() || {}; markLoaded("rules"); }, () => markLoaded("rules"));
+        }, () => { systemBlocked = true; markLoaded("schedules"); });
+        onValue(ref(db, "rules"), (snapshot) => { rulesData = snapshot.val() || {}; markLoaded("rules"); }, () => { systemBlocked = true; markLoaded("rules"); });
 
-        let requireEmployeeCodeSetting = "לא";
-        onValue(ref(db, "settings/requireEmployeeCode"), (snapshot) => { requireEmployeeCodeSetting = snapshot.val() || "לא"; });
 
         let submissionsAllowed = false;
         let systemBlocked = false;
@@ -1262,52 +1321,19 @@
             refreshSubmissionState();
         }, () => {
             settingsLoaded = false;
+            systemBlocked = true;
+            markLoaded("settings");
             refreshSubmissionState();
             document.getElementById("submissionDisabledMessage").textContent = "לא ניתן לבדוק את מצב ההגשה. יש לרענן את הדף.";
         });
         refreshSubmissionState();
 
-        // --- בדיקת אוטומציה שבועית בכניסה: משלימה סגירה/איפוס שהגיע זמנם, מתחת למסך טעינה ---
-        const settingsRef = ref(db, "settings");
-        const automationIO = {
-            getSettings: async () => (await get(settingsRef)).val(),
-            claim: async (action, scheduledAt) => (await runTransaction(settingsRef, current => {
-                const result = SidorAutomation.applyAutomationEvent({ settings: current || {} }, action, scheduledAt);
-                return result ? result.settings : undefined;
-            })).committed,
-            clearSchedules: () => remove(ref(db, "schedules")),
-            release: (action, scheduledAt) => runTransaction(settingsRef, current => current && current.weeklyAutomationLastEventAt === scheduledAt
-                ? { ...current, allowScheduleSubmission: "לא", weeklyAutomationLastEventAt: scheduledAt - 1 } : undefined)
-        };
-        const CATCH_UP_TIMEOUT_MS = 10000;
+        // Weekly writes run in the trusted automation workflow; employee browsers only read.
         async function startup() {
-            const loader = document.getElementById("startupLoader");
-            const minimumDelay = new Promise(resolve => setTimeout(resolve, 1200));
-            const deadline = Date.now() + CATCH_UP_TIMEOUT_MS;
-            let succeeded = false;
-            while (!succeeded) {
-                try {
-                    await new Promise(resolve => onValue(ref(db, ".info/serverTimeOffset"), s => { serverTimeOffset = s.val() || 0; resolve(); }, { onlyOnce: true }));
-                    await SidorAutomation.runCatchUp(automationIO, Date.now() + serverTimeOffset);
-                    succeeded = true;
-                } catch (err) {
-                    console.error("Weekly automation check failed:", err);
-                    if (Date.now() >= deadline) break;
-                    await new Promise(resolve => setTimeout(resolve, 1000));
-                }
-            }
-            if (!succeeded) {
-                // Keep the loader up with the message: the form must not open with last week's submissions still in place.
-                systemBlocked = true;
-                loader.querySelector(".startup-spinner").style.display = "none";
-                loader.querySelector(".startup-text").textContent = BLOCKED_MESSAGE;
-                refreshSubmissionState();
-                return;
-            }
-            // Hide the loader only once every dataset has arrived, so the first click already works.
-            await Promise.all([minimumDelay, ...Object.values(initialLoads)]);
+            const loader = document.getElementById('startupLoader');
+            await Promise.all(Object.values(initialLoads));
             refreshSubmissionState();
-            loader.classList.add("hidden");
+            loader.classList.add('hidden');
         }
         startup();
         setInterval(refreshSubmissionState, 1000);
@@ -1386,7 +1412,7 @@
             currentEmployeeData = employeesData[currentEmployeeId];
             const fullName = `${currentEmployeeData.firstName} ${currentEmployeeData.lastName}`;
 
-            existingSchedule = Object.entries(submittedSchedules).find(([key, val]) => val.name === fullName) || null;
+            existingSchedule = Object.entries(submittedSchedules).find(([key, val]) => val.employeeId === currentEmployeeId) || null;
             if (existingSchedule) {
                 existingSchedule = { key: existingSchedule[0], ...existingSchedule[1] };
             }
@@ -1397,15 +1423,7 @@
             const rulesSnapshot = await get(child(ref(db), `employeeRules/${currentEmployeeId}`));
             employeeRulesData = rulesSnapshot.val() || null;
 
-            if (currentEmployeeData.code && requireEmployeeCodeSetting === "כן") {
-                codeModalContext = 'submit'; 
-                document.getElementById("shiftsDiv").style.display = "none";
-                document.getElementById("employeeCodeInput").value = "";
-                document.getElementById("employeeCodeError").style.display = "none";
-                document.getElementById("employeeCodeModal").style.display = "block";
-            } else {
-                handlePostAuthentication();
-            }
+            handlePostAuthentication();
         });
 
         function handlePostAuthentication() {
@@ -1466,42 +1484,6 @@
 
         // --- מודלים ואירועים ---
 
-        document.getElementById("confirmCodeBtn").addEventListener("click", () => {
-            const codeTyped = document.getElementById("employeeCodeInput").value.trim();
-
-            if (codeModalContext === 'view') {
-                if (pendingViewData && codeTyped === pendingViewData.employee.code) {
-                    document.getElementById("employeeCodeModal").style.display = "none";
-                    const schedule = pendingViewData.schedule;
-                    const viewContent = document.getElementById("viewScheduleContent");
-                    viewContent.innerHTML = "";
-                    viewContent.appendChild(createScheduleTable(schedule.schedule || ""));
-                    if (schedule.preferences) {
-                        viewContent.innerHTML += `<div style="background: var(--surface-bg); padding: 15px; border-radius: 12px; margin-top: 15px;"><p style="margin:0;"><strong>העדפות:</strong><br> ${schedule.preferences.replace(/\n/g, '<br>')}</p></div>`;
-                    }
-                    document.getElementById('viewModalHistorySelect').style.display = 'none';
-                    openViewScheduleModal();
-                    pendingViewData = null; 
-                } else {
-                    document.getElementById("employeeCodeError").style.display = "block";
-                }
-            } else { 
-                if (!currentEmployeeData.code || codeTyped !== currentEmployeeData.code) {
-                    document.getElementById("employeeCodeError").style.display = "block";
-                    return;
-                }
-                document.getElementById("employeeCodeModal").style.display = "none";
-                handlePostAuthentication();
-            }
-        });
-
-        document.getElementById("cancelCodeBtn").addEventListener("click", () => {
-            document.getElementById("employeeCodeModal").style.display = "none";
-            if (codeModalContext === 'submit') {
-                resetForm();
-            }
-            pendingViewData = null; 
-        });
 
         document.getElementById("shiftForm").addEventListener("submit", (event) => {
             event.preventDefault();
@@ -1566,11 +1548,12 @@
 
             const scheduleString = shifts.map(s => s.value).join(", ");
             pendingSubmission = {
+                employeeId: currentEmployeeId,
                 role: roleInput.value,
                 name: `${currentEmployeeData.firstName} ${currentEmployeeData.lastName}`,
                 schedule: scheduleString,
                 preferences: document.getElementById("preferences").value,
-                submissionTime: Date.now()
+                submissionTime: serverTimestamp()
             };
             openPreviewModal(pendingSubmission);
         }
@@ -1594,17 +1577,21 @@
                     scheduleKey = push(child(ref(db), 'schedules')).key;
                 }
 
+                pendingSubmission.name = `${currentEmployeeData.firstName} ${currentEmployeeData.lastName}`;
+                pendingSubmission.role = currentEmployeeData.type;
                 const scheduleRef = ref(db, `schedules/${scheduleKey}`);
                 await set(scheduleRef, pendingSubmission);
 
                 const historyRef = ref(db, `scheduleHistory/${currentEmployeeId}`);
                 const historySnapshot = await get(historyRef);
                 let currentHistory = historySnapshot.val() || {};
-                currentHistory[Date.now()] = pendingSubmission;
+                const savedSubmission = (await get(scheduleRef)).val();
+                pendingSubmission = savedSubmission;
+                currentHistory[String(savedSubmission.submissionTime)] = savedSubmission;
 
                 const historyKeys = Object.keys(currentHistory).sort((a, b) => a - b);
-                if (historyKeys.length > 3) {
-                    delete currentHistory[historyKeys[0]];
+                while (historyKeys.length > 3) {
+                    delete currentHistory[historyKeys.shift()];
                 }
                 await set(historyRef, currentHistory);
 
@@ -1675,7 +1662,7 @@
             previewContent.innerHTML = "";
             previewContent.appendChild(createScheduleTable(data.schedule));
             if (data.preferences) {
-                previewContent.innerHTML += `<div style="background: var(--surface-bg); padding: 15px; border-radius: 12px; margin-top: 15px;"><p style="margin:0;"><strong>העדפות שנכתבו:</strong><br> ${data.preferences.replace(/\n/g, '<br>')}</p></div>`;
+                previewContent.innerHTML += `<div style="background: var(--surface-bg); padding: 15px; border-radius: 12px; margin-top: 15px;"><p style="margin:0;"><strong>העדפות שנכתבו:</strong><br> ${escapeHtml(data.preferences).replace(/\n/g, '<br>')}</p></div>`;
             }
             document.getElementById("previewModal").style.display = "block";
         }
@@ -1689,7 +1676,7 @@
             contentDiv.innerHTML = '';
             contentDiv.appendChild(createScheduleTable(data.schedule));
             if (data.preferences) {
-                contentDiv.innerHTML += `<div style="background: var(--surface-bg); padding: 15px; border-radius: 12px; margin-top: 15px;"><p style="margin:0;"><strong>העדפות שנכתבו אז:</strong><br> ${data.preferences.replace(/\n/g, '<br>')}</p></div>`;
+                contentDiv.innerHTML += `<div style="background: var(--surface-bg); padding: 15px; border-radius: 12px; margin-top: 15px;"><p style="margin:0;"><strong>העדפות שנכתבו אז:</strong><br> ${escapeHtml(data.preferences).replace(/\n/g, '<br>')}</p></div>`;
             }
 
             const copyBtn = document.getElementById('copyScheduleBtn');
@@ -1732,7 +1719,7 @@
 
         window.finishExistingSchedule = function () {
             closeExistingScheduleModal();
-            resetForm();
+            logoutSidor();
         };
 
         window.viewExistingSchedule = function () {
@@ -1743,7 +1730,7 @@
                 viewContent.innerHTML = "";
                 viewContent.appendChild(createScheduleTable(scheduleData.schedule || ""));
                 if (scheduleData.preferences) {
-                    viewContent.innerHTML += `<div style="background: var(--surface-bg); padding: 15px; border-radius: 12px; margin-top: 15px;"><p style="margin:0;"><strong>העדפות:</strong><br> ${scheduleData.preferences.replace(/\n/g, '<br>')}</p></div>`;
+                    viewContent.innerHTML += `<div style="background: var(--surface-bg); padding: 15px; border-radius: 12px; margin-top: 15px;"><p style="margin:0;"><strong>העדפות:</strong><br> ${escapeHtml(scheduleData.preferences).replace(/\n/g, '<br>')}</p></div>`;
                 }
             };
 
@@ -1781,7 +1768,7 @@
                 viewContent.innerHTML = "";
                 viewContent.appendChild(createScheduleTable(scheduleToShow.schedule || ""));
                 if (scheduleToShow.preferences) {
-                    viewContent.innerHTML += `<div style="background: var(--surface-bg); padding: 15px; border-radius: 12px; margin-top: 15px;"><p style="margin:0;"><strong>העדפות:</strong><br> ${scheduleToShow.preferences.replace(/\n/g, '<br>')}</p></div>`;
+                    viewContent.innerHTML += `<div style="background: var(--surface-bg); padding: 15px; border-radius: 12px; margin-top: 15px;"><p style="margin:0;"><strong>העדפות:</strong><br> ${escapeHtml(scheduleToShow.preferences).replace(/\n/g, '<br>')}</p></div>`;
                 }
             }
         });
@@ -1796,13 +1783,7 @@
         window.openAdminModal = () => document.getElementById("adminModal").style.display = "block";
         window.closeAdminModal = () => document.getElementById("adminModal").style.display = "none";
 
-        document.getElementById("adminLoginBtn").addEventListener("click", () => {
-            const email = document.getElementById("adminEmail").value;
-            const password = document.getElementById("adminPassword").value;
-            signInWithEmailAndPassword(auth, email, password)
-                .then(() => { window.location.href = "manager.html"; })
-                .catch(err => { alert("שגיאה בהתחברות. ודא שפרטי הגישה נכונים."); });
-        });
+
 
         document.getElementById("viewSubmittedScheduleBtn").onclick = function () {
             document.getElementById("viewScheduleSelectionModal").style.display = "block";
@@ -1830,25 +1811,18 @@
 
             const employee = employeesData[selectedEmployeeId];
             const fullName = `${employee.firstName} ${employee.lastName}`;
-            const schedule = Object.values(submittedSchedules).find(s => s.name === fullName);
+            const schedule = Object.values(submittedSchedules).find(s => s.employeeId === selectedEmployeeId);
 
             if (!schedule) {
                 return alert('לא נמצא סידור עבור העובד שנבחר בשבוע זה.');
             }
 
-            if (!submissionsAllowed && employee.code) {
-                codeModalContext = 'view';
-                pendingViewData = { employee, schedule };
-                document.getElementById("employeeCodeInput").value = "";
-                document.getElementById("employeeCodeError").style.display = "none";
-                closeViewScheduleSelectionModal(); 
-                document.getElementById("employeeCodeModal").style.display = "block";
-            } else {
+            {
                 const viewContent = document.getElementById("viewScheduleContent");
                 viewContent.innerHTML = "";
                 viewContent.appendChild(createScheduleTable(schedule.schedule || ""));
                 if (schedule.preferences) {
-                    viewContent.innerHTML += `<div style="background: var(--surface-bg); padding: 15px; border-radius: 12px; margin-top: 15px;"><p style="margin:0;"><strong>העדפות:</strong><br> ${schedule.preferences.replace(/\n/g, '<br>')}</p></div>`;
+                    viewContent.innerHTML += `<div style="background: var(--surface-bg); padding: 15px; border-radius: 12px; margin-top: 15px;"><p style="margin:0;"><strong>העדפות:</strong><br> ${escapeHtml(schedule.preferences).replace(/\n/g, '<br>')}</p></div>`;
                 }
                 document.getElementById('viewModalHistorySelect').style.display = 'none';
                 closeViewScheduleSelectionModal();

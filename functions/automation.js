@@ -68,7 +68,12 @@
       catch (err) { await io.release(event.action, event.scheduledAt); throw err; }
     }
   }
-  const api = { isSubmissionWindowClosed, applyAutomationEvent, dueEvents, runCatchUp };
+  function submissionWindow(now = Date.now()) {
+    const close = dueEvents(now + 8 * 86400000, now).find(event => event.action === 'close');
+    const resets = dueEvents(close.scheduledAt, close.scheduledAt - 8 * 86400000).filter(event => event.action === 'reset');
+    return { opensAt: resets[resets.length - 1].scheduledAt, closesAt: close.scheduledAt };
+  }
+  const api = { submissionWindow, isSubmissionWindowClosed, applyAutomationEvent, dueEvents, runCatchUp };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.SidorAutomation = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

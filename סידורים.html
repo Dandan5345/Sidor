@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="he">
+<html lang="he" style="visibility:hidden">
 
 <head>
   <meta charset="UTF-8">
@@ -430,6 +430,7 @@
   <div class="top-buttons">
     <button onclick="window.location.href='index.html'">חזרה לטופס הראשי</button>
     <button onclick="window.location.href='manager.html'">חזרה למנהל</button>
+    <button onclick="logoutSidor()">התנתקות</button>
   </div>
   <h1>סידורים</h1>
   <div id="schedulesContainer"></div>
@@ -464,6 +465,9 @@
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-analytics.js";
     import { getDatabase, ref, onValue, remove } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-database.js";
 
+    import { requireManager } from './auth-session.mjs';
+    import { escapeHtml } from './employee-credentials.mjs';
+
     const firebaseConfig = {
       apiKey: "AIzaSyCeYVNOdp8N9BJdsO9eLeATX1_PX5LRG_A",
       authDomain: "sidoravoda111.firebaseapp.com",
@@ -478,6 +482,7 @@
     const app = initializeApp(firebaseConfig);
     const analytics = getAnalytics(app);
     const db = getDatabase(app);
+    await requireManager(app, db);
 
     // פונקציה ליצירת טבלת משמרות להצגה בדף
     function createScheduleTable(scheduleString) {
@@ -650,7 +655,7 @@
             if (entry.preferences && entry.preferences.trim() !== "") {
               const prefEl = document.createElement("div");
               prefEl.className = "preferences";
-              prefEl.innerHTML = "<strong>העדפות:</strong> " + entry.preferences;
+              prefEl.innerHTML = "<strong>העדפות:</strong> " + escapeHtml(entry.preferences);
               entryDiv.appendChild(prefEl);
             }
             const deleteBtn = document.createElement("button");
@@ -700,7 +705,7 @@
               if (entry.preferences && entry.preferences.trim() !== "") {
                 let prefEl = document.createElement("div");
                 prefEl.className = "preferences";
-                prefEl.innerHTML = "<strong>העדפות:</strong> " + entry.preferences;
+                prefEl.innerHTML = "<strong>העדפות:</strong> " + escapeHtml(entry.preferences);
                 entryDiv.appendChild(prefEl);
               }
               groupDiv.appendChild(entryDiv);
@@ -730,7 +735,7 @@
               if (entry.preferences && entry.preferences.trim() !== "") {
                 let prefEl = document.createElement("div");
                 prefEl.className = "preferences";
-                prefEl.innerHTML = "<strong>העדפות:</strong> " + entry.preferences;
+                prefEl.innerHTML = "<strong>העדפות:</strong> " + escapeHtml(entry.preferences);
                 containerDiv.appendChild(prefEl);
               }
               let isLong = false;

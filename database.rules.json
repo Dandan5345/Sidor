@@ -1,0 +1,122 @@
+{
+  "rules": {
+    ".read": "auth != null && root.child('access/managers').child(auth.uid).val() === true",
+    ".write": "auth != null && root.child('access/managers').child(auth.uid).val() === true",
+    "access": {
+      ".read": "auth != null && root.child('access/managers').child(auth.uid).val() === true",
+      ".write": "auth != null && root.child('access/managers').child(auth.uid).val() === true",
+      "managers": {
+        "$uid": {
+          ".read": "auth != null && auth.uid === $uid"
+        }
+      },
+      "employees": {
+        "$uid": {
+          ".read": "auth != null && auth.uid === $uid"
+        }
+      }
+    },
+    "employeeCodeClaims": {
+      ".read": "auth != null && root.child('access/managers').child(auth.uid).val() === true",
+      ".write": "auth != null && root.child('access/managers').child(auth.uid).val() === true"
+    },
+    "employeeOperations": {
+      ".read": "auth != null && root.child('access/managers').child(auth.uid).val() === true",
+      ".write": "auth != null && root.child('access/managers').child(auth.uid).val() === true"
+    },
+    "employees": {
+      ".read": "auth != null && root.child('access/managers').child(auth.uid).val() === true",
+      ".write": "auth != null && root.child('access/managers').child(auth.uid).val() === true",
+      "$employeeId": {
+        ".validate": "newData.hasChildren(['authUid','code']) && newData.child('authUid').isString() && (newData.child('code').isString() || newData.child('code').isNumber())"
+      }
+    },
+    "employeeProfiles": {
+      ".read": "auth != null && root.child('access/managers').child(auth.uid).val() === true",
+      ".write": "auth != null && root.child('access/managers').child(auth.uid).val() === true",
+      "$employeeId": {
+        ".read": "(auth != null && root.child('access/managers').child(auth.uid).val() === true) || ((auth != null && root.child('access/employees').child(auth.uid).isString() && root.child('employees').child(root.child('access/employees').child(auth.uid).val()).child('authUid').val() === auth.uid) && $employeeId === root.child('access/employees').child(auth.uid).val())"
+      }
+    },
+    "settings": {
+      ".read": "(auth != null && root.child('access/managers').child(auth.uid).val() === true) || (auth != null && root.child('access/employees').child(auth.uid).isString() && root.child('employees').child(root.child('access/employees').child(auth.uid).val()).child('authUid').val() === auth.uid)",
+      ".write": "auth != null && root.child('access/managers').child(auth.uid).val() === true"
+    },
+    "rules": {
+      ".read": "(auth != null && root.child('access/managers').child(auth.uid).val() === true) || (auth != null && root.child('access/employees').child(auth.uid).isString() && root.child('employees').child(root.child('access/employees').child(auth.uid).val()).child('authUid').val() === auth.uid)",
+      ".write": "auth != null && root.child('access/managers').child(auth.uid).val() === true"
+    },
+    "employeeRules": {
+      ".read": "auth != null && root.child('access/managers').child(auth.uid).val() === true",
+      ".write": "auth != null && root.child('access/managers').child(auth.uid).val() === true",
+      "$employeeId": {
+        ".read": "(auth != null && root.child('access/managers').child(auth.uid).val() === true) || ((auth != null && root.child('access/employees').child(auth.uid).isString() && root.child('employees').child(root.child('access/employees').child(auth.uid).val()).child('authUid').val() === auth.uid) && $employeeId === root.child('access/employees').child(auth.uid).val())"
+      }
+    },
+    "schedules": {
+      ".indexOn": [
+        "employeeId"
+      ],
+      ".read": "(auth != null && root.child('access/managers').child(auth.uid).val() === true) || ((auth != null && root.child('access/employees').child(auth.uid).isString() && root.child('employees').child(root.child('access/employees').child(auth.uid).val()).child('authUid').val() === auth.uid) && query.orderByChild === 'employeeId' && query.equalTo === root.child('access/employees').child(auth.uid).val())",
+      ".write": "auth != null && root.child('access/managers').child(auth.uid).val() === true",
+      "$scheduleId": {
+        ".read": "(auth != null && root.child('access/managers').child(auth.uid).val() === true) || ((auth != null && root.child('access/employees').child(auth.uid).isString() && root.child('employees').child(root.child('access/employees').child(auth.uid).val()).child('authUid').val() === auth.uid) && data.child('employeeId').val() === root.child('access/employees').child(auth.uid).val())",
+        ".write": "(auth != null && root.child('access/managers').child(auth.uid).val() === true) || ((auth != null && root.child('access/employees').child(auth.uid).isString() && root.child('employees').child(root.child('access/employees').child(auth.uid).val()).child('authUid').val() === auth.uid) && (root.child('settings/allowScheduleSubmission').val() !== 'לא' && root.child('settings/allowScheduleSubmission').val() !== false && (root.child('settings/weeklyAutomationEnabled').val() !== true || (root.child('settings/weeklyNextCloseAt').isNumber() && now < root.child('settings/weeklyNextCloseAt').val() && root.child('settings/weeklyWindowOpensAt').isNumber() && now >= root.child('settings/weeklyWindowOpensAt').val()))) && newData.exists() && newData.child('employeeId').val() === root.child('access/employees').child(auth.uid).val() && (!data.exists() || data.child('employeeId').val() === root.child('access/employees').child(auth.uid).val()))",
+        ".validate": "(auth != null && root.child('access/managers').child(auth.uid).val() === true) || (newData.hasChildren(['employeeId','name','role','schedule','preferences','submissionTime']))",
+        "employeeId": {
+          ".validate": "(auth != null && root.child('access/managers').child(auth.uid).val() === true) || (newData.isString() && root.child('employeeProfiles').child(newData.val()).exists())"
+        },
+        "name": {
+          ".validate": "(auth != null && root.child('access/managers').child(auth.uid).val() === true) || (newData.isString() && newData.val() === root.child('employeeProfiles').child(newData.parent().child('employeeId').val()).child('firstName').val() + ' ' + root.child('employeeProfiles').child(newData.parent().child('employeeId').val()).child('lastName').val())"
+        },
+        "role": {
+          ".validate": "(auth != null && root.child('access/managers').child(auth.uid).val() === true) || (newData.isString() && newData.val() === root.child('employeeProfiles').child(newData.parent().child('employeeId').val()).child('type').val())"
+        },
+        "schedule": {
+          ".validate": "(auth != null && root.child('access/managers').child(auth.uid).val() === true) || (newData.isString() && newData.val().length <= 2000)"
+        },
+        "preferences": {
+          ".validate": "(auth != null && root.child('access/managers').child(auth.uid).val() === true) || (newData.isString() && newData.val().length <= 4000)"
+        },
+        "submissionTime": {
+          ".validate": "(auth != null && root.child('access/managers').child(auth.uid).val() === true) || (newData.isNumber() && newData.val() > 0 && newData.val() <= now + 60000)"
+        },
+        "$other": {
+          ".validate": "(auth != null && root.child('access/managers').child(auth.uid).val() === true) || (false)"
+        }
+      }
+    },
+    "scheduleHistory": {
+      ".read": "auth != null && root.child('access/managers').child(auth.uid).val() === true",
+      ".write": "auth != null && root.child('access/managers').child(auth.uid).val() === true",
+      "$employeeId": {
+        ".read": "(auth != null && root.child('access/managers').child(auth.uid).val() === true) || ((auth != null && root.child('access/employees').child(auth.uid).isString() && root.child('employees').child(root.child('access/employees').child(auth.uid).val()).child('authUid').val() === auth.uid) && $employeeId === root.child('access/employees').child(auth.uid).val())",
+        ".write": "(auth != null && root.child('access/managers').child(auth.uid).val() === true) || (((auth != null && root.child('access/employees').child(auth.uid).isString() && root.child('employees').child(root.child('access/employees').child(auth.uid).val()).child('authUid').val() === auth.uid) && $employeeId === root.child('access/employees').child(auth.uid).val()) && (root.child('settings/allowScheduleSubmission').val() !== 'לא' && root.child('settings/allowScheduleSubmission').val() !== false && (root.child('settings/weeklyAutomationEnabled').val() !== true || (root.child('settings/weeklyNextCloseAt').isNumber() && now < root.child('settings/weeklyNextCloseAt').val() && root.child('settings/weeklyWindowOpensAt').isNumber() && now >= root.child('settings/weeklyWindowOpensAt').val()))) && newData.exists())",
+        "$timestamp": {
+          ".validate": "(auth != null && root.child('access/managers').child(auth.uid).val() === true) || (newData.hasChildren(['employeeId','name','role','schedule','preferences','submissionTime']) && newData.child('employeeId').val() === $employeeId)",
+          "employeeId": {
+            ".validate": "(auth != null && root.child('access/managers').child(auth.uid).val() === true) || (newData.isString() && root.child('employeeProfiles').child(newData.val()).exists())"
+          },
+          "name": {
+            ".validate": "(auth != null && root.child('access/managers').child(auth.uid).val() === true) || (newData.isString() && newData.val().length <= 200)"
+          },
+          "role": {
+            ".validate": "(auth != null && root.child('access/managers').child(auth.uid).val() === true) || (newData.isString() && newData.val().length <= 100)"
+          },
+          "schedule": {
+            ".validate": "(auth != null && root.child('access/managers').child(auth.uid).val() === true) || (newData.isString() && newData.val().length <= 2000)"
+          },
+          "preferences": {
+            ".validate": "(auth != null && root.child('access/managers').child(auth.uid).val() === true) || (newData.isString() && newData.val().length <= 4000)"
+          },
+          "submissionTime": {
+            ".validate": "(auth != null && root.child('access/managers').child(auth.uid).val() === true) || (newData.isNumber() && newData.val() > 0 && newData.val() <= now + 60000)"
+          },
+          "$other": {
+            ".validate": "(auth != null && root.child('access/managers').child(auth.uid).val() === true) || (false)"
+          }
+        }
+      }
+    }
+  }
+}

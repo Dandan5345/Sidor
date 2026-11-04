@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="he">
+<html lang="he" style="visibility:hidden">
 
 <head>
   <meta charset="UTF-8">
@@ -618,6 +618,7 @@
       <p>סידור עבודה מחלקת ביטחון</p>
       <div class="header-menu">
         <button onclick="window.location.href='index.html';">חזרה לטופס הראשי</button>
+        <button onclick="logoutSidor()">התנתקות</button>
         <button onclick="window.location.href='סידורים.html';">מעבר לסידורים</button>
       </div>
     </header>
@@ -650,13 +651,8 @@
           </div>
         </div>
         <div class="settings-question">
-          <label>האם לבקש קוד עובד בעת בחירת שם:</label>
-          <div class="toggle-group" id="requireEmployeeCodeGroup">
-            <div class="toggle-btn" data-value="כן"
-              onclick="selectToggle(this, 'requireEmployeeCode'); updateRequireCodeSetting('כן');">כן</div>
-            <div class="toggle-btn" data-value="לא"
-              onclick="selectToggle(this, 'requireEmployeeCode'); updateRequireCodeSetting('לא');">לא</div>
-          </div>
+          <label>אימות עובדים:</label>
+          <p>הכניסה עם מספר עובד היא חובה ומאומתת ב־Firebase.</p>
         </div>
       </div>
 
@@ -858,6 +854,10 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
     import { getDatabase, ref, push, onValue, set, get, remove, update, serverTimestamp, runTransaction } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-database.js";
 
+    import { requireManager } from './auth-session.mjs';
+    import { saveEmployeeRecord } from './employee-management.mjs';
+    import { escapeHtml } from './employee-credentials.mjs';
+
     // --- Firebase Configuration ---
     const firebaseConfig = {
       apiKey: "AIzaSyCeYVNOdp8N9BJdsO9eLeATX1_PX5LRG_A",
@@ -872,6 +872,7 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
+    await requireManager(app, db);
 
     // --- Global State ---
     let employees = {};
@@ -932,29 +933,19 @@
     }
 
     // --- Settings Management ---
-    // Same entry-time catch-up as the public form: whoever opens the site first applies the due close/reset.
-    const settingsRef = ref(db, 'settings');
-    onValue(ref(db, '.info/serverTimeOffset'), async offsetSnap => {
-      try {
-        await SidorAutomation.runCatchUp({
-          getSettings: async () => (await get(settingsRef)).val(),
-          claim: async (action, scheduledAt) => (await runTransaction(settingsRef, current => {
-            const result = SidorAutomation.applyAutomationEvent({ settings: current || {} }, action, scheduledAt);
-            return result ? result.settings : undefined;
-          })).committed,
-          clearSchedules: () => remove(ref(db, 'schedules')),
-          release: (action, scheduledAt) => runTransaction(settingsRef, current => current && current.weeklyAutomationLastEventAt === scheduledAt
-            ? { ...current, allowScheduleSubmission: 'לא', weeklyAutomationLastEventAt: scheduledAt - 1 } : undefined)
-        }, Date.now() + (offsetSnap.val() || 0));
-      } catch (err) { console.error('Weekly automation check failed:', err); }
-    }, { onlyOnce: true });
-
+    // Weekly updates run in GitHub Actions with a trusted service identity.
     window.updateWeeklyAutomation = async function (enabled) {
       const buttons = document.querySelectorAll('#weeklyAutomationGroup button');
       buttons.forEach(button => button.disabled = true);
       try {
         const values = { weeklyAutomationEnabled: enabled };
-        if (enabled) values.weeklyAutomationEnabledAt = serverTimestamp();
+        if (enabled) {
+          const now = Date.now();
+          values.weeklyAutomationEnabledAt = serverTimestamp();
+          const window = SidorAutomation.submissionWindow(now);
+          values.weeklyNextCloseAt = window.closesAt;
+          values.weeklyWindowOpensAt = window.opensAt;
+        }
         await update(ref(db, 'settings'), values);
         showNotification(enabled ? 'האוטומציה הופעלה' : 'האוטומציה בוטלה. ניתן לשלוט בהגשה ידנית.');
       } catch (err) {
@@ -970,7 +961,7 @@
       document.querySelectorAll('#weeklyAutomationGroup button').forEach(button =>
         button.setAttribute('aria-pressed', String((button.dataset.value === 'כן') === enabled)));
       const status = document.getElementById('weeklyAutomationStatus');
-      status.textContent = enabled ? 'האוטומציה פעילה. הסגירה והאיפוס מתבצעים אוטומטית כשמישהו נכנס לאתר.' : 'האוטומציה כבויה; השליטה בהגשה ידנית.';
+      status.textContent = enabled ? 'האוטומציה פעילה. הסגירה והאיפוס מתבצעים בתהליך מאובטח ברקע (ייתכן עיכוב של מספר דקות באיפוס).' : 'האוטומציה כבויה; השליטה בהגשה ידנית.';
       if (settings.weeklyAutomationLastEventAt) {
         status.textContent += ' פעולה אחרונה: ' + (settings.weeklyAutomationLastEvent === 'reset' ? 'איפוס ופתיחה' : 'סגירת הגשה') + ' — ' +
           new Date(settings.weeklyAutomationLastEventAt).toLocaleString('he-IL', { timeZone: 'Asia/Jerusalem' });
@@ -986,20 +977,8 @@
       }
     };
 
-    window.updateRequireCodeSetting = async function (value) {
-      try {
-        await set(ref(db, "settings/requireEmployeeCode"), value);
-        showNotification("הגדרת דרישת קוד עובד עודכנה ל: " + value);
-      } catch (err) {
-        showNotification("אירעה שגיאה בעדכון: " + err.message, "שגיאה");
-      }
-    };
-
     onValue(ref(db, "settings/allowScheduleSubmission"), (snapshot) => {
       if (snapshot.exists()) setToggleGroupValue("scheduleSubmissionGroup", snapshot.val());
-    });
-    onValue(ref(db, "settings/requireEmployeeCode"), (snapshot) => {
-      if (snapshot.exists()) setToggleGroupValue("requireEmployeeCodeGroup", snapshot.val());
     });
 
     // --- Toggle Button Helpers ---
@@ -1052,10 +1031,10 @@
       empArray.forEach(([key, emp]) => {
         const tr = document.createElement("tr");
         tr.innerHTML = `
-          <td>${emp.firstName} ${emp.lastName}</td>
-          <td>${emp.type}</td>
-          <td>${emp.student}</td>
-          <td>${emp.code}</td>
+          <td>${escapeHtml(emp.firstName)} ${escapeHtml(emp.lastName)}</td>
+          <td>${escapeHtml(emp.type)}</td>
+          <td>${escapeHtml(emp.student)}</td>
+          <td>${escapeHtml(emp.code)}</td>
           <td>
             <button class="action-btn edit-btn" onclick="openEditEmployeeModal('${key}')">ערוך</button>
             <button class="action-btn delete-btn" onclick="deleteEmployee('${key}')">מחק</button>
@@ -1096,8 +1075,8 @@
 
       const newEmployee = { firstName, lastName, code, type, student };
       try {
-        const data = await push(ref(db, "employees"), newEmployee);
-        const newKey = data.key;
+        const newKey = push(ref(db, 'employees')).key;
+        await saveEmployeeRecord({ db, config: firebaseConfig, id: newKey, employee: newEmployee });
         const specificToggle = document.getElementById("employeeSpecificRulesToggleGroup").getAttribute("data-selected");
 
         if (specificToggle === "כן" && tempEmployeeRules.length > 0) {
@@ -1140,7 +1119,7 @@
 
       const updatedEmployee = { firstName, lastName, code, type, student };
       try {
-        await set(ref(db, "employees/" + currentEditKey), updatedEmployee);
+        await saveEmployeeRecord({ db, config: firebaseConfig, id: currentEditKey, previous: employees[currentEditKey], employee: updatedEmployee });
         showNotification("העובד עודכן בהצלחה!");
         closeEditEmployeeModal();
       } catch (err) {
@@ -1151,8 +1130,7 @@
     window.deleteEmployee = async function (key) {
       if (await showConfirmation("האם אתה בטוח שברצונך למחוק עובד זה? הפעולה אינה הפיכה.")) {
         try {
-          await remove(ref(db, "employees/" + key));
-          await remove(ref(db, "employeeRules/" + key)); // Also delete specific rules
+          await saveEmployeeRecord({ db, config: firebaseConfig, id: key, previous: employees[key] });
           showNotification("העובד נמחק.");
         } catch (err) {
           showNotification("אירעה שגיאה במחיקה: " + err.message, "שגיאה");
