@@ -1,6 +1,6 @@
 # Sidor — authenticated scheduling
 
-Employees first select their name from a public directory containing only names and roles, then enter the matching personal employee code in a modal. A code belonging to another selected name is rejected. The submission form uses a separate in-memory Auth session; retained manager logins never authorize employee submissions. Reloading or finishing requires name/code verification again. Managers sign in with their existing Firebase email and password. Reading application data requires an explicit membership entry; creating an arbitrary Firebase Authentication account grants no access.
+Employees first choose אחמ״ש or קב״ט using the original role buttons, select their name from the filtered list, then enter the matching personal employee code in a modal. The pre-login directory contains only names and roles. A code belonging to another selected name is rejected. The submission form uses a separate in-memory Auth session; retained manager logins never authorize employee submissions. Reloading or finishing requires name/code verification again. Managers sign in with their existing Firebase email and password. Reading application data requires an explicit membership entry; creating an arbitrary Firebase Authentication account grants no access.
 
 ## Permissions
 

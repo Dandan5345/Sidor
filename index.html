@@ -931,14 +931,35 @@
         כניסת מנהל
     </div>
 
-    <section id="loginGate" class="main-container" style="max-width:440px;margin-top:100px">
-        <h1 class="page-title">כניסה לסידור עבודה</h1>
-        <p style="text-align:center">בחר את השם שלך כדי להמשיך.</p>
-        <label for="loginEmployeeSelect">שם העובד</label>
-        <select id="loginEmployeeSelect" class="form-select" disabled>
-            <option value="" selected disabled>טוען שמות עובדים…</option>
-        </select>
-        <p id="directoryError" role="alert" style="color:var(--error-color)"></p>
+    <section id="loginGate" class="main-container">
+        <div class="header-section fade-in">
+            <h1 class="page-title">סידור עבודה</h1>
+            <div class="header-divider"></div>
+            <div class="page-subtitle">מחלקת ביטחון — מלון ממילא</div>
+        </div>
+        <div class="fade-in">
+            <div id="loginRoleDiv">
+                <label class="section-label">סוג תפקיד:</label>
+                <div class="role-buttons">
+                    <label class="role-button" id="loginRoleA">
+                        <input type="radio" name="loginRole" value="אחמ״ש" disabled onchange="handleLoginRoleChange(this);">
+                        אחמ״ש
+                    </label>
+                    <label class="role-button" id="loginRoleB">
+                        <input type="radio" name="loginRole" value="קב״ט" disabled onchange="handleLoginRoleChange(this);">
+                        קב״ט
+                    </label>
+                </div>
+            </div>
+            <div id="loginNameDiv" style="display:none" class="fade-in">
+                <label for="loginEmployeeSelect" class="section-label">שם העובד:</label>
+                <select id="loginEmployeeSelect" class="form-select" disabled>
+                    <option value="" selected disabled>יש לבחור שם מהרשימה</option>
+                </select>
+            </div>
+            <p id="directoryError" role="alert" style="color:var(--error-color)"></p>
+        </div>
+        <div class="footer-text fade-in">מחלקת ביטחון מלון ממילא ©</div>
     </section>
     <div id="employeeLoginModal" class="modal">
         <div class="modal-content">
@@ -1230,11 +1251,33 @@
         const codeModal = document.getElementById('employeeLoginModal');
         const codeInput = document.getElementById('loginEmployeeCode');
         const loginError = document.getElementById('loginError');
+        let publicEmployees = {};
+        let selectedLoginRole = '';
+        window.handleLoginRoleChange = input => {
+            loginAttempt++;
+            selectedLoginRole = input.value;
+            gate.querySelectorAll('.role-button').forEach(label => label.classList.toggle('active', label.contains(input)));
+            codeModal.style.display = 'none';
+            codeInput.value = '';
+            loginError.textContent = '';
+            employeeSelect.innerHTML = '<option value="" selected disabled>יש לבחור שם מהרשימה</option>';
+            const employees = Object.entries(publicEmployees).filter(([, employee]) => employee.type === selectedLoginRole);
+            employees.sort(([,a],[,b]) => `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`, 'he'));
+            for (const [id, employee] of employees) {
+                const option = document.createElement('option');
+                option.value = id;
+                option.textContent = `${employee.firstName} ${employee.lastName}`;
+                employeeSelect.add(option);
+            }
+            employeeSelect.disabled = false;
+            document.getElementById('loginNameDiv').style.display = 'block';
+        };
         main.style.display = 'none';
         document.getElementById('startupLoader').classList.add('hidden');
         let resolveEmployeeLogin;
         const employeeLogin = new Promise(resolve => { resolveEmployeeLogin = resolve; });
         employeeSelect.addEventListener('change', () => {
+            if (!selectedLoginRole || publicEmployees[employeeSelect.value]?.type !== selectedLoginRole) return;
             loginAttempt++;
             codeInput.value = '';
             loginError.textContent = '';
@@ -1255,7 +1298,7 @@
             event.preventDefault();
             const button = document.getElementById('employeeLoginBtn');
             const selectedEmployeeId = employeeSelect.value;
-            if (!selectedEmployeeId || button.disabled) return;
+            if (!selectedEmployeeId || !selectedLoginRole || publicEmployees[selectedEmployeeId]?.type !== selectedLoginRole || button.disabled) return;
             const attempt = ++loginAttempt;
             button.disabled = true;
             loginError.textContent = '';
@@ -1290,15 +1333,8 @@
         if (new URLSearchParams(location.search).has('manager')) window.openAdminModal();
         try {
             // This directory contains names/roles only; credentials and schedules remain private.
-            const directory = (await get(ref(db, 'publicEmployees'))).val() || {};
-            employeeSelect.innerHTML = '<option value="" selected disabled>יש לבחור את השם שלך</option>';
-            for (const [id, employee] of Object.entries(directory).sort(([,a],[,b]) => `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`, 'he'))) {
-                const option = document.createElement('option');
-                option.value = id;
-                option.textContent = `${employee.firstName} ${employee.lastName}`;
-                employeeSelect.add(option);
-            }
-            employeeSelect.disabled = false;
+            publicEmployees = (await get(ref(db, 'publicEmployees'))).val() || {};
+            gate.querySelectorAll('input[name="loginRole"]').forEach(input => { input.disabled = false; });
         } catch {
             document.getElementById('directoryError').textContent = 'לא ניתן לטעון את רשימת השמות. יש לרענן ולנסות שוב.';
         }
@@ -1399,7 +1435,7 @@
             const select = document.getElementById('nameSelect');
             select.value = sessionAccess.employeeId;
             select.disabled = true;
-            document.getElementById('roleDiv').style.display = 'none';
+            document.querySelectorAll('input[name="role"]').forEach(input => { input.disabled = true; });
             await selectAuthenticatedEmployee(sessionAccess.employeeId);
             refreshSubmissionState();
             loader.classList.add('hidden');
