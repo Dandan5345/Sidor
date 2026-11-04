@@ -1,13 +1,13 @@
 # Sidor — authenticated scheduling
 
-Employees sign in with their existing personal employee code. Managers sign in with their existing Firebase email and password. Reading application data requires an explicit membership entry; creating an arbitrary Firebase Authentication account grants no access.
+Employees first select their name from a public directory containing only names and roles, then enter the matching personal employee code in a modal. A code belonging to another selected name is rejected. The submission form uses a separate in-memory Auth session; retained manager logins never authorize employee submissions. Reloading or finishing requires name/code verification again. Managers sign in with their existing Firebase email and password. Reading application data requires an explicit membership entry; creating an arbitrary Firebase Authentication account grants no access.
 
 ## Permissions
 
-- `access/managers/{uid}` is the manager allowlist. Only managers can change membership, employee records, codes, rules or settings, and read/delete all schedules.
+- `access/managers/{uid}` is the manager allowlist. Only managers can change membership, employee records, codes, rules or settings, and read/delete all schedules. Manager credentials cannot create submissions or edit their shifts, preferences, timestamp or employee ID; name/type metadata synchronization remains allowed.
 - `access/employees/{uid}` maps a login to an employee ID. The matching `employees/{employeeId}/authUid` binding must also be current, so removing an employee or rotating a code immediately blocks their previous session.
 - Workers can read only their safe profile, their schedules/history, and shared rules/settings. They can create/update only their own schedule and history while submissions are open. They cannot read the employee/code directory or write settings.
-- All other paths deny access. Anonymous requests and unapproved authenticated accounts are denied.
+- `publicEmployees` contains only first name, last name and role for the pre-login name picker; its schema rejects code/UID fields. All other unlisted paths deny access. Anonymous requests and unapproved authenticated accounts are denied.
 
 The employee code is encoded as a deterministic synthetic email/password for Firebase Authentication. This supports the existing five-digit codes without a paid backend or custom token server. Hashing is an encoding and does not make a short or known code harder to guess. Treat employee codes as passwords. Existing codes were previously public; rotate them through the manager screen if confidentiality is required. Employee edits and code assignments are reserved in a database transaction. Two-minute leases recover interrupted operations; the final transaction checks the lease and operation ID again, preventing stale browsers from committing after takeover.
 

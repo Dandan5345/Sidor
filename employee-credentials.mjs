@@ -12,3 +12,14 @@ export async function employeeCredentials(value) {
 export function escapeHtml(value) {
   return String(value ?? '').replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]);
 }
+export function employeeSelectionSession(selectedEmployeeId, access, user) {
+  if (!selectedEmployeeId || !user?.uid || access?.manager !== false || access.employeeId !== selectedEmployeeId || !access.profile) {
+    throw new Error('מספר העובד אינו תואם לשם שנבחר');
+  }
+  return Object.freeze({ employeeId: selectedEmployeeId, uid: user.uid, profile: Object.freeze({ ...access.profile }) });
+}
+export function assertSubmissionIdentity(session, user, employeeId) {
+  if (!session?.employeeId || !user?.uid || user.uid !== session.uid || employeeId !== session.employeeId) {
+    throw new Error('יש לבחור את השם ולהזין את מספר העובד התואם לפני שליחה');
+  }
+}

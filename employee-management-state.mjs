@@ -19,6 +19,7 @@ export function commitEmployeeChange(state, o, authUid, now) {
     const { firstName, lastName, type, student } = o.employee;
     (state.employees ||= {})[o.id] = { ...o.employee, authUid };
     (state.employeeProfiles ||= {})[o.id] = { firstName, lastName, type, student };
+    (state.publicEmployees ||= {})[o.id] = { firstName, lastName, type };
     ((state.access ||= {}).employees ||= {})[authUid] = o.id;
     for (const schedule of Object.values(state.schedules || {})) if (schedule.employeeId === o.id) {
       schedule.name = `${firstName} ${lastName}`;
@@ -27,6 +28,7 @@ export function commitEmployeeChange(state, o, authUid, now) {
   } else {
     delete state.employees?.[o.id];
     delete state.employeeProfiles?.[o.id];
+    delete state.publicEmployees?.[o.id];
     delete state.employeeRules?.[o.id];
   }
   if (o.previous?.authUid && o.previous.authUid !== authUid) delete state.access?.employees?.[o.previous.authUid];

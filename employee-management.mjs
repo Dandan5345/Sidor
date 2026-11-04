@@ -2,7 +2,7 @@ import { ref, get, runTransaction, onValue } from 'https://www.gstatic.com/fireb
 import { provisionEmployee } from './auth-session.mjs';
 import { employeeCredentials } from './employee-credentials.mjs';
 
-import { reserveEmployeeChange, commitEmployeeChange, releaseEmployeeChange } from './employee-management-state.mjs';
+import { reserveEmployeeChange, commitEmployeeChange, releaseEmployeeChange } from './employee-management-state.mjs?v=20261104-name-code';
 
 // Managers reserve an employee and a code in one transaction. Expired reservations
 // can be recovered; the final transaction checks the operation ID and lease again,

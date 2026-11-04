@@ -933,14 +933,28 @@
 
     <section id="loginGate" class="main-container" style="max-width:440px;margin-top:100px">
         <h1 class="page-title">כניסה לסידור עבודה</h1>
-        <p style="text-align:center">יש להזין את מספר העובד האישי כדי להיכנס למערכת.</p>
-        <form id="employeeLoginForm">
-            <label for="loginEmployeeCode">מספר עובד</label>
-            <input id="loginEmployeeCode" type="password" inputmode="numeric" autocomplete="current-password" required style="width:100%;box-sizing:border-box;padding:14px;border-radius:12px;margin:12px 0">
-            <p id="loginError" role="alert" style="color:var(--error-color)"></p>
-            <button id="employeeLoginBtn" class="confirm-btn" style="width:100%;padding:14px;border-radius:12px">כניסה</button>
-        </form>
+        <p style="text-align:center">בחר את השם שלך כדי להמשיך.</p>
+        <label for="loginEmployeeSelect">שם העובד</label>
+        <select id="loginEmployeeSelect" class="form-select" disabled>
+            <option value="" selected disabled>טוען שמות עובדים…</option>
+        </select>
+        <p id="directoryError" role="alert" style="color:var(--error-color)"></p>
     </section>
+    <div id="employeeLoginModal" class="modal">
+        <div class="modal-content">
+            <h2>אימות עובד</h2>
+            <p id="selectedEmployeeName" style="text-align:center"></p>
+            <form id="employeeLoginForm">
+                <label for="loginEmployeeCode">מספר העובד שלך</label>
+                <input id="loginEmployeeCode" type="password" inputmode="numeric" autocomplete="off" required style="width:100%;box-sizing:border-box;padding:14px;border-radius:12px;margin:12px 0">
+                <p id="loginError" role="alert" style="color:var(--error-color)"></p>
+                <div class="modal-buttons">
+                    <button id="cancelEmployeeLogin" type="button" class="cancel-btn">ביטול</button>
+                    <button id="employeeLoginBtn" type="submit" class="confirm-btn">אישור והמשך</button>
+                </div>
+            </form>
+        </div>
+    </div>
     <button id="sessionLogout" onclick="logoutSidor()" style="display:none;position:fixed;left:16px;top:16px;z-index:1000">התנתקות</button>
 
     <div class="main-container" style="display:none">
@@ -1174,9 +1188,9 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
         import { getDatabase, ref, push, onValue, set, get, child, remove, runTransaction, query, orderByChild, equalTo, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-database.js";
-        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-auth.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, setPersistence, browserSessionPersistence, inMemoryPersistence } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-auth.js";
 
-        import { employeeCredentials, escapeHtml } from './employee-credentials.mjs';
+        import { employeeCredentials, escapeHtml, employeeSelectionSession, assertSubmissionIdentity } from './employee-credentials.mjs?v=20261104-name-code';
         import { accessForUser } from './auth-session.mjs';
 
         const firebaseConfig = {
@@ -1190,60 +1204,105 @@
             databaseURL: "https://sidoravoda111-default-rtdb.europe-west1.firebasedatabase.app/"
         };
 
-        const app = initializeApp(firebaseConfig);
+        // The employee form uses its own in-memory Auth instance. A retained manager
+        // session can open management pages, but can never authorize this form.
+        const managerApp = initializeApp(firebaseConfig);
+        const managerAuth = getAuth(managerApp);
+        const managerDb = getDatabase(managerApp);
+        const app = initializeApp(firebaseConfig, 'employee-form');
         const db = getDatabase(app);
         const auth = getAuth(app);
-        await setPersistence(auth, browserSessionPersistence);
+        await Promise.all([setPersistence(auth, inMemoryPersistence), setPersistence(managerAuth, browserSessionPersistence)]);
+        await signOut(auth);
+        let loggingOut = false;
+        let sessionUid;
+        let loginAttempt = 0;
         window.openAdminModal = () => document.getElementById('adminModal').style.display = 'block';
         window.closeAdminModal = () => document.getElementById('adminModal').style.display = 'none';
-        window.logoutSidor = async () => { await signOut(auth); location.reload(); };
+        window.logoutSidor = async () => {
+            loggingOut = true;
+            await Promise.all([signOut(auth), signOut(managerAuth)]);
+            location.replace('index.html');
+        };
         const gate = document.getElementById('loginGate');
         const main = document.querySelector('div.main-container');
+        const employeeSelect = document.getElementById('loginEmployeeSelect');
+        const codeModal = document.getElementById('employeeLoginModal');
+        const codeInput = document.getElementById('loginEmployeeCode');
+        const loginError = document.getElementById('loginError');
         main.style.display = 'none';
         document.getElementById('startupLoader').classList.add('hidden');
-        const loginError = document.getElementById('loginError');
+        let resolveEmployeeLogin;
+        const employeeLogin = new Promise(resolve => { resolveEmployeeLogin = resolve; });
+        employeeSelect.addEventListener('change', () => {
+            loginAttempt++;
+            codeInput.value = '';
+            loginError.textContent = '';
+            document.getElementById('selectedEmployeeName').textContent = employeeSelect.selectedOptions[0]?.textContent || '';
+            codeModal.style.display = 'block';
+            codeInput.focus();
+        });
+        document.getElementById('cancelEmployeeLogin').addEventListener('click', () => {
+            loginAttempt++;
+            codeModal.style.display = 'none';
+            employeeSelect.value = '';
+            codeInput.value = '';
+        });
+        onAuthStateChanged(auth, user => {
+            if (!loggingOut && sessionUid && user?.uid !== sessionUid) location.reload();
+        });
         document.getElementById('employeeLoginForm').addEventListener('submit', async event => {
             event.preventDefault();
             const button = document.getElementById('employeeLoginBtn');
+            const selectedEmployeeId = employeeSelect.value;
+            if (!selectedEmployeeId || button.disabled) return;
+            const attempt = ++loginAttempt;
             button.disabled = true;
             loginError.textContent = '';
             try {
-                const credentials = await employeeCredentials(document.getElementById('loginEmployeeCode').value);
-                await signInWithEmailAndPassword(auth, credentials.email, credentials.password);
+                const credentials = await employeeCredentials(codeInput.value);
+                const result = await signInWithEmailAndPassword(auth, credentials.email, credentials.password);
+                const access = await accessForUser(db, result.user);
+                const verified = employeeSelectionSession(selectedEmployeeId, access, result.user);
+                if (attempt !== loginAttempt || employeeSelect.value !== selectedEmployeeId) throw new Error('Selection changed');
+                sessionUid = result.user.uid;
+                codeInput.value = '';
+                codeModal.style.display = 'none';
+                resolveEmployeeLogin(verified);
             } catch {
-                loginError.textContent = 'לא ניתן להתחבר. בדוק את מספר העובד ונסה שוב.';
+                await signOut(auth);
+                loginError.textContent = 'מספר העובד אינו תואם לשם שנבחר. יש לבדוק ולנסות שוב.';
             } finally { button.disabled = false; }
         });
         document.getElementById('adminLoginBtn').addEventListener('click', async () => {
             const button = document.getElementById('adminLoginBtn');
             button.disabled = true;
             try {
-                const result = await signInWithEmailAndPassword(auth, document.getElementById('adminEmail').value.trim(), document.getElementById('adminPassword').value);
-                const access = await accessForUser(db, result.user);
+                const result = await signInWithEmailAndPassword(managerAuth, document.getElementById('adminEmail').value.trim(), document.getElementById('adminPassword').value);
+                const access = await accessForUser(managerDb, result.user);
                 if (!access?.manager) throw new Error('not manager');
                 location.href = 'manager.html';
             } catch {
-                await signOut(auth);
+                await signOut(managerAuth);
                 alert('שגיאה בהתחברות. ודא שפרטי המנהל נכונים.');
             } finally { button.disabled = false; }
         });
         if (new URLSearchParams(location.search).has('manager')) window.openAdminModal();
-        let sessionUid;
-        const sessionAccess = await new Promise(resolve => {
-            onAuthStateChanged(auth, async user => {
-                if (sessionUid && user?.uid !== sessionUid) { location.reload(); return; }
-                if (!user) return;
-                try {
-                    const access = await accessForUser(db, user);
-                    if (!access) throw new Error('not a member');
-                    sessionUid = user.uid;
-                    resolve(access);
-                } catch {
-                    loginError.textContent = 'לחשבון אין הרשאה למערכת. פנה למנהל.';
-                    await signOut(auth);
-                }
-            });
-        });
+        try {
+            // This directory contains names/roles only; credentials and schedules remain private.
+            const directory = (await get(ref(db, 'publicEmployees'))).val() || {};
+            employeeSelect.innerHTML = '<option value="" selected disabled>יש לבחור את השם שלך</option>';
+            for (const [id, employee] of Object.entries(directory).sort(([,a],[,b]) => `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`, 'he'))) {
+                const option = document.createElement('option');
+                option.value = id;
+                option.textContent = `${employee.firstName} ${employee.lastName}`;
+                employeeSelect.add(option);
+            }
+            employeeSelect.disabled = false;
+        } catch {
+            document.getElementById('directoryError').textContent = 'לא ניתן לטעון את רשימת השמות. יש לרענן ולנסות שוב.';
+        }
+        const sessionAccess = await employeeLogin;
         gate.style.display = 'none';
         main.style.display = '';
         document.getElementById('sessionLogout').style.display = 'block';
@@ -1269,13 +1328,13 @@
         const loaded = name => initialLoads[name] ||= (() => { let done; const promise = new Promise(resolve => done = resolve); promise.done = done; return promise; })();
         const markLoaded = name => loaded(name).done();
         ["employees", "schedules", "rules", "settings"].forEach(loaded);
-        const employeesRef = ref(db, sessionAccess.manager ? 'employees' : `employeeProfiles/${sessionAccess.employeeId}`);
+        const employeesRef = ref(db, `employeeProfiles/${sessionAccess.employeeId}`);
         onValue(employeesRef, snapshot => {
-            employeesData = sessionAccess.manager ? (snapshot.val() || {}) : { [sessionAccess.employeeId]: snapshot.val() || {} };
+            employeesData = { [sessionAccess.employeeId]: snapshot.val() || {} };
             if (currentEmployeeId && employeesData[currentEmployeeId]) currentEmployeeData = employeesData[currentEmployeeId];
             markLoaded('employees');
         }, () => { systemBlocked = true; markLoaded('employees'); });
-        const schedulesRef = sessionAccess.manager ? ref(db, 'schedules') : query(ref(db, 'schedules'), orderByChild('employeeId'), equalTo(sessionAccess.employeeId));
+        const schedulesRef = query(ref(db, 'schedules'), orderByChild('employeeId'), equalTo(sessionAccess.employeeId));
         onValue(schedulesRef, (snapshot) => {
             submittedSchedules = snapshot.val() || {};
             markLoaded("schedules");
@@ -1292,7 +1351,7 @@
 
         let submissionsAllowed = false;
         let systemBlocked = false;
-        const BLOCKED_MESSAGE = "יש בעיה במערכת. אנא בקש מהמנהל למחוק את סידורי העבודה של השבוע הקודם על מנת שהמערכת תעבוד.";
+        const BLOCKED_MESSAGE = "לא ניתן לאמת את ההרשאה לטופס. יש להתנתק ולבחור מחדש את השם ומספר העובד.";
         let submissionSettings = {};
         let settingsLoaded = false;
         let serverTimeOffset = 0;
@@ -1332,10 +1391,20 @@
         async function startup() {
             const loader = document.getElementById('startupLoader');
             await Promise.all(Object.values(initialLoads));
+            const employee = employeesData[sessionAccess.employeeId];
+            const role = Array.from(document.querySelectorAll('input[name="role"]')).find(input => input.value === employee?.type);
+            if (!role || !employee) { systemBlocked = true; refreshSubmissionState(); loader.classList.add('hidden'); return; }
+            role.checked = true;
+            window.handleRoleChange(role);
+            const select = document.getElementById('nameSelect');
+            select.value = sessionAccess.employeeId;
+            select.disabled = true;
+            document.getElementById('roleDiv').style.display = 'none';
+            await selectAuthenticatedEmployee(sessionAccess.employeeId);
             refreshSubmissionState();
             loader.classList.add('hidden');
         }
-        startup();
+        startup().catch(() => { systemBlocked = true; refreshSubmissionState(); document.getElementById('startupLoader').classList.add('hidden'); });
         setInterval(refreshSubmissionState, 1000);
         document.addEventListener('visibilitychange', refreshSubmissionState);
 
@@ -1360,22 +1429,7 @@
         }
 
         function resetForm() {
-            document.getElementById("nameDiv").style.display = "none";
-            document.getElementById("shiftsDiv").style.display = "none";
-            document.getElementById("previousSchedulesDiv").style.display = "none";
-
-            document.querySelectorAll('.role-button').forEach(btn => btn.classList.remove('active'));
-            document.querySelectorAll('input[name="role"]').forEach(radio => radio.checked = false);
-            document.getElementById("nameSelect").value = "";
-
-            document.querySelectorAll('input[name="shift"]').forEach(checkbox => checkbox.checked = false);
-            document.getElementById("preferences").value = "";
-
-            currentEmployeeId = "";
-            currentEmployeeData = {};
-            existingSchedule = null;
-            currentScheduleKey = null;
-            pendingSubmission = null;
+            window.logoutSidor();
         }
 
         // --- טיפול בטופס ---
@@ -1405,9 +1459,9 @@
             document.getElementById("previousSchedulesDiv").style.display = "none";
         };
 
-        document.getElementById("nameSelect").addEventListener("change", async () => {
-            currentEmployeeId = document.getElementById("nameSelect").value;
-            if (!currentEmployeeId) return;
+        async function selectAuthenticatedEmployee(employeeId) {
+            assertSubmissionIdentity(sessionAccess, auth.currentUser, employeeId);
+            currentEmployeeId = sessionAccess.employeeId;
 
             currentEmployeeData = employeesData[currentEmployeeId];
             const fullName = `${currentEmployeeData.firstName} ${currentEmployeeData.lastName}`;
@@ -1424,6 +1478,10 @@
             employeeRulesData = rulesSnapshot.val() || null;
 
             handlePostAuthentication();
+        }
+        document.getElementById('nameSelect').addEventListener('change', async () => {
+            try { await selectAuthenticatedEmployee(document.getElementById('nameSelect').value); }
+            catch { document.getElementById('nameSelect').value = sessionAccess.employeeId; }
         });
 
         function handlePostAuthentication() {
@@ -1493,6 +1551,7 @@
         });
 
         function validateAndPreview() {
+            assertSubmissionIdentity(sessionAccess, auth.currentUser, currentEmployeeId);
             const roleInput = document.querySelector('input[name="role"]:checked');
             if (!roleInput) { alert("אנא בחר תפקיד."); return; }
             if (!currentEmployeeId) { alert("אנא בחר שם."); return; }
@@ -1548,7 +1607,7 @@
 
             const scheduleString = shifts.map(s => s.value).join(", ");
             pendingSubmission = {
-                employeeId: currentEmployeeId,
+                employeeId: sessionAccess.employeeId,
                 role: roleInput.value,
                 name: `${currentEmployeeData.firstName} ${currentEmployeeData.lastName}`,
                 schedule: scheduleString,
@@ -1566,6 +1625,11 @@
             btn.innerHTML = 'שולח נתונים <svg width="24" height="24" viewBox="0 0 24 24" style="animation: spin 1s linear infinite"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
             try {
+                assertSubmissionIdentity(sessionAccess, auth.currentUser, currentEmployeeId);
+                if (pendingSubmission.employeeId !== sessionAccess.employeeId) throw new Error('זהות ההגשה אינה תואמת לעובד שאומת');
+                const access = await accessForUser(db, auth.currentUser);
+                const verified = employeeSelectionSession(sessionAccess.employeeId, access, auth.currentUser);
+                currentEmployeeData = verified.profile;
                 // Recheck after the preview, including when this tab was left open at the deadline.
                 submissionSettings = (await get(ref(db, "settings"))).val() || {};
                 refreshSubmissionState();
@@ -1582,7 +1646,7 @@
                 const scheduleRef = ref(db, `schedules/${scheduleKey}`);
                 await set(scheduleRef, pendingSubmission);
 
-                const historyRef = ref(db, `scheduleHistory/${currentEmployeeId}`);
+                const historyRef = ref(db, `scheduleHistory/${sessionAccess.employeeId}`);
                 const historySnapshot = await get(historyRef);
                 let currentHistory = historySnapshot.val() || {};
                 const savedSubmission = (await get(scheduleRef)).val();
@@ -1808,6 +1872,7 @@
         window.submitViewScheduleSelection = function () {
             const selectedEmployeeId = document.getElementById('viewEmployeeSelect').value;
             if (!selectedEmployeeId) return alert('יש לבחור שם מהרשימה');
+            assertSubmissionIdentity(sessionAccess, auth.currentUser, selectedEmployeeId);
 
             const employee = employeesData[selectedEmployeeId];
             const fullName = `${employee.firstName} ${employee.lastName}`;

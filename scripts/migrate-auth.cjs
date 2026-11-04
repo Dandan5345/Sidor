@@ -55,6 +55,7 @@ async function migrate({ token, managerUids, backupPath, apply = false, prepareO
   if (prepareOnly) { console.log(`Prepared and verified ${employees.length} logins; database content is unchanged.`); return; }
   updates.access = { managers: Object.fromEntries(managerUids.map(uid => [uid, true])), employees: employeeAccess };
   updates.employeeProfiles = profiles;
+  updates.publicEmployees = Object.fromEntries(Object.entries(profiles).map(([id, {firstName,lastName,type}]) => [id,{firstName,lastName,type}]));
   for (const [key, schedule] of Object.entries(state.schedules || {})) updates[`schedules/${key}/employeeId`] = names.get(schedule.name);
   for (const [id, history] of Object.entries(state.scheduleHistory || {})) for (const timestamp of Object.keys(history || {})) updates[`scheduleHistory/${id}/${timestamp}/employeeId`] = id;
   const window = submissionWindow(Date.now());
