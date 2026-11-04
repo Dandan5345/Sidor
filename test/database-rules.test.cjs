@@ -109,3 +109,18 @@ test('manager atomic employee edits retain schedules/history and satisfy product
   await assertSucceeds(set(ref(db('worker'), 'scheduleHistory/one'), state.scheduleHistory.one));
   stop();
 });
+test('retained manager credentials cannot submit or overwrite employee shift content', async () => {
+  const d = db('manager');
+  await assertFails(set(ref(d, 'schedules/manager-submission'), schedule('two')));
+  await assertFails(update(ref(d, 'schedules/a'), { schedule: 'שני-ערב' }));
+  await assertFails(update(ref(d, 'schedules/a'), { preferences: 'submitted without employee code' }));
+  await assertFails(update(ref(d, 'schedules/a'), { name: 'Second Employee' }));
+  await assertSucceeds(remove(ref(d, 'schedules/a')));
+});
+test('public name directory exposes only names and roles, with no codes or private data', async () => {
+  await env.withSecurityRulesDisabled(async c => set(ref(c.database(), 'publicEmployees'), { one: { firstName: 'First', lastName: 'Employee', type: 'staff' } }));
+  await assertSucceeds(get(ref(db(), 'publicEmployees')));
+  await assertFails(set(ref(db(), 'publicEmployees/one/code'), '12345'));
+  await assertFails(set(ref(db('manager'), 'publicEmployees/one/code'), '12345'));
+  await assertFails(get(ref(db(), 'employees/one/code')));
+});
