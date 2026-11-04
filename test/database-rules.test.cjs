@@ -124,3 +124,11 @@ test('public name directory exposes only names and roles, with no codes or priva
   await assertFails(set(ref(db('manager'), 'publicEmployees/one/code'), '12345'));
   await assertFails(get(ref(db(), 'employees/one/code')));
 });
+test('anyone can read only the public submission status flags', async () => {
+  for (const path of ['settings/allowScheduleSubmission', 'settings/weeklyAutomationEnabled']) {
+    await assertSucceeds(get(ref(db(), path)));
+    await assertFails(set(ref(db(), path), 'כן'));
+    await assertFails(set(ref(db('worker'), path), 'כן'));
+  }
+  for (const path of ['settings', 'settings/weeklyNextCloseAt', 'settings/weeklyWindowOpensAt']) await assertFails(get(ref(db(), path)));
+});

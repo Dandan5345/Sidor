@@ -40,7 +40,13 @@
     },
     "settings": {
       ".read": "(auth != null && root.child('access/managers').child(auth.uid).val() === true) || (auth != null && root.child('access/employees').child(auth.uid).isString() && root.child('employees').child(root.child('access/employees').child(auth.uid).val()).child('authUid').val() === auth.uid)",
-      ".write": "auth != null && root.child('access/managers').child(auth.uid).val() === true"
+      ".write": "auth != null && root.child('access/managers').child(auth.uid).val() === true",
+      "allowScheduleSubmission": {
+        ".read": true
+      },
+      "weeklyAutomationEnabled": {
+        ".read": true
+      }
     },
     "rules": {
       ".read": "(auth != null && root.child('access/managers').child(auth.uid).val() === true) || (auth != null && root.child('access/employees').child(auth.uid).isString() && root.child('employees').child(root.child('access/employees').child(auth.uid).val()).child('authUid').val() === auth.uid)",

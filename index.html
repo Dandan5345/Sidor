@@ -501,7 +501,7 @@
         }
 
         /* --- הודעת חסימת הגשה ולחצן צפייה --- */
-        #submissionDisabledMessage {
+        #submissionDisabledMessage, #gateClosedMessage {
             display: none;
             text-align: center;
             padding: 22px 20px;
@@ -516,7 +516,7 @@
             border: 1px solid rgba(255, 255, 255, 0.15);
         }
 
-        #viewSubmittedScheduleBtn {
+        #viewSubmittedScheduleBtn, #gateViewScheduleBtn {
             display: none;
             margin: 0 auto 28px auto;
             padding: 15px 30px;
@@ -533,7 +533,7 @@
             letter-spacing: 0.3px;
         }
         
-        #viewSubmittedScheduleBtn:hover {
+        #viewSubmittedScheduleBtn:hover, #gateViewScheduleBtn:hover {
             background-color: var(--gold-primary);
             color: #fff;
             transform: translateY(-2px);
@@ -874,13 +874,13 @@
                 font-size: 0.78rem;
             }
 
-            #submissionDisabledMessage {
+            #submissionDisabledMessage, #gateClosedMessage {
                 font-size: 1.05rem;
                 padding: 16px 14px;
                 border-radius: 14px;
             }
 
-            #viewSubmittedScheduleBtn {
+            #viewSubmittedScheduleBtn, #gateViewScheduleBtn {
                 padding: 12px 24px;
                 font-size: 1.05rem;
             }
@@ -968,7 +968,7 @@
             #loginEmployeeCode { font-size: 1.1rem; min-height: 48px; }
         }
         @media (hover: none) {
-            .shifts-container tr.day-row:hover, .submit-btn:hover, .modal-buttons .confirm-btn:hover, #viewSubmittedScheduleBtn:hover { transform: none; }
+            .shifts-container tr.day-row:hover, .submit-btn:hover, .modal-buttons .confirm-btn:hover, #viewSubmittedScheduleBtn:hover, #gateViewScheduleBtn:hover { transform: none; }
             .role-button:not(.active):hover { background: transparent; color: var(--muted-text); }
         }
         @media (prefers-reduced-motion: reduce) {
@@ -998,7 +998,11 @@
             <div class="header-divider"></div>
             <div class="page-subtitle">מחלקת ביטחון — מלון ממילא</div>
         </div>
-        <div class="selection-card fade-in">
+        <div id="gateClosedMessage" role="status"></div>
+        <button type="button" id="gateViewScheduleBtn">
+            צפייה בסידור שנשלח
+        </button>
+        <div id="loginCard" class="selection-card fade-in" style="display:none">
             <div id="loginRoleDiv">
                 <label class="section-label">סוג תפקיד:</label>
                 <div class="role-buttons">
@@ -1410,6 +1414,48 @@
             } finally { button.disabled = false; }
         });
         if (new URLSearchParams(location.search).has('manager')) window.openAdminModal();
+
+        // --- בדיקה בכניסה לאתר: האם הגשת הסידור פתוחה או סגורה (לפני בחירת תפקיד/שם/מספר עובד) ---
+        // Only these two public status flags are readable before login; the rest of /settings stays private.
+        const gateStatus = { allow: undefined, automation: false, offset: 0, loaded: { allow: false, automation: false } };
+        let gateViewMode = false;
+        let resolveGateStatus;
+        const gateStatusReady = new Promise(resolve => { resolveGateStatus = resolve; });
+        const gateClosedMessage = document.getElementById('gateClosedMessage');
+        const gateViewButton = document.getElementById('gateViewScheduleBtn');
+        const loginCard = document.getElementById('loginCard');
+        function gateSubmissionClosed() {
+            const closedByTime = gateStatus.automation && SidorAutomation.isSubmissionWindowClosed(new Date(Date.now() + gateStatus.offset));
+            return { closed: gateStatus.allow === 'לא' || gateStatus.allow === false || closedByTime, closedByTime };
+        }
+        function refreshGate() {
+            if (!gateStatus.loaded.allow || !gateStatus.loaded.automation || sessionUid) return;
+            resolveGateStatus();
+            const { closed, closedByTime } = gateSubmissionClosed();
+            gateClosedMessage.textContent = closedByTime
+                ? 'ההגשה נסגרה ביום שלישי ב־14:00 ותיפתח מחדש ביום שישי ב־23:50 (שעון ישראל).'
+                : 'זמן הגשת הסידור הסתיים.';
+            gateClosedMessage.style.display = closed ? 'block' : 'none';
+            gateViewButton.style.display = closed && !gateViewMode ? 'block' : 'none';
+            loginCard.style.display = !closed || gateViewMode ? '' : 'none';
+            if (!closed) gateViewMode = false;
+        }
+        gateViewButton.addEventListener('click', () => {
+            gateViewMode = true;
+            refreshGate();
+            gate.querySelector('input[name="loginRole"]:not(:disabled)')?.focus({ preventScroll: true });
+        });
+        const gateStatusError = () => {
+            // If the status cannot be read, fall back to the login; the form re-checks after login.
+            gateStatus.loaded.allow = gateStatus.loaded.automation = true;
+            gateStatus.allow = undefined; gateStatus.automation = false;
+            refreshGate();
+        };
+        onValue(ref(db, 'settings/allowScheduleSubmission'), snapshot => { gateStatus.allow = snapshot.val(); gateStatus.loaded.allow = true; refreshGate(); }, gateStatusError);
+        onValue(ref(db, 'settings/weeklyAutomationEnabled'), snapshot => { gateStatus.automation = snapshot.val() === true; gateStatus.loaded.automation = true; refreshGate(); }, gateStatusError);
+        onValue(ref(db, '.info/serverTimeOffset'), snapshot => { gateStatus.offset = snapshot.val() || 0; refreshGate(); });
+        const gateTimer = setInterval(refreshGate, 1000);
+
         try {
             // This directory contains names/roles only; credentials and schedules remain private.
             publicEmployees = (await get(ref(db, 'publicEmployees'))).val() || {};
@@ -1417,6 +1463,8 @@
         } catch {
             document.getElementById('directoryError').textContent = 'לא ניתן לטעון את רשימת השמות. יש לרענן ולנסות שוב.';
         }
+        await Promise.race([gateStatusReady, new Promise(resolve => setTimeout(resolve, 8000))]);
+        if (!gateStatus.loaded.allow || !gateStatus.loaded.automation) gateStatusError();
         document.getElementById('startupLoader').classList.add('hidden');
         const sessionAccess = await employeeLogin;
 
@@ -1520,9 +1568,15 @@
             document.getElementById('sessionLogout').style.display = 'block';
             codeModal.style.display = 'none';
             document.body.classList.remove('employee-login-open');
+            clearInterval(gateTimer);
             formReady = true;
             refreshSubmissionState();
             handlePostAuthentication();
+            if (gateViewMode && !submissionsAllowed) {
+                document.getElementById('viewSubmittedScheduleBtn').click();
+                document.getElementById('viewEmployeeSelect').value = sessionAccess.employeeId;
+                window.submitViewScheduleSelection();
+            }
             const existingDialog = document.getElementById('existingScheduleModal');
             const focusTarget = existingDialog.style.display === 'block' ? existingDialog.querySelector('button') : main.querySelector('h1');
             if (focusTarget.tagName === 'H1') focusTarget.tabIndex = -1;
