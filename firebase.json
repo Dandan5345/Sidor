@@ -1,8 +1,32 @@
 {
-  "database": { "rules": "database.rules.json" },
-  "emulators": { "database": { "port": 9000 }, "ui": { "enabled": false } },
+  "database": {
+    "rules": "database.rules.json"
+  },
+  "emulators": {
+    "database": {
+      "port": 9000
+    },
+    "ui": {
+      "enabled": false
+    }
+  },
   "hosting": {
     "public": ".",
-    "ignore": ["firebase.json", "database.rules.json", ".*", "node_modules/**", "test/**", "scripts/**", "package*.json", "README.md", "functions/test/**", "functions/package.json", "*-debug.log"]
+    "ignore": [
+      "firebase.json",
+      "database.rules.json",
+      ".*",
+      "node_modules/**",
+      "test/**",
+      "scripts/**",
+      "package*.json",
+      "README.md",
+      "functions/test/**",
+      "functions/package.json",
+      "*-debug.log",
+      ".git/**",
+      ".firebase/**",
+      "**/.*"
+    ]
   }
 }
